@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Home",
+    "collection": "Shop",
+    "about": "Story",
+    "cta": "Shop now"
+  },
+  "hero": {
+    "eyebrow": "SS25 — New Drops",
+    "headline": "Verano\nExotico.",
+    "subline": "Fashion from another world. Limited pieces, no repeats.",
+    "cta_primary": "Enter the shop",
+    "cta_secondary": "Our story"
+  },
+  "collection": {
+    "title": "Shop",
+    "subtitle": "Browse all pieces",
+    "filter_all": "All",
+    "filter_tops": "Tops",
+    "filter_bottoms": "Bottoms",
+    "view_product": "View"
+  },
+  "product": {
+    "add_to_cart": "Add to cart",
+    "size_guide": "Size guide",
+    "details": "Details",
+    "material": "Material",
+    "care": "Care",
+    "measurements": "Measurements",
+    "size": "Size",
+    "color": "Colour",
+    "rotate_hint": "Drag to rotate",
+    "sourced": "Curated & shipped from international sources",
+    "shipping": "Shipping in 5–14 business days"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "no_reviews": "No reviews yet. Be the first!",
+    "form_title": "Leave a review",
+    "name_label": "Your name",
+    "name_placeholder": "e.g. Lena M.",
+    "rating_label": "Rating",
+    "comment_label": "Comment",
+    "comment_placeholder": "How does it fit? How's the fabric?",
+    "submit": "Submit",
+    "submitted": "Thank you for your review!",
+    "rating_stars": "out of 5 stars",
+    "verified": "Verified purchase"
+  },
+  "about": {
+    "title": "Verano Exotico",
+    "subtitle": "The Story",
+    "body": "Verano Exotico is not a label — it's an attitude. We curate fashion pieces from around the world, bring them to you, and charge a margin that keeps us running. No BS prices. Just good gear.",
+    "values_title": "What drives us",
+    "value_quality": "Quality",
+    "value_quality_desc": "Every piece is hand-picked. No throwaway garbage.",
+    "value_sustainability": "Curated",
+    "value_sustainability_desc": "We find the best pieces. You wear them.",
+    "value_design": "Authentic",
+    "value_design_desc": "No fake logos. Real style."
+  },
+  "footer": {
+    "tagline": "Fashion. No apologies.",
+    "links_legal": "Imprint",
+    "links_privacy": "Privacy",
+    "copyright": "© 2025 Verano Exotico. All rights reserved."
+  },
+  "meta": {
+    "home_title": "Verano Exotico — Fashion",
+    "home_description": "Curated fashion. Limited drops. No BS.",
+    "collection_title": "Shop — Verano Exotico",
+    "about_title": "Story — Verano Exotico"
+  }
+}

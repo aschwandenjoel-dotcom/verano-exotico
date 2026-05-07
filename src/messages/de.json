@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Start",
+    "collection": "Shop",
+    "about": "Story",
+    "cta": "Jetzt shoppen"
+  },
+  "hero": {
+    "eyebrow": "SS25 — Neue Drops",
+    "headline": "Verano\nExotico.",
+    "subline": "Mode aus einer anderen Welt. Limitierte Stücke, keine Wiederholung.",
+    "cta_primary": "Shop betreten",
+    "cta_secondary": "Unsere Story"
+  },
+  "collection": {
+    "title": "Shop",
+    "subtitle": "Alle Stücke entdecken",
+    "filter_all": "Alle",
+    "filter_tops": "Tops",
+    "filter_bottoms": "Hosen",
+    "view_product": "Ansehen"
+  },
+  "product": {
+    "add_to_cart": "In den Warenkorb",
+    "size_guide": "Grössentabelle",
+    "details": "Details",
+    "material": "Material",
+    "care": "Pflege",
+    "measurements": "Maße",
+    "size": "Grösse",
+    "color": "Farbe",
+    "rotate_hint": "Ziehen zum Drehen",
+    "sourced": "Kuratiert & versandt aus internationalen Quellen",
+    "shipping": "Versand in 5–14 Werktagen"
+  },
+  "reviews": {
+    "title": "Bewertungen",
+    "no_reviews": "Noch keine Bewertungen. Sei die Erste!",
+    "form_title": "Bewertung hinterlassen",
+    "name_label": "Dein Name",
+    "name_placeholder": "z. B. Lena M.",
+    "rating_label": "Bewertung",
+    "comment_label": "Kommentar",
+    "comment_placeholder": "Wie sitzt es? Wie ist der Stoff?",
+    "submit": "Absenden",
+    "submitted": "Danke für deine Bewertung!",
+    "rating_stars": "von 5 Sternen",
+    "verified": "Bestätigter Kauf"
+  },
+  "about": {
+    "title": "Verano Exotico",
+    "subtitle": "Die Story",
+    "body": "Verano Exotico ist kein Label — es ist eine Einstellung. Wir kuratieren Mode-Stücke aus der ganzen Welt, bringen sie zu dir und setzen eine Marge, die es uns erlaubt, weiterzumachen. Keine Bullshit-Preise. Nur gute Ware.",
+    "values_title": "Was uns bewegt",
+    "value_quality": "Qualität",
+    "value_quality_desc": "Jedes Stück wird handverlesen. Kein Wegwerfkram.",
+    "value_sustainability": "Kuratiert",
+    "value_sustainability_desc": "Wir suchen die besten Stücke, du trägst sie.",
+    "value_design": "Authentisch",
+    "value_design_desc": "Keine gefakten Logos. Echter Stil."
+  },
+  "footer": {
+    "tagline": "Mode. Keine Entschuldigungen.",
+    "links_legal": "Impressum",
+    "links_privacy": "Datenschutz",
+    "copyright": "© 2025 Verano Exotico. Alle Rechte vorbehalten."
+  },
+  "meta": {
+    "home_title": "Verano Exotico — Mode",
+    "home_description": "Kuratierte Mode. Limitierte Drops. Kein Bullshit.",
+    "collection_title": "Shop — Verano Exotico",
+    "about_title": "Story — Verano Exotico"
+  }
+}
