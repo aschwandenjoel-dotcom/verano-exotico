@@ -1,5 +1,17 @@
 export type Locale = "de" | "en";
 
+export interface CartItem {
+  id: string;
+  productSlug: string;
+  name: string;
+  price: number;
+  image?: string;
+  color?: string;
+  colorName?: string;
+  size?: string;
+  quantity: number;
+}
+
 export interface Review {
   id: string;
   productSlug: string;
@@ -19,6 +31,10 @@ export interface Product {
   colorNames?: { de: string[]; en: string[] };
   sizes?: string[];
   measurements?: { de: string; en: string };
+  sizeChart?: {
+    columns: string[];
+    rows: Array<{ size: string; eu: string; cm: number[]; in: number[] }>;
+  };
   images?: string[];
   description: { de: string; en: string };
   material: { de: string; en: string };

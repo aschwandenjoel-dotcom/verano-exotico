@@ -15,9 +15,7 @@ export const products: Product[] = [
     },
     sizes: ["One Size"],
     images: [
-      "/products/neve-turtleneck-1.webp",
-      "/products/neve-turtleneck-2.webp",
-      "/products/neve-turtleneck-3.webp",
+      "/products/neve-turtleneck-1.png",
     ],
     measurements: {
       de: "Brustumfang 110 cm · Länge 68 cm · Schulterbreite 110 cm · Ärmellänge 44 cm · Kragenhöhe 42 cm",
@@ -51,9 +49,7 @@ export const products: Product[] = [
     },
     sizes: ["S (EU 36)", "M (EU 38)", "L (EU 40/42)", "XL (EU 44)"],
     images: [
-      "/products/solstice-wrap-top-1.webp",
-      "/products/solstice-wrap-top-2.webp",
-      "/products/solstice-wrap-top-3.webp",
+      "/products/solstice-wrap-top-1.png",
     ],
     measurements: {
       de: "Brustumfang (S) 76 cm · Länge (S) 51 cm",
@@ -87,9 +83,7 @@ export const products: Product[] = [
     },
     sizes: ["XS (EU 34)", "S (EU 36)", "M (EU 38)", "L (EU 40/42)"],
     images: [
-      "/products/corset-rib-crop-1.webp",
-      "/products/corset-rib-crop-2.webp",
-      "/products/corset-rib-crop-3.webp",
+      "/products/corset-rib-crop-1.png",
     ],
     measurements: {
       de: "Brustumfang (S) 70 cm · Länge (S) 41 cm",
@@ -123,9 +117,7 @@ export const products: Product[] = [
     },
     sizes: ["XS (EU 34)", "S (EU 36)", "M (EU 38)", "L (EU 40/42)"],
     images: [
-      "/products/halter-rib-tank-1.webp",
-      "/products/halter-rib-tank-2.webp",
-      "/products/halter-rib-tank-3.webp",
+      "/products/halter-rib-tank-1.png",
     ],
     measurements: {
       de: "Brustumfang (S) 72 cm · Länge (S) 30 cm",
@@ -159,13 +151,23 @@ export const products: Product[] = [
     },
     sizes: ["XS (EU 34)", "S (EU 36)", "M (EU 38)", "L (EU 40/42)", "XL (EU 44)"],
     images: [
-      "/products/atelier-wide-leg-1.webp",
+      "/products/atelier-wide-leg-1.png",
       "/products/atelier-wide-leg-2.webp",
       "/products/atelier-wide-leg-3.webp",
     ],
     measurements: {
-      de: "Taille (M) 80 cm · Hüfte (M) 120 cm · Länge 105 cm",
-      en: "Waist (M) 80 cm · Hip (M) 120 cm · Length 105 cm",
+      de: "Taille (M) 68 cm · Hüfte (M) 108 cm · Länge 103 cm",
+      en: "Waist (M) 68 cm · Hip (M) 108 cm · Length 103 cm",
+    },
+    sizeChart: {
+      columns: ["Taillengröße", "Hüftgröße", "Länge (Unterteil)"],
+      rows: [
+        { size: "XS", eu: "34",    cm: [60, 100, 101], in: [23.62, 39.37, 39.76] },
+        { size: "S",  eu: "36",    cm: [64, 104, 102], in: [25.20, 40.94, 40.16] },
+        { size: "M",  eu: "38",    cm: [68, 108, 103], in: [26.77, 42.52, 40.55] },
+        { size: "L",  eu: "40/42", cm: [74, 114, 104], in: [29.13, 44.88, 40.94] },
+        { size: "XL", eu: "44",    cm: [80, 120, 105], in: [31.50, 47.24, 41.34] },
+      ],
     },
     description: {
       de: "Die Atelier fließt. Ein plissierter Stoff, der bei jedem Schritt mitgeht — weich, leicht, angenehm an der Haut. Hochsitzende Taille mit Bindekordel, weites Bein, das optisch verlängert. Fällt ohne Knitter. Für Büro, Markt oder Abend — je nach was du oben trägst.",
@@ -195,8 +197,8 @@ export const products: Product[] = [
     },
     sizes: ["XS (EU 34)", "S (EU 36)", "M (EU 38)", "L (EU 40/42)", "XL (EU 44)"],
     images: [
-      "/products/archive-baggy-jean-1.webp",
-      "/products/archive-baggy-jean-2.webp",
+      "/products/archive-baggy-jean-1.png",
+      "/products/archive-baggy-jean-2.png",
       "/products/archive-baggy-jean-3.webp",
     ],
     measurements: {

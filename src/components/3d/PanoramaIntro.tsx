@@ -220,14 +220,14 @@ export default function PanoramaIntro() {
 
         {/* Tagline */}
         <p style={{
-          color: "rgba(242,237,228,0.5)",
-          fontSize: "clamp(9px, 1vw, 11px)",
-          letterSpacing: "0.4em",
+          color: "rgba(242,237,228,0.85)",
+          fontSize: "clamp(11px, 1.3vw, 14px)",
+          letterSpacing: "0.3em",
           textTransform: "uppercase",
           fontFamily: "var(--font-geist-mono)",
           marginTop: 20,
         }}>
-          Golden Days, Timeless Wear
+          Where our ideas come to life
         </p>
 
         {/* Scroll cue */}

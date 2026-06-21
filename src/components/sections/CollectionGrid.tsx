@@ -46,7 +46,7 @@ function BershkaCard({
       <div
         className="relative overflow-hidden"
         style={{
-          aspectRatio: featured ? "3 / 4" : "3 / 4",
+          aspectRatio: "1 / 1",
           background: "#E8E4DE",
         }}
       >
@@ -58,7 +58,7 @@ function BershkaCard({
             sizes={featured
               ? "(max-width: 768px) 100vw, 66vw"
               : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"}
-            className="object-cover object-top"
+            className="object-contain"
             style={{
               transform: hovered ? "scale(1.04)" : "scale(1)",
               transition: "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
@@ -307,12 +307,8 @@ export default function CollectionGrid({ products, locale }: Props) {
           </div>
         ) : (
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "clamp(8px, 2vw, 16px)",
-            }}
-            className="md:grid-cols-3 lg:grid-cols-4"
+            style={{ display: "grid", gap: "clamp(8px, 2vw, 16px)" }}
+            className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           >
             {filtered.map((product) => (
               <div key={product.slug}>

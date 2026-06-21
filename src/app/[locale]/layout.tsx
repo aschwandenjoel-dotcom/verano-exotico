@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Locale } from "@/types";
 import CursorGuard from "@/components/ui/CursorGuard";
+import ClientProviders from "@/components/ui/ClientProviders";
 import "../globals.css";
 
 const syne = Syne({
@@ -76,7 +77,9 @@ export default async function LocaleLayout({
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
           <CursorGuard />
-          {children}
+          <ClientProviders>
+            {children}
+          </ClientProviders>
         </NextIntlClientProvider>
       </body>
     </html>

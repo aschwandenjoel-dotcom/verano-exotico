@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import CollectionGrid from "@/components/sections/CollectionGrid";
 import ShopShell from "@/components/ui/ShopShell";
-import { products } from "@/lib/products";
+import { fetchProducts } from "@/lib/api";
 import type { Locale } from "@/types";
 
 export async function generateMetadata({
@@ -21,6 +21,7 @@ export default async function CollectionPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const products = await fetchProducts();
 
   return (
     <ShopShell locale={locale as Locale}>
@@ -33,19 +34,19 @@ export default async function CollectionPage({
             position: "sticky",
             top: 0,
             width: "100%",
-            height: "100vh",
+            height: "clamp(300px, 34vw, 680px)",
             overflow: "hidden",
             zIndex: 0,
           }}
         >
           {/* Background image — beach panorama cropped to cover */}
           <Image
-            src="/images/panorama-360.webp"
+            src="/images/shop-banner.webp"
             alt="Verano Exotico SS25"
             fill
             priority
             sizes="100vw"
-            style={{ objectFit: "cover", objectPosition: "center 30%" }}
+            style={{ objectFit: "cover", objectPosition: "center 50%" }}
           />
 
           {/* Dark gradient overlay — top + strong bottom */}

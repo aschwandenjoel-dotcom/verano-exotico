@@ -32,14 +32,14 @@ export default function ProductGallery({ product }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {/* Main image */}
-      <div className="relative h-[60vh] md:h-[70vh] rounded-2xl overflow-hidden bg-surface">
+      <div style={{ position: "relative", width: "100%", aspectRatio: "1/1", borderRadius: "16px", overflow: "hidden", background: "#EDE9E2" }}>
         <Image
           key={active}
           src={images[active]}
           alt={product.name.de}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover object-top"
+          style={{ objectFit: "contain" }}
           priority
         />
       </div>

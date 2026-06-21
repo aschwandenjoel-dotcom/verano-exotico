@@ -40,7 +40,7 @@ export default function BrandStory() {
       {/* ── HERO ──────────────────────────────────────────────────── */}
       <section
         style={{
-          background: "#0A3D52",
+          background: "#F0F8F9",
           minHeight: "70vh",
           display: "flex",
           flexDirection: "column",
@@ -48,20 +48,9 @@ export default function BrandStory() {
           padding: "clamp(5rem, 10vw, 10rem) clamp(1.5rem, 5vw, 5rem) clamp(3rem, 6vw, 6rem)",
           position: "relative",
           overflow: "hidden",
+          borderBottom: "1px solid rgba(26,48,64,0.08)",
         }}
       >
-        {/* Background texture */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-            backgroundSize: "250px",
-            opacity: 0.04,
-            mixBlendMode: "overlay",
-          }}
-        />
         {/* Decorative teal circle */}
         <div
           aria-hidden="true"
@@ -72,7 +61,7 @@ export default function BrandStory() {
             width: "clamp(300px, 50vw, 700px)",
             height: "clamp(300px, 50vw, 700px)",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(0,180,197,0.12) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(0,180,197,0.07) 0%, transparent 70%)",
             pointerEvents: "none",
           }}
         />
@@ -81,7 +70,7 @@ export default function BrandStory() {
           <p
             className="about-reveal"
             style={{
-              color: "#D4AF37",
+              color: "#00B4C5",
               fontSize: "10px",
               letterSpacing: "0.45em",
               textTransform: "uppercase",
@@ -101,7 +90,7 @@ export default function BrandStory() {
               lineHeight: 0.92,
               letterSpacing: "-0.02em",
               textTransform: "uppercase",
-              color: "#F8F3E8",
+              color: "#1A3040",
               transitionDelay: "0.1s",
             }}
           >
@@ -135,7 +124,7 @@ export default function BrandStory() {
           <p
             className="about-reveal"
             style={{
-              color: "rgba(228,244,247,0.6)",
+              color: "rgba(26,48,64,0.55)",
               fontSize: "clamp(0.8rem, 1.2vw, 1rem)",
               letterSpacing: "0.04em",
               fontFamily: "var(--font-syne)",
@@ -243,7 +232,7 @@ export default function BrandStory() {
         {/* Visual column */}
         <div
           style={{
-            background: "#0A3D52",
+            background: "#F0F8F9",
             display: "flex",
             alignItems: "flex-end",
             justifyContent: "flex-start",
@@ -263,7 +252,7 @@ export default function BrandStory() {
               textAlign: "right",
             }}
           >
-            <p style={{ color: "rgba(232,201,122,0.35)", fontSize: "10px", letterSpacing: "0.3em", fontFamily: "var(--font-geist-mono)", lineHeight: 1.8 }}>
+            <p style={{ color: "rgba(26,48,64,0.35)", fontSize: "10px", letterSpacing: "0.3em", fontFamily: "var(--font-geist-mono)", lineHeight: 1.8 }}>
               38°00'S<br />57°33'W<br />Mar del Plata
             </p>
           </div>
@@ -274,9 +263,9 @@ export default function BrandStory() {
               { color: "#00B4C5", h: "40%" },
               { color: "#2E7D5E", h: "60%" },
               { color: "#D4AF37", h: "80%" },
-              { color: "#F8F3E8", h: "55%" },
+              { color: "#1A3040", h: "55%" },
               { color: "#00B4C5", h: "90%" },
-              { color: "#0A3D52", h: "35%", border: "1px solid rgba(0,180,197,0.4)" },
+              { color: "transparent", h: "35%", border: "1px solid rgba(0,180,197,0.4)" },
             ].map((bar, i) => (
               <div
                 key={i}
@@ -285,7 +274,7 @@ export default function BrandStory() {
                   height: bar.h,
                   background: bar.color,
                   border: bar.border,
-                  opacity: 0.85,
+                  opacity: 0.75,
                   flexShrink: 0,
                 }}
               />
@@ -297,7 +286,7 @@ export default function BrandStory() {
               position: "absolute",
               bottom: "clamp(1.5rem, 3vw, 3rem)",
               right: "clamp(1.5rem, 3vw, 3rem)",
-              color: "rgba(228,244,247,0.2)",
+              color: "rgba(26,48,64,0.2)",
               fontSize: "10px",
               letterSpacing: "0.3em",
               fontFamily: "var(--font-geist-mono)",
@@ -312,31 +301,19 @@ export default function BrandStory() {
       {/* ── DAS VERSPRECHEN ───────────────────────────────────────── */}
       <section
         style={{
-          background: "#0A3D52",
+          background: "#F8F3E8",
           padding: "clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem)",
           position: "relative",
           overflow: "hidden",
+          borderTop: "1px solid rgba(26,48,64,0.08)",
+          borderBottom: "1px solid rgba(26,48,64,0.08)",
         }}
       >
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            bottom: "-20%",
-            left: "-10%",
-            width: "clamp(200px, 40vw, 600px)",
-            height: "clamp(200px, 40vw, 600px)",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(0,180,197,0.08) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
-
         <div style={{ maxWidth: "760px", margin: "0 auto", textAlign: "center", position: "relative" }}>
           <p
             className="about-reveal"
             style={{
-              color: "#D4AF37",
+              color: "#00B4C5",
               fontSize: "10px",
               letterSpacing: "0.45em",
               textTransform: "uppercase",
@@ -355,7 +332,7 @@ export default function BrandStory() {
               fontSize: "clamp(1.8rem, 4.5vw, 4rem)",
               lineHeight: 1.05,
               textTransform: "uppercase",
-              color: "#F8F3E8",
+              color: "#1A3040",
               marginBottom: "clamp(1.5rem, 3vw, 2.5rem)",
               transitionDelay: "0.1s",
             }}
@@ -391,7 +368,7 @@ export default function BrandStory() {
               fontFamily: "var(--font-syne)",
               fontSize: "clamp(0.875rem, 1.2vw, 1rem)",
               lineHeight: 1.9,
-              color: "rgba(228,244,247,0.7)",
+              color: "rgba(26,48,64,0.65)",
               transitionDelay: "0.2s",
             }}
           >
@@ -555,7 +532,7 @@ export default function BrandStory() {
       {/* ── CLOSING ───────────────────────────────────────────────── */}
       <section
         style={{
-          background: "#0A3D52",
+          background: "#111111",
           padding: "clamp(5rem, 10vw, 10rem) clamp(1.5rem, 5vw, 5rem)",
           textAlign: "center",
           position: "relative",
@@ -571,7 +548,7 @@ export default function BrandStory() {
             left: "10%",
             right: "10%",
             height: "1px",
-            background: "linear-gradient(to right, transparent, rgba(232,201,122,0.3), transparent)",
+            background: "linear-gradient(to right, transparent, rgba(212,175,55,0.25), transparent)",
           }}
         />
 

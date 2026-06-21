@@ -22,7 +22,7 @@ export default function ProductCard({ product, locale }: Props) {
       href={`/${locale}/product/${product.slug}`}
       className="group block bg-surface overflow-hidden"
     >
-      <div className="relative h-72 overflow-hidden bg-[#111]">
+      <div className="relative aspect-square overflow-hidden bg-[#111]">
         {images.length > 0 ? (
           <>
             <Image
@@ -30,7 +30,7 @@ export default function ProductCard({ product, locale }: Props) {
               alt={name}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+              className="object-contain transition-transform duration-500 group-hover:scale-105"
             />
             {/* Thumbnail strip — hover to switch image */}
             {images.length > 1 && (

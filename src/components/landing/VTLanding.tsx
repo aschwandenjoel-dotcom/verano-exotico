@@ -3,7 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Image from "next/image";
 import type { Locale } from "@/types";
+import { products } from "@/lib/products";
+import Header from "@/components/ui/Header";
 
 const PanoramaIntro = dynamic(
   () => import("@/components/3d/PanoramaIntro"),
@@ -248,6 +251,46 @@ function ProductCard({ product, locale }: { product: Product; locale: Locale }) 
   );
 }
 
+/* ─── Shop Card (horizontal scroll) ─────────────────────────────── */
+function ShopCard({ product, locale, index }: { product: (typeof products)[0]; locale: Locale; index: number }) {
+  const [hovered, setHovered] = useState(false);
+  const image = product.images?.[0];
+  const name = product.name[locale];
+
+  return (
+    <Link
+      href={`/${locale}/product/${product.slug}`}
+      style={{
+        flexShrink: 0, width: "520px", display: "block", textDecoration: "none",
+        transform: hovered ? "translateY(-6px)" : "translateY(0)",
+        transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div style={{ position: "relative", aspectRatio: "1/1", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
+        {image ? (
+          <Image src={image} alt={name} fill sizes="520px" style={{ objectFit: "contain" }} priority={index < 2} />
+        ) : (
+          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {product.colors.slice(0, 3).map((c, i) => (
+              <div key={c} style={{ background: c, width: 32, height: 48 + i * 16, margin: "0 4px", opacity: 0.85 }} />
+            ))}
+          </div>
+        )}
+        {product.isNew && (
+          <span style={{ position: "absolute", top: "10px", left: "10px", background: "#D4AF37", color: "#1A3040", fontSize: "9px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, letterSpacing: "0.22em", textTransform: "uppercase", padding: "3px 8px" }}>
+            NEU
+          </span>
+        )}
+      </div>
+      <p style={{ fontSize: "9px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.18em", textTransform: "uppercase", color: "#00B4C5", marginBottom: "4px" }}>{product.category}</p>
+      <p style={{ fontSize: "13px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", marginBottom: "4px", lineHeight: 1.2 }}>{name}</p>
+      <p style={{ fontSize: "13px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.55)" }}>CHF {product.price}</p>
+    </Link>
+  );
+}
+
 /* ─── Newsletter ─────────────────────────────────────────────────── */
 function NewsletterInput() {
   const [email, setEmail] = useState("");
@@ -306,111 +349,42 @@ export default function VTLanding({ locale }: Props) {
       <PanoramaIntro />
 
       {/* ── HEADER ──────────────────────────────────────────────── */}
-      <header
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 py-4"
-        style={{ background: "#F8F3E8", borderBottom: "1px solid rgba(26,48,64,0.1)" }}
-      >
-        <Link
-          href={`/${locale}`}
-          className="text-[11px] font-black tracking-[0.2em] uppercase"
-          style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}
-          aria-label="Verano Exotico — Startseite"
-        >
-          VERANO EXOTICO
-        </Link>
-
-        <nav className="hidden md:flex items-center gap-8" aria-label="Hauptnavigation">
-          {[
-            { label: "Start", href: `/${locale}` },
-            { label: "Shop", href: `/${locale}/collection` },
-            { label: "Über uns", href: `/${locale}/about` },
-          ].map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="text-[10px] tracking-[0.25em] uppercase transition-colors"
-              style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.5)")}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        <Link
-          href={`/${locale}/collection`}
-          className="text-[10px] font-black tracking-[0.2em] uppercase px-4 py-2 hover:opacity-80 transition-opacity"
-          style={{
-            fontFamily: "var(--font-archivo-black), sans-serif",
-            background: "#D4AF37",
-            color: "#1A3040",
-            minHeight: "44px",
-            display: "inline-flex",
-            alignItems: "center",
-          }}
-        >
-          SHOP
-        </Link>
-      </header>
+      <Header locale={locale} />
 
       {/* ── HERO ────────────────────────────────────────────────── */}
       <section
-        className="pt-20 min-h-screen flex flex-col justify-between px-6 md:px-10 pb-12"
-        style={{ borderBottom: "1px solid rgba(26,48,64,0.1)" }}
+        className="pt-20 min-h-screen px-6 md:px-10 pb-12"
+        style={{ borderBottom: "1px solid rgba(26,48,64,0.1)", position: "relative", overflow: "hidden", display: "grid", gridTemplateRows: "auto 1fr auto" }}
       >
-        <div className="flex items-center justify-between pt-12 md:pt-20">
-          <span
-            className="text-[10px] tracking-[0.3em] uppercase"
-            style={{ color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}
-          >
+        {/* Meta row */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "clamp(3rem,8vw,5rem)" }}>
+          <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>
             Sommer {new Date().getFullYear()}
           </span>
-          <span
-            className="text-[10px] tracking-[0.3em] uppercase"
-            style={{ color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}
-          >
+          <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>
             Golden Days, Timeless Wear
           </span>
         </div>
 
-        {/* Staggered headline */}
-        <div className="py-8 md:py-0">
-          <h1
-            className="font-black uppercase leading-[0.88] tracking-tight"
-            style={{ fontSize: "clamp(3.5rem, 13vw, 13rem)", fontFamily: "var(--font-archivo-black), sans-serif" }}
-          >
-            <span className="hero-word">Golden</span>
-            <span
-              className="hero-word"
-              style={{
-                fontFamily: "var(--font-dm-serif)",
-                fontStyle: "italic",
-                fontWeight: 400,
-                color: "#00B4C5",
-                textTransform: "none",
-                letterSpacing: "-0.03em",
-              }}
-            >
-              days,
+        {/* Headline */}
+        <div style={{ padding: "40px 0" }}>
+          <div style={{ marginBottom: "28px" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(26,48,64,0.06)", borderRadius: "9999px", padding: "6px 16px", fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(26,48,64,0.5)" }}>
+              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#D4AF37", display: "inline-block" }} />
+              SS25 · Sommer Kollektion
             </span>
-            <span className="hero-word">timeless</span>
-            <span
-              className="hero-word"
-              style={{
-                fontFamily: "var(--font-dm-serif)",
-                fontStyle: "italic",
-                fontWeight: 400,
-                color: "#00B4C5",
-                textTransform: "none",
-                letterSpacing: "-0.03em",
-              }}
-            >
-              wear.
+          </div>
+          <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 0.92, margin: 0 }}>
+            <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.02em", color: "#1A3040" }}>
+              Golden Days,
+            </span>
+            <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", textTransform: "none", letterSpacing: "-0.02em" }}>
+              Timeless Wear.
             </span>
           </h1>
         </div>
 
+        {/* Bottom row */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
           <p className="text-sm max-w-sm leading-relaxed md:max-w-xs" style={{ color: "rgba(26,48,64,0.65)", fontFamily: "var(--font-syne)" }}>
             Kleidung, die sich gut anfühlt. Nicht gut aussieht auf Instagram,
@@ -420,16 +394,10 @@ export default function VTLanding({ locale }: Props) {
             <em style={{ color: "#D4AF37", fontFamily: "var(--font-dm-serif)" }}>Timeless Wear</em>{" "}
             sind keine Versprechen. Es ist unser Massstab.
           </p>
-
           <Link
             href={`/${locale}/collection`}
-            className="inline-flex items-center gap-3 text-[11px] font-black tracking-[0.25em] uppercase px-7 py-4 hover:opacity-80 transition-opacity"
-            style={{
-              fontFamily: "var(--font-archivo-black), sans-serif",
-              background: "#D4AF37",
-              color: "#1A3040",
-              minHeight: "44px",
-            }}
+            className="btn-shimmer inline-flex items-center gap-3 text-[11px] font-black tracking-[0.25em] uppercase px-7 py-4 hover:opacity-80 transition-opacity"
+            style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px" }}
           >
             In den Shop
             <span aria-hidden="true">→</span>
@@ -438,7 +406,7 @@ export default function VTLanding({ locale }: Props) {
       </section>
 
       {/* ── TICKER STRIP ────────────────────────────────────────── */}
-      <div className="overflow-hidden py-3" style={{ background: "#00B4C5" }}>
+      <div className="overflow-hidden py-3" style={{ background: "#1A3040" }}>
         <div
           className="flex gap-12 whitespace-nowrap"
           style={{ animation: "marquee 22s linear infinite" }}
@@ -546,16 +514,18 @@ export default function VTLanding({ locale }: Props) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6" style={{ borderLeft: "none" }}>
-          {PRODUCTS.map((product, i) => (
-            <div
-              key={product.number}
-              className={`md:px-6 first:pl-0 last:pr-0 reveal reveal-delay-${i + 1 as 1 | 2 | 3}`}
-              style={i > 0 ? { borderLeft: "1px solid rgba(26,48,64,0.1)" } : {}}
-            >
-              <ProductCard product={product} locale={locale} />
-            </div>
-          ))}
+        <div style={{ position: "relative" }}>
+          <div
+            style={{ display: "flex", gap: "20px", overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: "16px", scrollbarWidth: "none", msOverflowStyle: "none" }}
+            className="hide-scrollbar"
+          >
+            {products.map((product, i) => (
+              <div key={product.slug} style={{ scrollSnapAlign: "start" }}>
+                <ShopCard product={product} locale={locale} index={i} />
+              </div>
+            ))}
+          </div>
+          <div style={{ position: "absolute", right: 0, top: 0, bottom: "16px", width: "80px", background: "linear-gradient(to left, #F8F3E8, transparent)", pointerEvents: "none" }} />
         </div>
       </section>
 

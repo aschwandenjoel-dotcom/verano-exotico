@@ -1,26 +1,61 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function Footer() {
   const t = useTranslations("footer");
+  const locale = useLocale();
 
   return (
-    <footer className="border-t border-white/10 px-6 py-12 md:px-10 bg-bg-dark">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 mb-10">
-          <div>
-            <p className="text-xs font-black tracking-[0.2em] uppercase text-cream">VERANO EXOTICO</p>
-            <p className="mt-2 text-xs font-mono text-tan italic">{t("tagline")}</p>
+    <footer style={{ background: "#F8F3E8", borderTop: "1px solid rgba(26,48,64,0.08)" }}>
+      <div style={{ maxWidth: "1152px", margin: "0 auto", padding: "48px clamp(1.5rem, 5vw, 2.5rem) 40px" }}>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+
+          {/* Top row */}
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: "24px" }}>
+            <div>
+              <p style={{ fontSize: "13px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", color: "#1A3040" }}>
+                Verano Exotico
+              </p>
+              <p style={{ marginTop: "6px", fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)", fontStyle: "italic" }}>
+                {t("tagline")}
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "32px" }}>
+              <a
+                href={`/${locale}/impressum`}
+                style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,48,64,0.55)", textDecoration: "none", transition: "color 0.15s" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.55)")}
+              >
+                {t("links_legal")}
+              </a>
+              <a
+                href={`/${locale}/datenschutz`}
+                style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,48,64,0.55)", textDecoration: "none", transition: "color 0.15s" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.55)")}
+              >
+                {t("links_privacy")}
+              </a>
+            </div>
           </div>
-          <div className="flex items-center gap-8 text-[10px] font-mono tracking-widest uppercase text-text-muted">
-            <a href="#" className="hover:text-cream transition-colors">{t("links_legal")}</a>
-            <a href="#" className="hover:text-cream transition-colors">{t("links_privacy")}</a>
+
+          {/* Divider */}
+          <div style={{ borderTop: "1px solid rgba(26,48,64,0.08)" }} />
+
+          {/* Bottom row */}
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+            <p style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.4)" }}>
+              © {new Date().getFullYear()} Verano Exotico. Alle Rechte vorbehalten.
+            </p>
+            <p style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.4)" }}>
+              Curated worldwide. Shipped to you.
+            </p>
           </div>
-        </div>
-        <div className="border-t border-white/8 pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-[10px] font-mono text-text-muted">© {new Date().getFullYear()} Verano Exotico. Alle Rechte vorbehalten.</p>
-          <p className="text-[10px] font-mono text-text-muted">Curated worldwide. Shipped to you.</p>
+
         </div>
       </div>
     </footer>
