@@ -33,9 +33,11 @@ export interface Product {
   measurements?: { de: string; en: string };
   sizeChart?: {
     columns: string[];
-    rows: Array<{ size: string; eu: string; cm: number[]; in: number[] }>;
+    rows: Array<{ size: string; eu: string; cm: string[]; in: string[] }>;
   };
   images?: string[];
+  /** Pro Farbe ein Bild — gleiche Reihenfolge wie `colors`. Leere Slots = kein Farb-Bild. */
+  colorImages?: string[];
   description: { de: string; en: string };
   material: { de: string; en: string };
   care: { de: string; en: string };

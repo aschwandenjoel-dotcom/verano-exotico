@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 560">
+  <defs>
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E54E2E"/>
+      <stop offset="45%" stop-color="#F0922A"/>
+      <stop offset="100%" stop-color="#F5CC20"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="20%" y1="100%" x2="80%" y2="0%">
+      <stop offset="0%" stop-color="#2E7D58"/>
+      <stop offset="100%" stop-color="#72C87C"/>
+    </linearGradient>
+    <linearGradient id="stemGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2E7D58"/>
+      <stop offset="100%" stop-color="#5AB870"/>
+    </linearGradient>
+    <linearGradient id="hibGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5943C"/>
+      <stop offset="100%" stop-color="#E04030"/>
+    </linearGradient>
+  </defs>
+
+  <!-- SUN RAYS (behind arc) -->
+  <!-- Top -->
+  <line x1="250" y1="82" x2="250" y2="55" stroke="#F5CC20" stroke-width="9" stroke-linecap="round"/>
+  <!-- Top-right -->
+  <line x1="314" y1="100" x2="332" y2="80" stroke="#F5C020" stroke-width="9" stroke-linecap="round"/>
+  <!-- Right -->
+  <line x1="348" y1="148" x2="374" y2="140" stroke="#F0A028" stroke-width="9" stroke-linecap="round"/>
+  <!-- Far right -->
+  <line x1="352" y1="170" x2="380" y2="168" stroke="#F0A028" stroke-width="9" stroke-linecap="round"/>
+  <!-- Top-left -->
+  <line x1="186" y1="100" x2="168" y2="80" stroke="#F08030" stroke-width="9" stroke-linecap="round"/>
+  <!-- Left -->
+  <line x1="152" y1="148" x2="126" y2="140" stroke="#E86030" stroke-width="9" stroke-linecap="round"/>
+  <!-- Far left -->
+  <line x1="148" y1="170" x2="120" y2="168" stroke="#E54E2E" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- SUN SEMICIRCLE ARC -->
+  <path d="M 178 163 A 72 72 0 0 1 322 163"
+    stroke="url(#sunGrad)" stroke-width="9" fill="none" stroke-linecap="round"/>
+
+  <!-- PALM STEM -->
+  <path d="M 232 220 Q 268 188 308 158 Q 328 143 350 125"
+    stroke="url(#stemGrad)" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+  <!-- PALM LEAVES (right-facing fronds) -->
+  <!-- Leaf 1 - lowest/widest -->
+  <path d="M 268 194 C 295 172 335 150 385 128 C 358 146 320 164 282 184 Z" fill="url(#leafGrad)"/>
+  <!-- Leaf 2 -->
+  <path d="M 278 184 C 308 160 352 134 404 110 C 375 130 335 152 296 172 Z" fill="url(#leafGrad)"/>
+  <!-- Leaf 3 -->
+  <path d="M 290 174 C 322 148 368 120 418 96 C 388 118 348 142 308 162 Z" fill="url(#leafGrad)"/>
+  <!-- Leaf 4 - upper -->
+  <path d="M 302 163 C 334 136 380 108 428 85 C 398 107 358 132 320 152 Z" fill="url(#leafGrad)" opacity="0.85"/>
+  <!-- Leaf 5 - small lower -->
+  <path d="M 258 206 C 282 190 312 172 350 158 C 326 170 296 184 265 198 Z" fill="url(#leafGrad)" opacity="0.9"/>
+
+  <!-- HIBISCUS FLOWER -->
+  <!-- Petals (5) -->
+  <ellipse cx="228" cy="212" rx="8" ry="14" fill="url(#hibGrad)" transform="rotate(-20 228 228)"/>
+  <ellipse cx="242" cy="216" rx="8" ry="14" fill="url(#hibGrad)" transform="rotate(52 228 228)"/>
+  <ellipse cx="240" cy="232" rx="8" ry="14" fill="url(#hibGrad)" transform="rotate(124 228 228)"/>
+  <ellipse cx="226" cy="236" rx="8" ry="14" fill="url(#hibGrad)" transform="rotate(196 228 228)"/>
+  <ellipse cx="216" cy="222" rx="8" ry="14" fill="url(#hibGrad)" transform="rotate(268 228 228)"/>
+  <!-- Center -->
+  <circle cx="228" cy="226" r="8" fill="#F5943C"/>
+  <circle cx="228" cy="226" r="4" fill="#F5CC20"/>
+
+  <!-- TEXT: VERANO -->
+  <text x="250" y="338"
+    text-anchor="middle"
+    font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+    font-size="86" font-weight="900"
+    fill="#1B6878">VERANO</text>
+
+  <!-- TEXT: EXÓTICO -->
+  <text x="250" y="428"
+    text-anchor="middle"
+    font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+    font-size="86" font-weight="900"
+    fill="#1B6878">EX&#xD3;TICO</text>
+
+  <!-- SUBTITLE -->
+  <text x="250" y="476"
+    text-anchor="middle"
+    font-family="'Arial', 'Helvetica Neue', Arial, sans-serif"
+    font-size="19" letter-spacing="5"
+    fill="#4A9DAA">EXPERIENCE THE TROPICS</text>
+</svg>

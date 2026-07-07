@@ -1,10 +1,30 @@
 "use client";
 
+import type React from "react";
 import { useTranslations, useLocale } from "next-intl";
+
+const linkStyle: React.CSSProperties = {
+  fontSize: "11px",
+  fontFamily: "var(--font-geist-mono)",
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: "rgba(26,48,64,0.55)",
+  textDecoration: "none",
+  transition: "color 0.15s",
+};
 
 export default function Footer() {
   const t = useTranslations("footer");
   const locale = useLocale();
+
+  const links = [
+    { href: `/${locale}/versand`, label: t("links_shipping") },
+    { href: `/${locale}/faq`, label: t("links_faq") },
+    { href: `/${locale}/agb`, label: t("links_terms") },
+    { href: `/${locale}/widerruf`, label: t("links_withdrawal") },
+    { href: `/${locale}/impressum`, label: t("links_legal") },
+    { href: `/${locale}/datenschutz`, label: t("links_privacy") },
+  ];
 
   return (
     <footer style={{ background: "#F8F3E8", borderTop: "1px solid rgba(26,48,64,0.08)" }}>
@@ -23,23 +43,18 @@ export default function Footer() {
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: "32px" }}>
-              <a
-                href={`/${locale}/impressum`}
-                style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,48,64,0.55)", textDecoration: "none", transition: "color 0.15s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.55)")}
-              >
-                {t("links_legal")}
-              </a>
-              <a
-                href={`/${locale}/datenschutz`}
-                style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,48,64,0.55)", textDecoration: "none", transition: "color 0.15s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.55)")}
-              >
-                {t("links_privacy")}
-              </a>
+            <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", rowGap: "12px" }}>
+              {links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  style={linkStyle}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.55)")}
+                >
+                  {link.label}
+                </a>
+              ))}
             </div>
           </div>
 
@@ -52,7 +67,7 @@ export default function Footer() {
               © {new Date().getFullYear()} Verano Exotico. Alle Rechte vorbehalten.
             </p>
             <p style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.4)" }}>
-              Curated worldwide. Shipped to you.
+              {t("payment_note")}
             </p>
           </div>
 

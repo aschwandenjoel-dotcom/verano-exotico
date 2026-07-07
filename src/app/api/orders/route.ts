@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase";
+import { isAdminRequest } from "@/lib/adminAuth";
 
-export async function GET() {
+export async function GET(req: Request) {
+  if (!isAdminRequest(req)) {
+    return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
+  }
   const db = createServiceClient();
   const { data, error } = await db
     .from("orders")
@@ -13,6 +17,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  if (!isAdminRequest(req)) {
+    return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
+  }
   const body = await req.json();
   const { customerEmail, customerName, items, subtotal } = body;
 

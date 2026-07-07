@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 interface PannellumViewer {
   on: (event: string, cb: () => void) => PannellumViewer;
   destroy: () => void;
-  setAutoRotate: (speed: number) => void;
+  stopAutoRotate: () => void;
 }
 
 declare global {
@@ -69,14 +69,14 @@ export default function PanoramaIntro() {
         compass: false,
         hfov: 100,
         pitch: 0,
-        yaw: 0,
+        yaw: 120,
       });
 
       viewerRef.current = viewer;
       viewer.on("load", () => { if (!destroyed) setLoading(false); });
 
       /* 4. Stop rotation on user drag */
-      const stop = () => viewer.setAutoRotate(0);
+      const stop = () => viewer.stopAutoRotate();
       containerRef.current.addEventListener("mousedown", stop);
       containerRef.current.addEventListener("touchstart", stop, { passive: true });
     };

@@ -44,9 +44,28 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   return {
+    metadataBase: new URL(base),
     title: t("home_title"),
     description: t("home_description"),
+    alternates: {
+      languages: { de: "/de", en: "/en" },
+    },
+    openGraph: {
+      type: "website",
+      siteName: "Verano Exotico",
+      title: t("home_title"),
+      description: t("home_description"),
+      locale: locale === "de" ? "de_CH" : "en_US",
+      images: [{ url: "/images/og-image.jpg", width: 1200, height: 630, alt: "Verano Exotico" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("home_title"),
+      description: t("home_description"),
+      images: ["/images/og-image.jpg"],
+    },
   };
 }
 

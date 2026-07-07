@@ -30,7 +30,7 @@ export default function ProductCard({ product, locale }: Props) {
               alt={name}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-contain transition-transform duration-500 group-hover:scale-105"
+              className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
             />
             {/* Thumbnail strip — hover to switch image */}
             {images.length > 1 && (
@@ -90,7 +90,7 @@ export default function ProductCard({ product, locale }: Props) {
             <h3 className="text-sm font-bold text-text-primary uppercase tracking-wide">{name}</h3>
           </div>
           <div className="text-right">
-            <span className="text-sm font-black text-cream">CHF {product.price}</span>
+            <span className="text-sm font-black text-cream">CHF {product.price.toFixed(2)}</span>
             <p className="text-[10px] font-mono text-text-muted mt-0.5">
               {t("view_product")} →
             </p>

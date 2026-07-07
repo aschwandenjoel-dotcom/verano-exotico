@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Claude Code
 .claude/
+
+# temporary processing files
+.tmp/

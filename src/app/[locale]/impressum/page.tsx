@@ -71,7 +71,7 @@ function LegalContent() {
       </Section>
 
       <Section title="Streitbeilegung">
-        <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" style={{ color: "#1A3040" }}>https://ec.europa.eu/consumers/odr</a>. Wir sind nicht verpflichtet und nicht bereit, an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+        <p>Wir sind nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen. Bei Anliegen zu Ihrer Bestellung wenden Sie sich bitte direkt an uns — wir finden eine Lösung.</p>
       </Section>
     </div>
   );

@@ -1,29 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, totalPrice } = useCart();
-  const [loading, setLoading] = useState(false);
+  const t = useTranslations("cart");
   const params = useParams();
+  const router = useRouter();
   const locale = (params?.locale as string) ?? "de";
 
-  async function handleCheckout() {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, locale }),
-      });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } finally {
-      setLoading(false);
-    }
+  function handleCheckout() {
+    closeCart();
+    router.push(`/${locale}/checkout`);
   }
 
   useEffect(() => {
@@ -61,7 +53,7 @@ export default function CartDrawer() {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid rgba(26,48,64,0.08)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <h2 style={{ fontSize: "13px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.1em", color: "#1A3040", margin: 0 }}>
-              Warenkorb
+              {t("title")}
             </h2>
             {items.length > 0 && (
               <span style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)" }}>
@@ -71,7 +63,7 @@ export default function CartDrawer() {
           </div>
           <button
             onClick={closeCart}
-            aria-label="Warenkorb schliessen"
+            aria-label={t("close")}
             style={{ width: 34, height: 34, borderRadius: "50%", border: "1px solid rgba(26,48,64,0.15)", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", color: "#1A3040" }}
           >
             ×
@@ -84,7 +76,7 @@ export default function CartDrawer() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "12px" }}>
               <span style={{ fontSize: "32px", opacity: 0.2 }}>○</span>
               <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.1em" }}>
-                Dein Warenkorb ist leer
+                {t("empty")}
               </p>
             </div>
           ) : (
@@ -147,7 +139,7 @@ export default function CartDrawer() {
                   {/* Remove */}
                   <button
                     onClick={() => removeItem(item.id)}
-                    aria-label="Entfernen"
+                    aria-label={t("remove")}
                     style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(26,48,64,0.3)", fontSize: "14px", padding: "0", alignSelf: "flex-start", lineHeight: 1, transition: "color 0.15s" }}
                     onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
                     onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.3)")}
@@ -165,23 +157,22 @@ export default function CartDrawer() {
           <div style={{ padding: "20px 24px", borderTop: "1px solid rgba(26,48,64,0.08)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "16px" }}>
               <span style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(26,48,64,0.5)" }}>
-                Subtotal
+                {t("subtotal")}
               </span>
               <span style={{ fontSize: "18px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#1A3040" }}>
                 CHF {totalPrice.toFixed(2)}
               </span>
             </div>
             <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.4)", marginBottom: "14px", textAlign: "center" }}>
-              Versandkosten werden an der Kasse berechnet
+              {t("shipping_note")}
             </p>
             <button
               onClick={handleCheckout}
-              disabled={loading}
-              style={{ width: "100%", padding: "15px", background: "#1A3040", color: "#F8F3E8", border: "none", borderRadius: "9999px", fontSize: "12px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", cursor: loading ? "wait" : "pointer", opacity: loading ? 0.7 : 1, transition: "opacity 0.2s" }}
-              onMouseEnter={(e) => { if (!loading) e.currentTarget.style.opacity = "0.85"; }}
-              onMouseLeave={(e) => { if (!loading) e.currentTarget.style.opacity = "1"; }}
+              style={{ width: "100%", padding: "15px", background: "#1A3040", color: "#F8F3E8", border: "none", borderRadius: "9999px", fontSize: "12px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", transition: "opacity 0.2s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
             >
-              {loading ? "Wird geladen…" : "Zur Kasse →"}
+              {t("checkout")}
             </button>
           </div>
         )}

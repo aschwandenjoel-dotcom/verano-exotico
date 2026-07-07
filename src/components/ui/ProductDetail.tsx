@@ -10,22 +10,27 @@ const SizeGuide = dynamic(() => import("./SizeGuide"), { ssr: false });
 interface Props {
   product: Product;
   locale: Locale;
+  activeColor: number;
+  onSelectColor: (i: number) => void;
   labels: {
     color: string;
     size: string;
     addToCart: string;
+    added: string;
     sizeGuide: string;
     details: string;
     material: string;
     care: string;
     measurements: string;
     shipping: string;
+    trustShipping: string;
+    trustReturns: string;
+    trustPayment: string;
   };
 }
 
-export default function ProductDetail({ product, locale: loc, labels: t }: Props) {
+export default function ProductDetail({ product, locale: loc, labels: t, activeColor, onSelectColor }: Props) {
   const [activeSize, setActiveSize] = useState<string | null>(null);
-  const [activeColor, setActiveColor] = useState<number>(0);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
@@ -38,7 +43,7 @@ export default function ProductDetail({ product, locale: loc, labels: t }: Props
       productSlug: product.slug,
       name: product.name[loc],
       price: product.price,
-      image: product.images?.[0],
+      image: product.colorImages?.[activeColor] || product.images?.[0],
       color: colorHex,
       colorName,
       size: activeSize ?? undefined,
@@ -64,7 +69,7 @@ export default function ProductDetail({ product, locale: loc, labels: t }: Props
       </h1>
 
       <p className="text-3xl font-bold mb-8" style={{ color: "#D4AF37" }}>
-        CHF {product.price}
+        CHF {product.price.toFixed(2)}
       </p>
 
       {/* Color swatches */}
@@ -79,12 +84,21 @@ export default function ProductDetail({ product, locale: loc, labels: t }: Props
           <div className="flex flex-wrap gap-2">
             {product.colors.map((color, i) => {
               const name = product.colorNames?.[loc]?.[i];
+              const img = product.colorImages?.[i];
               return (
-                <div key={color} className="group relative">
+                <div key={i} className="group relative">
                   <div
-                    onClick={() => setActiveColor(i)}
+                    onClick={() => onSelectColor(i)}
                     className="w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition-transform"
-                    style={{ background: color, border: `2px solid ${activeColor === i ? "#1A3040" : "rgba(26,48,64,0.15)"}`, outline: activeColor === i ? "2px solid #1A3040" : "none", outlineOffset: "2px" }}
+                    style={{
+                      backgroundColor: color,
+                      backgroundImage: img ? `url("${img}")` : undefined,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center 30%",
+                      border: `2px solid ${activeColor === i ? "#1A3040" : "rgba(26,48,64,0.15)"}`,
+                      outline: activeColor === i ? "2px solid #1A3040" : "none",
+                      outlineOffset: "2px",
+                    }}
                   />
                   {name && (
                     <span
@@ -141,8 +155,13 @@ export default function ProductDetail({ product, locale: loc, labels: t }: Props
           transition: "background 0.3s, color 0.3s",
         }}
       >
-        {added ? "✓ Hinzugefügt" : t.addToCart}
+        {added ? t.added : t.addToCart}
       </button>
+
+      {/* Versand-Hinweis direkt bei der Kaufentscheidung */}
+      <p className="text-xs font-mono text-center mb-4" style={{ color: "rgba(26,48,64,0.5)" }}>
+        {t.shipping}
+      </p>
 
       {product.sizeChart && (
         <button
@@ -162,6 +181,19 @@ export default function ProductDetail({ product, locale: loc, labels: t }: Props
       {sizeGuideOpen && (
         <SizeGuide product={product} onClose={() => setSizeGuideOpen(false)} />
       )}
+
+      {/* Trust bar */}
+      <div className="flex items-center justify-center gap-5 flex-wrap mb-10">
+        {[t.trustShipping, t.trustReturns, t.trustPayment].map((item) => (
+          <span
+            key={item}
+            className="text-[10px] font-mono tracking-widest uppercase"
+            style={{ color: "rgba(26,48,64,0.55)" }}
+          >
+            ✓ {item}
+          </span>
+        ))}
+      </div>
 
       {/* Details */}
       <div className="space-y-6 pt-8" style={{ borderTop: "1px solid rgba(26,48,64,0.1)" }}>
@@ -187,9 +219,6 @@ export default function ProductDetail({ product, locale: loc, labels: t }: Props
         ))}
       </div>
 
-      <p className="mt-8 text-xs font-mono text-center" style={{ color: "rgba(26,48,64,0.4)" }}>
-        {t.shipping}
-      </p>
     </div>
   );
 }

@@ -22,6 +22,7 @@ export default async function CollectionPage({
 }) {
   const { locale } = await params;
   const products = await fetchProducts();
+  const t = await getTranslations({ locale, namespace: "collection" });
 
   return (
     <ShopShell locale={locale as Locale}>
@@ -34,7 +35,7 @@ export default async function CollectionPage({
             position: "sticky",
             top: 0,
             width: "100%",
-            height: "clamp(300px, 34vw, 680px)",
+            height: "clamp(300px, 52vw, 820px)",
             overflow: "hidden",
             zIndex: 0,
           }}
@@ -46,7 +47,7 @@ export default async function CollectionPage({
             fill
             priority
             sizes="100vw"
-            style={{ objectFit: "cover", objectPosition: "center 50%" }}
+            style={{ objectFit: "cover", objectPosition: "center 36%" }}
           />
 
           {/* Dark gradient overlay — top + strong bottom */}
@@ -56,7 +57,7 @@ export default async function CollectionPage({
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(10,61,82,0.55) 0%, transparent 35%, transparent 50%, rgba(10,61,82,0.72) 100%)",
+                "linear-gradient(to bottom, rgba(10,61,82,0.65) 0%, rgba(10,61,82,0.22) 28%, rgba(10,61,82,0.28) 55%, rgba(10,61,82,0.62) 76%, rgba(10,61,82,0.92) 100%)",
             }}
           />
 
@@ -70,14 +71,15 @@ export default async function CollectionPage({
           >
             <p
               style={{
-                color: "rgba(248,243,232,0.7)",
+                color: "rgba(248,243,232,0.85)",
                 fontSize: "10px",
                 letterSpacing: "0.45em",
                 textTransform: "uppercase",
                 fontFamily: "var(--font-geist-mono)",
+                textShadow: "0 1px 8px rgba(0,0,0,0.6)",
               }}
             >
-              Sommer {new Date().getFullYear()}
+              {t("season", { year: new Date().getFullYear() })}
             </p>
           </div>
 
@@ -92,13 +94,14 @@ export default async function CollectionPage({
           >
             <p
               style={{
-                color: "rgba(248,243,232,0.5)",
+                color: "rgba(248,243,232,0.75)",
                 fontSize: "10px",
                 letterSpacing: "0.3em",
                 fontFamily: "var(--font-geist-mono)",
+                textShadow: "0 1px 8px rgba(0,0,0,0.6)",
               }}
             >
-              {products.length} Stücke
+              {products.length} {t("pieces")}
             </p>
           </div>
 
@@ -127,7 +130,7 @@ export default async function CollectionPage({
                   letterSpacing: "-0.02em",
                   textTransform: "uppercase",
                   color: "#F8F3E8",
-                  textShadow: "0 2px 40px rgba(0,0,0,0.4)",
+                  textShadow: "0 2px 10px rgba(0,0,0,0.75), 0 8px 40px rgba(0,0,0,0.5)",
                   marginBottom: "clamp(0.3rem, 0.8vw, 0.6rem)",
                 }}
               >
@@ -140,7 +143,7 @@ export default async function CollectionPage({
                   fontSize: "clamp(1rem, 2.5vw, 2rem)",
                   color: "#D4AF37",
                   letterSpacing: "0.06em",
-                  textShadow: "0 1px 20px rgba(0,0,0,0.5)",
+                  textShadow: "0 1px 6px rgba(0,0,0,0.7), 0 4px 24px rgba(0,0,0,0.5)",
                 }}
               >
                 Verano Exotico
@@ -168,25 +171,29 @@ export default async function CollectionPage({
             >
               <p
                 style={{
-                  color: "rgba(248,243,232,0.45)",
+                  color: "rgba(248,243,232,0.7)",
                   fontSize: "9px",
                   letterSpacing: "0.4em",
                   textTransform: "uppercase",
                   fontFamily: "var(--font-geist-mono)",
+                  textShadow: "0 1px 8px rgba(0,0,0,0.6)",
                 }}
               >
-                Scrollen
+                {t("scroll")}
               </p>
               <svg
                 width="12"
                 height="18"
                 viewBox="0 0 12 18"
                 fill="none"
-                style={{ animation: "scrollBounce 1.8s ease-in-out infinite" }}
+                style={{
+                  animation: "scrollBounce 1.8s ease-in-out infinite",
+                  filter: "drop-shadow(0 1px 4px rgba(0,0,0,0.6))",
+                }}
               >
                 <path
                   d="M6 0 L6 12 M1 8 L6 13 L11 8"
-                  stroke="rgba(248,243,232,0.4)"
+                  stroke="rgba(248,243,232,0.65)"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"

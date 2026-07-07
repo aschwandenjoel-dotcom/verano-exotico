@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/fulfillment/sync",
+      "schedule": "0 */2 * * *"
+    }
+  ]
+}

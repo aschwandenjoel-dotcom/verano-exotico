@@ -34,7 +34,7 @@ function PrivacyContent() {
         Datenschutz&shy;erklärung
       </h1>
       <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", marginBottom: "48px" }}>
-        Stand: Juni 2026
+        Stand: Juli 2026
       </p>
 
       <Section title="1. Allgemeines">
@@ -76,13 +76,12 @@ function PrivacyContent() {
           <li>E-Mail-Adresse</li>
           <li>Bestelldetails (Artikel, Menge, Preis)</li>
         </ul>
-        <p>Zahlungsdaten (Kreditkarteninformationen) werden ausschliesslich durch unseren Zahlungsanbieter Stripe verarbeitet und gelangen zu keinem Zeitpunkt auf unsere Server.</p>
+        <p>Die Zahlung erfolgt per Banküberweisung (Vorkasse). Kreditkartendaten werden von uns nicht erhoben und nicht verarbeitet.</p>
         <p style={{ marginTop: "12px" }}>Bestelldaten werden für die Dauer der gesetzlichen Aufbewahrungspflicht (10 Jahre gemäss OR Art. 958f) gespeichert und danach gelöscht.</p>
       </Section>
 
-      <Section title="4. Zahlungsdienstleister: Stripe">
-        <p>Die Zahlungsabwicklung erfolgt über Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland. Bei Bezahlung werden Ihre Zahlungsdaten direkt an Stripe übermittelt. Stripe verarbeitet diese Daten auf Grundlage der PCI-DSS-Zertifizierung und hält die Anforderungen des Datenschutzes gemäss DSGVO ein.</p>
-        <p style={{ marginTop: "12px" }}>Weitere Informationen finden Sie in der Datenschutzerklärung von Stripe: <a href="https://stripe.com/de/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#1A3040" }}>stripe.com/de/privacy</a></p>
+      <Section title="4. Zahlungsabwicklung (Banküberweisung)">
+        <p>Die Bezahlung erfolgt per Überweisung auf unser Bankkonto (Vorkasse). Dabei erhalten wir von Ihrer Bank die üblichen Buchungsangaben (Name, IBAN, Betrag, Zahlungsreferenz). Diese Daten verwenden wir ausschliesslich zur Zuordnung und Abwicklung Ihrer Bestellung (Art. 6 Abs. 1 lit. b DSGVO) und bewahren sie im Rahmen der gesetzlichen Aufbewahrungspflichten auf. Eine Weitergabe an Dritte findet nicht statt.</p>
       </Section>
 
       <Section title="5. E-Mail-Versand (Bestellbestätigung)">
@@ -99,11 +98,27 @@ function PrivacyContent() {
         <p>Zur Speicherung von Bestelldaten nutzen wir Supabase, angeboten von Supabase Inc., 970 Toa Payoh North, #07-04, Singapore 318992. Bestelldaten werden verschlüsselt übertragen und gespeichert. Mit Supabase besteht ein Datenverarbeitungsvertrag gemäss Art. 28 DSGVO.</p>
       </Section>
 
-      <Section title="8. Analyse & Tracking">
+      <Section title="8. Logistik & Auftragsabwicklung (CJ Dropshipping)">
+        <p>Zur Auslieferung Ihrer Bestellung arbeiten wir mit dem Logistikdienstleister CJ Dropshipping (Yiwu Cute Jewelry Co., Ltd. bzw. CJ-Konzerngesellschaften mit Sitz in China und internationalen Lagerstandorten) zusammen. Zum Zweck der Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO) übermitteln wir folgende Daten an CJ Dropshipping:</p>
+        <ul style={ul}>
+          <li>Name der Empfängerin / des Empfängers</li>
+          <li>Lieferadresse</li>
+          <li>Telefonnummer (für Zustellung und Zollabwicklung)</li>
+          <li>Bestellte Artikel und Mengen</li>
+        </ul>
+        <p>Die Übermittlung erfolgt in Länder ausserhalb der Schweiz und des EWR, insbesondere nach China. Für diese Länder besteht kein Angemessenheitsbeschluss; die Übermittlung ist jedoch zur Erfüllung des Vertrags mit Ihnen erforderlich (Art. 49 Abs. 1 lit. b DSGVO, Art. 17 Abs. 1 lit. a nDSG). Es werden nur die für den Versand zwingend notwendigen Daten übermittelt; Zahlungsdaten werden nicht weitergegeben.</p>
+      </Section>
+
+      <Section title="9. Newsletter & Produktbewertungen">
+        <p><strong>Newsletter:</strong> Wenn Sie sich für unseren Newsletter anmelden, speichern wir Ihre E-Mail-Adresse in unserer Datenbank (Supabase), bis Sie sich abmelden. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO); Sie können diese jederzeit per E-Mail an uns widerrufen.</p>
+        <p style={{ marginTop: "12px" }}><strong>Produktbewertungen:</strong> Wenn Sie eine Bewertung hinterlassen, speichern wir den von Ihnen angegebenen Namen (freiwillig, auch Pseudonym möglich), die Bewertung und den Kommentartext. Die Bewertung wird öffentlich auf der jeweiligen Produktseite angezeigt. Sie können die Löschung jederzeit per E-Mail verlangen.</p>
+      </Section>
+
+      <Section title="10. Analyse & Tracking">
         <p>Wir setzen <strong>keinerlei</strong> Web-Analyse-Tools (wie Google Analytics, Matomo o. ä.) und <strong>keine</strong> Werbe-Tracking-Pixel (wie Meta Pixel, TikTok Pixel o. ä.) ein. Es erfolgt keine Erstellung von Nutzerprofilen und keine Weitergabe Ihrer Daten an Werbenetzwerke.</p>
       </Section>
 
-      <Section title="9. Ihre Rechte als betroffene Person">
+      <Section title="11. Ihre Rechte als betroffene Person">
         <p>Sie haben gegenüber uns folgende Rechte hinsichtlich Ihrer personenbezogenen Daten:</p>
         <ul style={ul}>
           <li><strong>Auskunftsrecht</strong> (Art. 15 DSGVO / Art. 25 nDSG): Sie können jederzeit Auskunft über die von uns gespeicherten Daten verlangen.</li>
@@ -117,8 +132,8 @@ function PrivacyContent() {
         <p style={{ marginTop: "12px" }}>Sie haben zudem das Recht, sich bei der zuständigen Datenschutzbehörde zu beschweren. In der Schweiz ist dies der <strong>Eidgenössische Datenschutz- und Öffentlichkeitsbeauftragte (EDÖB)</strong>, in der EU die zuständige nationale Aufsichtsbehörde.</p>
       </Section>
 
-      <Section title="10. Änderungen dieser Datenschutzerklärung">
-        <p>Wir behalten uns vor, diese Datenschutzerklärung bei Änderungen der rechtlichen Rahmenbedingungen oder unserer Dienstleistungen anzupassen. Die jeweils aktuelle Version ist auf dieser Seite abrufbar. Stand der aktuellen Fassung: Juni 2026.</p>
+      <Section title="12. Änderungen dieser Datenschutzerklärung">
+        <p>Wir behalten uns vor, diese Datenschutzerklärung bei Änderungen der rechtlichen Rahmenbedingungen oder unserer Dienstleistungen anzupassen. Die jeweils aktuelle Version ist auf dieser Seite abrufbar. Stand der aktuellen Fassung: Juli 2026.</p>
       </Section>
     </div>
   );

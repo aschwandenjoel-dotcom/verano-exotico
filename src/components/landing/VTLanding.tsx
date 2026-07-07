@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import type { Locale } from "@/types";
-import { products } from "@/lib/products";
+import type { Locale, Product as ShopProduct } from "@/types";
 import Header from "@/components/ui/Header";
 
 const PanoramaIntro = dynamic(
@@ -13,56 +13,18 @@ const PanoramaIntro = dynamic(
   { ssr: false }
 );
 
-interface Props { locale: Locale; }
+interface Props { locale: Locale; products: ShopProduct[]; }
 
-interface Product {
-  number: string;
-  category: string;
-  title: string;
-  name: string;
-  desc: string;
-  catchphrase: string;
-  price: string;
-  visual: "pants" | "shirts" | "sweaters";
-  slug: string;
-}
-
-const PRODUCTS: Product[] = [
-  {
-    number: "01", category: "PANTS", title: "The Pants", name: "Urban Blueprint",
-    desc: "Relaxed bis Wide-Leg. Inspiriert von der Skatekultur der 90er. Robust genug für die Straße, stylish genug für den Club.",
-    catchphrase: "Von der Rooftop-Party direkt in den Night-Bus.",
-    price: "CHF 149", visual: "pants", slug: "cargo-pants",
-  },
-  {
-    number: "02", category: "SHIRTS", title: "The Shirts", name: "Heavyweight Essentials",
-    desc: "240 GSM+ Heavyweight Cotton. Boxy & Bold Fit mit tiefem Schulterfall und engem Kragen.",
-    catchphrase: "Deine Leinwand aus Stoff. Formstabil, egal wie heiß es wird.",
-    price: "CHF 69", visual: "shirts", slug: "heavy-logo-tee",
-  },
-  {
-    number: "03", category: "SWEATERS", title: "The Sweaters", name: "Sunset Layers",
-    desc: "Ultra-weiches Fleece-Lining. 'Golden Hour Comfort' für die kühlen Stunden nach einem langen Tag in der City.",
-    catchphrase: "Der Hoodie, den man dir definitiv klauen wird.",
-    price: "CHF 129", visual: "sweaters", slug: "heavyweight-hoodie",
-  },
-];
-
-const TICKER_ITEMS = [
-  { text: "Golden Days, Timeless Wear", accent: false },
-  { text: "★ Verano Exotico ★ SS25", accent: true },
-  { text: "Streetwear for Eternity", accent: false },
-  { text: "Golden Days, Timeless Wear", accent: false },
-  { text: "★ Verano Exotico ★ SS25", accent: true },
-  { text: "Streetwear for Eternity", accent: false },
+// Slogan bleibt in beiden Sprachen gleich; nur die Kategorien-Zeile wird übersetzt
+function tickerItems(categories: string) {
+  const block = [
+    { text: "Golden Days, Timeless Wear", accent: false },
+    { text: "★ Verano Exotico ★", accent: true },
+    { text: categories, accent: false },
+  ];
   // duplicated for seamless loop
-  { text: "Golden Days, Timeless Wear", accent: false },
-  { text: "★ Verano Exotico ★ SS25", accent: true },
-  { text: "Streetwear for Eternity", accent: false },
-  { text: "Golden Days, Timeless Wear", accent: false },
-  { text: "★ Verano Exotico ★ SS25", accent: true },
-  { text: "Streetwear for Eternity", accent: false },
-];
+  return [...block, ...block, ...block, ...block];
+}
 
 
 /* ─── Scroll reveal hook ─────────────────────────────────────────── */
@@ -85,176 +47,10 @@ function useScrollReveal() {
   }, []);
 }
 
-/* ─── Product visual placeholders ───────────────────────────────── */
-function ProductVisual({ type }: { type: Product["visual"] }) {
-  if (type === "pants") {
-    return (
-      <div className="w-full h-full relative overflow-hidden" style={{ background: "#0A3D52" }}>
-        <div
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(0,180,197,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(0,180,197,0.4) 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        />
-        <div
-          className="absolute"
-          style={{ width: "200%", height: "3px", background: "#D4AF37", top: "38%", left: "-50%", transform: "rotate(-12deg)", opacity: 0.7 }}
-        />
-        <div
-          className="absolute"
-          style={{ width: "200%", height: "1px", background: "#D4AF37", top: "44%", left: "-50%", transform: "rotate(-12deg)", opacity: 0.3 }}
-        />
-        <span
-          className="absolute bottom-5 left-5 text-[10px] tracking-[0.3em] uppercase"
-          style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}
-        >
-          URBAN BLUEPRINT
-        </span>
-        <span
-          className="absolute top-4 right-5 font-black opacity-[0.07] select-none leading-none"
-          style={{ fontSize: "10rem", color: "#E4F4F7", fontFamily: "var(--font-archivo-black), sans-serif" }}
-        >
-          01
-        </span>
-      </div>
-    );
-  }
-
-  if (type === "shirts") {
-    return (
-      <div
-        className="w-full h-full relative overflow-hidden flex items-center justify-center"
-        style={{ background: "#0A3D52" }}
-      >
-        <span
-          className="absolute font-black select-none leading-none opacity-[0.07]"
-          style={{ fontSize: "7rem", color: "#E4F4F7", fontFamily: "var(--font-archivo-black), sans-serif", letterSpacing: "-0.04em", transform: "rotate(-4deg)" }}
-        >
-          240<br />GSM
-        </span>
-        {[30, 50, 70].map((top) => (
-          <div key={top} className="absolute w-full" style={{ top: `${top}%`, height: "1px", background: "rgba(228,244,247,0.08)" }} />
-        ))}
-        <div className="absolute" style={{ width: "1px", height: "40px", background: "#D4AF37", opacity: 0.6 }} />
-        <div className="absolute" style={{ width: "40px", height: "1px", background: "#D4AF37", opacity: 0.6 }} />
-        <span
-          className="absolute bottom-5 left-5 text-[10px] tracking-[0.3em] uppercase"
-          style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}
-        >
-          HEAVYWEIGHT
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="w-full h-full relative overflow-hidden"
-      style={{ background: "linear-gradient(160deg, #00B4C5 0%, #2E7D5E 55%, #0A3D52 100%)" }}
-    >
-      {[20, 40, 60, 80].map((top, i) => (
-        <div key={top} className="absolute w-full" style={{ top: `${top}%`, height: `${12 + i * 4}px`, background: "rgba(0,0,0,0.12)" }} />
-      ))}
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-          backgroundSize: "150px",
-          mixBlendMode: "overlay",
-        }}
-      />
-      <span
-        className="absolute bottom-5 left-5 text-[10px] tracking-[0.3em] uppercase"
-        style={{ color: "#F8F3E8", fontFamily: "var(--font-geist-mono)", opacity: 0.75 }}
-      >
-        SUNSET LAYERS
-      </span>
-      <span
-        className="absolute top-4 right-5 font-black opacity-10 select-none leading-none"
-        style={{ fontSize: "9rem", color: "#F8F3E8", fontFamily: "var(--font-archivo-black), sans-serif" }}
-      >
-        03
-      </span>
-    </div>
-  );
-}
-
-/* ─── Product Card ───────────────────────────────────────────────── */
-function ProductCard({ product, locale }: { product: Product; locale: Locale }) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <article
-      className="flex flex-col"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        transform: hovered ? "translateY(-8px)" : "translateY(0)",
-        transition: "transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
-      }}
-    >
-      <div className="relative overflow-hidden" style={{ aspectRatio: "3 / 4" }}>
-        <ProductVisual type={product.visual} />
-        <div
-          className="absolute inset-0 flex items-end p-6 transition-opacity duration-300"
-          style={{
-            background: "linear-gradient(to top, rgba(255,102,53,0.92) 0%, rgba(10,61,82,0.5) 100%)",
-            opacity: hovered ? 1 : 0,
-          }}
-        >
-          <p
-            className="text-[#F8F3E8] text-xl font-black leading-tight uppercase"
-            style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}
-          >
-            {product.catchphrase}
-          </p>
-        </div>
-      </div>
-
-      <div className="pt-4 pb-6 flex flex-col gap-3" style={{ borderBottom: "1px solid rgba(26,48,64,0.15)" }}>
-        <div className="flex items-baseline justify-between">
-          <span
-            className="text-[10px] tracking-[0.25em] uppercase"
-            style={{ color: "#00B4C5", fontFamily: "var(--font-geist-mono)" }}
-          >
-            {product.number} {product.category}
-          </span>
-          <span className="text-xs font-black" style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}>
-            {product.price}
-          </span>
-        </div>
-
-        <div>
-          <p className="text-[10px] tracking-widest uppercase mb-0.5" style={{ color: "rgba(26,48,64,0.4)" }}>{product.title}</p>
-          <h3
-            className="text-lg font-black uppercase leading-tight"
-            style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}
-          >
-            {product.name}
-          </h3>
-        </div>
-
-        <p className="text-xs leading-relaxed" style={{ color: "rgba(26,48,64,0.6)" }}>{product.desc}</p>
-
-        <Link
-          href={`/${locale}/product/${product.slug}`}
-          className="inline-flex items-center gap-2 text-[10px] font-black tracking-[0.25em] uppercase pb-px hover:opacity-60 transition-opacity w-fit"
-          style={{ fontFamily: "var(--font-geist-mono)", color: "#D4AF37", borderBottom: "1px solid #D4AF37" }}
-          aria-label={`${product.name} kaufen`}
-        >
-          Shop now →
-        </Link>
-      </div>
-    </article>
-  );
-}
-
 /* ─── Shop Card (horizontal scroll) ─────────────────────────────── */
-function ShopCard({ product, locale, index }: { product: (typeof products)[0]; locale: Locale; index: number }) {
+function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; locale: Locale; index: number; badgeNew: string }) {
   const [hovered, setHovered] = useState(false);
-  const image = product.images?.[0];
+  const image = product.colorImages?.[0] ?? product.images?.[0];
   const name = product.name[locale];
 
   return (
@@ -280,44 +76,63 @@ function ShopCard({ product, locale, index }: { product: (typeof products)[0]; l
         )}
         {product.isNew && (
           <span style={{ position: "absolute", top: "10px", left: "10px", background: "#D4AF37", color: "#1A3040", fontSize: "9px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, letterSpacing: "0.22em", textTransform: "uppercase", padding: "3px 8px" }}>
-            NEU
+            {badgeNew}
           </span>
         )}
       </div>
       <p style={{ fontSize: "9px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.18em", textTransform: "uppercase", color: "#00B4C5", marginBottom: "4px" }}>{product.category}</p>
       <p style={{ fontSize: "13px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", marginBottom: "4px", lineHeight: 1.2 }}>{name}</p>
-      <p style={{ fontSize: "13px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.55)" }}>CHF {product.price}</p>
+      <p style={{ fontSize: "13px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.55)" }}>CHF {product.price.toFixed(2)}</p>
     </Link>
   );
 }
 
 /* ─── Newsletter ─────────────────────────────────────────────────── */
 function NewsletterInput() {
+  const t = useTranslations("newsletter");
+  const locale = useLocale();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (email.trim()) setSubmitted(true);
+    if (!email.trim() || sending) return;
+    setSending(true);
+    setFailed(false);
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), locale }),
+      });
+      if (res.ok) setSubmitted(true);
+      else setFailed(true);
+    } catch {
+      setFailed(true);
+    } finally {
+      setSending(false);
+    }
   }
 
   if (submitted) {
     return (
       <p className="text-sm tracking-widest uppercase" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
-        ✓ You&apos;re in. See you in the heat.
+        ✓ {t("success")}
       </p>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-0 w-full max-w-md">
-      <label htmlFor="newsletter-email" className="sr-only">E-Mail-Adresse</label>
+      <label htmlFor="newsletter-email" className="sr-only">{t("placeholder")}</label>
       <input
         id="newsletter-email"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="your@email.com"
+        placeholder={t("placeholder")}
         required
         className="flex-1 bg-transparent px-4 py-3 text-sm outline-none transition-colors"
         style={{
@@ -331,18 +146,31 @@ function NewsletterInput() {
       />
       <button
         type="submit"
+        disabled={sending}
         className="px-6 py-3 text-[10px] font-black tracking-[0.25em] uppercase transition-colors hover:opacity-80"
-        style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px" }}
+        style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px", opacity: sending ? 0.7 : 1 }}
       >
-        Subscribe
+        {sending ? "…" : t("submit")}
       </button>
+      {failed && (
+        <p className="text-[11px] sm:self-center sm:ml-3 mt-2 sm:mt-0" style={{ color: "#E8A0A0", fontFamily: "var(--font-geist-mono)" }}>
+          {t("error")}
+        </p>
+      )}
     </form>
   );
 }
 
 /* ─── Main Landing ───────────────────────────────────────────────── */
-export default function VTLanding({ locale }: Props) {
+export default function VTLanding({ locale, products }: Props) {
   useScrollReveal();
+  const t = useTranslations("landing");
+  const tf = useTranslations("footer");
+  const tn = useTranslations("nav");
+  const year = new Date().getFullYear();
+  const shopScrollRef = useRef<HTMLDivElement>(null);
+  const scrollShop = (dir: number) =>
+    shopScrollRef.current?.scrollBy({ left: dir * 540, behavior: "smooth" });
 
   return (
     <div className="min-h-screen" style={{ background: "#F8F3E8", color: "#1A3040" }}>
@@ -359,7 +187,7 @@ export default function VTLanding({ locale }: Props) {
         {/* Meta row */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "clamp(3rem,8vw,5rem)" }}>
           <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>
-            Sommer {new Date().getFullYear()}
+            {t("season", { year })}
           </span>
           <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>
             Golden Days, Timeless Wear
@@ -371,10 +199,10 @@ export default function VTLanding({ locale }: Props) {
           <div style={{ marginBottom: "28px" }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(26,48,64,0.06)", borderRadius: "9999px", padding: "6px 16px", fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(26,48,64,0.5)" }}>
               <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#D4AF37", display: "inline-block" }} />
-              SS25 · Sommer Kollektion
+              {t("badge", { year })}
             </span>
           </div>
-          <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 0.92, margin: 0 }}>
+          <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
             <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.02em", color: "#1A3040" }}>
               Golden Days,
             </span>
@@ -387,19 +215,18 @@ export default function VTLanding({ locale }: Props) {
         {/* Bottom row */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
           <p className="text-sm max-w-sm leading-relaxed md:max-w-xs" style={{ color: "rgba(26,48,64,0.65)", fontFamily: "var(--font-syne)" }}>
-            Kleidung, die sich gut anfühlt. Nicht gut aussieht auf Instagram,
-            sondern gut anfühlt im echten Leben.{" "}
+            {t("hero_sub_1")}
             <em style={{ color: "#D4AF37", fontFamily: "var(--font-dm-serif)" }}>Golden Days</em>
-            {" "}und{" "}
-            <em style={{ color: "#D4AF37", fontFamily: "var(--font-dm-serif)" }}>Timeless Wear</em>{" "}
-            sind keine Versprechen. Es ist unser Massstab.
+            {t("hero_sub_2")}
+            <em style={{ color: "#D4AF37", fontFamily: "var(--font-dm-serif)" }}>Timeless Wear</em>
+            {t("hero_sub_3")}
           </p>
           <Link
             href={`/${locale}/collection`}
             className="btn-shimmer inline-flex items-center gap-3 text-[11px] font-black tracking-[0.25em] uppercase px-7 py-4 hover:opacity-80 transition-opacity"
             style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px" }}
           >
-            In den Shop
+            {t("cta_shop")}
             <span aria-hidden="true">→</span>
           </Link>
         </div>
@@ -412,7 +239,7 @@ export default function VTLanding({ locale }: Props) {
           style={{ animation: "marquee 22s linear infinite" }}
           aria-hidden="true"
         >
-          {TICKER_ITEMS.map((item, i) => (
+          {tickerItems(t("ticker_categories")).map((item, i) => (
             <span
               key={i}
               className="text-[10px] tracking-[0.3em] uppercase shrink-0"
@@ -442,10 +269,10 @@ export default function VTLanding({ locale }: Props) {
 
         <div className="max-w-3xl mx-auto text-center relative">
           <p
-            className="text-[10px] tracking-[0.4em] uppercase mb-8 reveal"
-            style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}
+            className="tracking-[0.4em] uppercase mb-8"
+            style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)", fontSize: "13px" }}
           >
-            Philosophy
+            {t("philosophy_eyebrow")}
           </p>
 
           <h2
@@ -456,7 +283,7 @@ export default function VTLanding({ locale }: Props) {
               fontFamily: "var(--font-archivo-black), sans-serif",
             }}
           >
-            Die Philosophie
+            {t("philosophy_title")}
           </h2>
 
           <div
@@ -468,11 +295,10 @@ export default function VTLanding({ locale }: Props) {
             className="text-base md:text-lg leading-loose reveal reveal-delay-3"
             style={{ color: "rgba(228,244,247,0.75)", fontFamily: "var(--font-syne)" }}
           >
-            <strong style={{ color: "#E4F4F7" }}>Golden Days</strong> ist dieses
-            Gefühl an einem langen Sommertag, wenn man einfach nicht nach Hause
-            will. <strong style={{ color: "#E4F4F7" }}>Timeless Wear</strong> ist
-            die Antwort darauf: Kleidung, die nicht nach einer Saison im Keller
-            landet. Wir machen Stücke für echte Menschen, nicht für Lookbooks.
+            <strong style={{ color: "#E4F4F7" }}>Golden Days</strong>
+            {t("phil_1")}
+            <strong style={{ color: "#E4F4F7" }}>Timeless Wear</strong>
+            {t("phil_2")}
           </p>
         </div>
       </section>
@@ -488,7 +314,7 @@ export default function VTLanding({ locale }: Props) {
               className="text-[10px] tracking-[0.35em] uppercase mb-1"
               style={{ color: "#00B4C5", fontFamily: "var(--font-geist-mono)" }}
             >
-              Neue Kollektion
+              {t("new_collection")}
             </p>
             <h2
               className="font-black uppercase text-3xl md:text-4xl"
@@ -510,22 +336,55 @@ export default function VTLanding({ locale }: Props) {
               e.currentTarget.style.borderBottomColor = "transparent";
             }}
           >
-            All pieces →
+            {t("all_pieces")}
           </Link>
         </div>
 
         <div style={{ position: "relative" }}>
           <div
+            ref={shopScrollRef}
             style={{ display: "flex", gap: "20px", overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: "16px", scrollbarWidth: "none", msOverflowStyle: "none" }}
             className="hide-scrollbar"
           >
             {products.map((product, i) => (
               <div key={product.slug} style={{ scrollSnapAlign: "start" }}>
-                <ShopCard product={product} locale={locale} index={i} />
+                <ShopCard product={product} locale={locale} index={i} badgeNew={t("badge_new")} />
               </div>
             ))}
           </div>
           <div style={{ position: "absolute", right: 0, top: 0, bottom: "16px", width: "80px", background: "linear-gradient(to left, #F8F3E8, transparent)", pointerEvents: "none" }} />
+
+          {/* Scroll-Pfeile */}
+          {[-1, 1].map((dir) => (
+            <button
+              key={dir}
+              type="button"
+              aria-label={dir < 0 ? t("aria_prev") : t("aria_next")}
+              onClick={() => scrollShop(dir)}
+              className="hidden md:flex items-center justify-center"
+              style={{
+                position: "absolute",
+                top: "calc(50% - 30px)",
+                [dir < 0 ? "left" : "right"]: "8px",
+                transform: "translateY(-50%)",
+                width: "44px",
+                height: "44px",
+                borderRadius: "9999px",
+                background: "#F8F3E8",
+                color: "#1A3040",
+                border: "1px solid rgba(26,48,64,0.15)",
+                boxShadow: "0 2px 10px rgba(26,48,64,0.15)",
+                cursor: "pointer",
+                zIndex: 5,
+                fontSize: "18px",
+                lineHeight: 1,
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#1A3040"; e.currentTarget.style.color = "#F8F3E8"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "#F8F3E8"; e.currentTarget.style.color = "#1A3040"; }}
+            >
+              {dir < 0 ? "‹" : "›"}
+            </button>
+          ))}
         </div>
       </section>
 
@@ -539,11 +398,11 @@ export default function VTLanding({ locale }: Props) {
             className="text-[10px] tracking-[0.35em] uppercase block mb-6"
             style={{ color: "#00B4C5", fontFamily: "var(--font-geist-mono)" }}
           >
-            Manifesto
+            {t("manifest_eyebrow")}
           </span>
           <blockquote
-            className="font-black uppercase leading-[0.92] tracking-tight"
-            style={{ fontSize: "clamp(2rem, 6vw, 6rem)", fontFamily: "var(--font-archivo-black), sans-serif" }}
+            className="font-black uppercase leading-none tracking-tight"
+            style={{ fontSize: "clamp(2rem, 6vw, 6rem)", fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.05 }}
           >
             <span className="block">Trends are</span>
             <span
@@ -582,8 +441,8 @@ export default function VTLanding({ locale }: Props) {
               className="font-black uppercase leading-tight mb-8"
               style={{ fontSize: "clamp(2.5rem, 8vw, 6rem)", color: "#F8F3E8", fontFamily: "var(--font-archivo-black), sans-serif" }}
             >
-              Join the<br />
-              <span style={{ color: "#D4AF37" }}>Heat.</span>
+              {t("newsletter_title_1")}<br />
+              <span style={{ color: "#D4AF37" }}>{t("newsletter_title_2")}</span>
             </h2>
             <NewsletterInput />
           </div>
@@ -598,21 +457,27 @@ export default function VTLanding({ locale }: Props) {
               VERANO EXOTICO
             </p>
             <p className="text-[10px]" style={{ color: "rgba(248,243,232,0.35)", fontFamily: "var(--font-geist-mono)" }}>
-              Guter Sommer. Gute Klamotten.
+              {t("footer_tagline")}
             </p>
           </div>
 
-          <nav className="flex items-center gap-6" aria-label="Footer-Navigation">
-            {["Impressum", "Datenschutz", "Shop"].map((item) => (
+          <nav className="flex items-center gap-6 flex-wrap" aria-label="Footer-Navigation">
+            {[
+              { label: tn("collection"), href: `/${locale}/collection` },
+              { label: tf("links_shipping"), href: `/${locale}/versand` },
+              { label: tf("links_terms"), href: `/${locale}/agb` },
+              { label: tf("links_legal"), href: `/${locale}/impressum` },
+              { label: tf("links_privacy"), href: `/${locale}/datenschutz` },
+            ].map((item) => (
               <a
-                key={item}
-                href="#"
+                key={item.href}
+                href={item.href}
                 className="text-[10px] tracking-[0.2em] uppercase transition-colors"
                 style={{ color: "rgba(248,243,232,0.35)", fontFamily: "var(--font-geist-mono)" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "#D4AF37")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(248,243,232,0.35)")}
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </nav>

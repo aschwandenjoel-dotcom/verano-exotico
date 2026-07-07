@@ -9,14 +9,9 @@ interface Props {
 }
 
 const MEASURE_STEPS = [
-  { n: 1, title: "Taillengröße",      desc: "Messen Sie waagerecht um die schmalste Stelle Ihrer Taille herum." },
-  { n: 2, title: "Hüftgröße",         desc: "Suchen Sie die weiteste Stelle des Hüftbereichs und messen Sie dort gerade von Kante zu Kante. Verdoppeln Sie dann dieses Maß." },
-  { n: 3, title: "Oberschenkelgröße", desc: "Breiteste Stelle des Oberschenkelbereichs in der Nähe der Schrittnaht, von Seite zu Seite messen, dann verdoppeln." },
-  { n: 4, title: "Kalbengröße",       desc: "Breiteste Stelle der Wade eines Beins quer messen, dann verdoppeln." },
-  { n: 5, title: "Frontaufstieg",     desc: "Messen Sie von der Schrittnaht bis zur Oberkante des vorderen Bunds." },
-  { n: 6, title: "Rücken aufstieg",   desc: "Messen Sie von der Schrittnaht bis zur Oberkante des hinteren Bunds." },
-  { n: 7, title: "Schrittlänge",      desc: "Von der Schrittnaht entlang des Innenschenkels bis zum unteren Ende des Saums." },
-  { n: 8, title: "Länge (Unterteil)", desc: "Messen Sie entlang der Seitennaht vom Bund bis zum unteren Saum." },
+  { n: 1, title: "Oberweite", desc: "Messen Sie waagerecht um die weiteste Stelle Ihrer Brust herum – das Massband bleibt dabei locker und parallel zum Boden." },
+  { n: 2, title: "Taille", desc: "Messen Sie um die schmalste Stelle Ihrer Taille herum, etwa auf Höhe des Bauchnabels." },
+  { n: 3, title: "Hüfte",  desc: "Messen Sie um die weiteste Stelle Ihrer Hüfte und Ihres Gesässes herum, mit geschlossenen Beinen." },
 ];
 
 const thStyle: React.CSSProperties = {
@@ -127,7 +122,7 @@ export default function SizeGuide({ product, onClose }: Props) {
                         <td style={tdBoldStyle}>{row.size}</td>
                         <td style={tdStyle}>{row.eu}</td>
                         {(unit === "cm" ? row.cm : row.in).map((val, j) => (
-                          <td key={j} style={tdStyle}>{unit === "in" ? val.toFixed(2) : val}</td>
+                          <td key={j} style={tdStyle}>{val}</td>
                         ))}
                       </tr>
                     ))}
@@ -146,14 +141,32 @@ export default function SizeGuide({ product, onClose }: Props) {
               Wie messe ich richtig?
             </p>
 
-            {/* Original reference image — unmodified */}
-            <div style={{ marginBottom: 28, background: "#FAFAFA", borderRadius: 6, overflow: "hidden" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/pants-diagram.svg"
-                alt="Hosendiagramm mit Messpunkten 1–8"
-                style={{ width: "100%", height: "auto", display: "block" }}
-              />
+            {/* Bikini-Messdiagramm (Oberweite / Taille / Hüfte) */}
+            <div style={{ marginBottom: 28, background: "#FAFAFA", borderRadius: 6, overflow: "hidden", display: "flex", justifyContent: "center", padding: "22px 0" }}>
+              <svg width="188" height="167" viewBox="0 0 220 195" role="img" aria-label="Diagramm mit Messpunkten Oberweite, Taille und Hüfte">
+                {/* Halsknauf der Schneiderpuppe */}
+                <circle cx="110" cy="24" r="5" fill="#E7EDF0" stroke="#CBD8DF" strokeWidth="1.5" />
+                <path d="M105 30 L115 30 L115 44 L105 44 Z" fill="#E7EDF0" stroke="#CBD8DF" strokeWidth="1.5" />
+                {/* Torso mit flachen, breiten Schultern (symmetrisch um x=110) */}
+                <path
+                  d="M78 44 L142 44 Q146 45 144 58 C140 78 126 98 126 118 C126 138 138 148 140 158
+                     C141 170 130 180 110 180 C90 180 79 170 80 158 C82 148 94 138 94 118
+                     C94 98 80 78 76 58 Q74 45 78 44 Z"
+                  fill="#E7EDF0" stroke="#CBD8DF" strokeWidth="1.5"
+                />
+                {/* Bikini-Oberteil */}
+                <path d="M82 62 C94 72 126 72 138 62 L138 74 C126 82 94 82 82 74 Z" fill="#0A3D52" />
+                {/* Bikini-Unterteil */}
+                <path d="M84 152 C96 163 124 163 136 152 L128 172 C119 179 101 179 92 172 Z" fill="#0A3D52" />
+                {/* Messlinien */}
+                {[{ y: 64, n: 1 }, { y: 118, n: 2 }, { y: 156, n: 3 }].map(({ y, n }) => (
+                  <g key={n}>
+                    <line x1="42" y1={y} x2="178" y2={y} stroke="#1A3040" strokeWidth="1" strokeDasharray="4 3" />
+                    <circle cx="30" cy={y} r="10" fill="#1A1A1A" />
+                    <text x="30" y={y + 3.5} textAnchor="middle" fontSize="11" fontWeight="700" fill="#FFF">{n}</text>
+                  </g>
+                ))}
+              </svg>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

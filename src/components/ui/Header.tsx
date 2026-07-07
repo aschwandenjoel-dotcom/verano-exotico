@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { Locale } from "@/types";
 import { useCart } from "@/context/CartContext";
 
@@ -9,20 +11,69 @@ interface Props {
   locale: Locale;
 }
 
+const LOCALES: Locale[] = ["de", "en"];
+
+/** Umschalter DE | EN — tauscht das Locale-Segment im aktuellen Pfad. */
+function LanguageSwitch({ locale, onNavigate }: { locale: Locale; onNavigate?: () => void }) {
+  const pathname = usePathname() ?? `/${locale}`;
+
+  const pathFor = (target: Locale) => {
+    const parts = pathname.split("/");
+    if (LOCALES.includes(parts[1] as Locale)) parts[1] = target;
+    else parts.splice(1, 0, target);
+    return parts.join("/") || `/${target}`;
+  };
+
+  return (
+    <div
+      aria-label="Sprache / Language"
+      style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-geist-mono)", fontSize: "10px", letterSpacing: "0.15em" }}
+    >
+      {LOCALES.map((l, i) => (
+        <span key={l} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          {i > 0 && <span aria-hidden="true" style={{ color: "rgba(26,48,64,0.25)" }}>/</span>}
+          <Link
+            href={pathFor(l)}
+            onClick={onNavigate}
+            aria-current={l === locale ? "true" : undefined}
+            style={{
+              color: l === locale ? "#1A3040" : "rgba(26,48,64,0.4)",
+              fontWeight: l === locale ? 700 : 400,
+              textDecoration: "none",
+              textTransform: "uppercase",
+              padding: "4px 2px",
+            }}
+          >
+            {l.toUpperCase()}
+          </Link>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export default function Header({ locale }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { openCart, totalCount } = useCart();
+  const t = useTranslations("nav");
+  const tc = useTranslations("cart");
 
   const navLinks = [
-    { href: `/${locale}`, label: "Start" },
-    { href: `/${locale}/collection`, label: "Shop" },
-    { href: `/${locale}/about`, label: "Über uns" },
+    { href: `/${locale}`, label: t("home") },
+    { href: `/${locale}/collection`, label: t("collection") },
+    { href: `/${locale}/about`, label: t("about") },
   ];
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 flex items-center px-6 md:px-10 py-4"
-      style={{ background: "#F8F3E8", borderBottom: "1px solid rgba(26,48,64,0.1)", position: "fixed" }}
+      className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-4"
+      style={{
+        background: "#F8F3E8",
+        borderBottom: "1px solid rgba(26,48,64,0.1)",
+        display: "grid",
+        gridTemplateColumns: "1fr auto 1fr",
+        alignItems: "center",
+      }}
     >
       <Link
         href={`/${locale}`}
@@ -33,7 +84,7 @@ export default function Header({ locale }: Props) {
         VERANO EXOTICO
       </Link>
 
-      <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2" aria-label="Hauptnavigation">
+      <nav className="hidden md:flex items-center gap-8" aria-label="Hauptnavigation">
         {navLinks.map((link) => (
           <Link
             key={link.href}
@@ -48,19 +99,22 @@ export default function Header({ locale }: Props) {
         ))}
       </nav>
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="flex items-center gap-3" style={{ justifySelf: "end" }}>
+        <div className="hidden md:block">
+          <LanguageSwitch locale={locale} />
+        </div>
         <Link
           href={`/${locale}/collection`}
           className="hidden md:inline-flex items-center text-[10px] font-black tracking-[0.2em] uppercase px-4 py-2 hover:opacity-80 transition-opacity"
           style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px" }}
         >
-          Jetzt shoppen
+          {t("cta")}
         </Link>
 
         {/* Cart button */}
         <button
           onClick={openCart}
-          aria-label="Warenkorb öffnen"
+          aria-label={tc("title")}
           style={{ position: "relative", width: "40px", height: "40px", border: "1px solid rgba(26,48,64,0.15)", borderRadius: "50%", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#1A3040", flexShrink: 0 }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -103,6 +157,7 @@ export default function Header({ locale }: Props) {
               {link.label}
             </Link>
           ))}
+          <LanguageSwitch locale={locale} onNavigate={() => setMenuOpen(false)} />
         </div>
       )}
     </header>

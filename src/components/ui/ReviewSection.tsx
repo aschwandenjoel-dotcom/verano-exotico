@@ -1,25 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
-import type { Review } from "@/types";
+import { useTranslations, useLocale } from "next-intl";
 
-const STORAGE_KEY = "ve_reviews";
-
-function loadReviews(slug: string): Review[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const all: Review[] = raw ? JSON.parse(raw) : [];
-    return all.filter((r) => r.productSlug === slug);
-  } catch { return []; }
-}
-
-function saveReview(review: Review) {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const all: Review[] = raw ? JSON.parse(raw) : [];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...all, review]));
-  } catch {}
+interface Review {
+  id: string;
+  name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
 }
 
 function Stars({ value, onChange }: { value: number; onChange?: (v: number) => void }) {
@@ -57,10 +46,11 @@ function Stars({ value, onChange }: { value: number; onChange?: (v: number) => v
   );
 }
 
-function ReviewCard({ review }: { review: Review }) {
-  const date = new Date(review.date).toLocaleDateString("de-CH", {
-    year: "numeric", month: "short", day: "numeric",
-  });
+function ReviewCard({ review, locale }: { review: Review; locale: string }) {
+  const date = new Date(review.created_at).toLocaleDateString(
+    locale === "de" ? "de-CH" : "en-GB",
+    { year: "numeric", month: "short", day: "numeric" }
+  );
 
   return (
     <div style={{
@@ -74,9 +64,6 @@ function ReviewCard({ review }: { review: Review }) {
       <Stars value={review.rating} />
       <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.7)", lineHeight: 1.7, marginTop: "10px" }}>
         {review.comment}
-      </p>
-      <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.3)", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: "10px" }}>
-        Verifizierter Kauf
       </p>
     </div>
   );
@@ -107,33 +94,47 @@ const labelStyle: React.CSSProperties = {
 
 export default function ReviewSection({ productSlug }: { productSlug: string }) {
   const t = useTranslations("reviews");
+  const locale = useLocale();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [name, setName] = useState("");
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => { setReviews(loadReviews(productSlug)); }, [productSlug]);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/reviews?slug=${encodeURIComponent(productSlug)}`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => { if (!cancelled && Array.isArray(data)) setReviews(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [productSlug]);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (rating === 0)    { setError("rating");  return; }
     if (!comment.trim()) { setError("comment"); return; }
 
-    const review: Review = {
-      id: crypto.randomUUID(),
-      productSlug,
-      name: name.trim() || "Anonym",
-      rating,
-      comment: comment.trim(),
-      date: new Date().toISOString(),
-    };
-
-    saveReview(review);
-    setReviews((prev) => [...prev, review]);
-    setSubmitted(true);
-    setName(""); setRating(0); setComment(""); setError("");
+    setSubmitting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productSlug, name: name.trim(), rating, comment: comment.trim() }),
+      });
+      if (!res.ok) { setError("submit"); return; }
+      const review: Review = await res.json();
+      setReviews((prev) => [review, ...prev]);
+      setSubmitted(true);
+      setName(""); setRating(0); setComment("");
+    } catch {
+      setError("submit");
+    } finally {
+      setSubmitting(false);
+    }
   }, [productSlug, name, rating, comment]);
 
   const avg = reviews.length > 0
@@ -147,7 +148,7 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
         {/* Header */}
         <div style={{ marginBottom: "48px" }}>
           <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "#00B4C5", marginBottom: "8px" }}>
-            Kundenstimmen
+            {t("label")}
           </p>
           <div style={{ display: "flex", alignItems: "baseline", gap: "16px" }}>
             <h2 style={{ fontSize: "28px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, color: "#1A3040", textTransform: "uppercase", letterSpacing: "-0.01em", margin: 0 }}>
@@ -155,7 +156,7 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
             </h2>
             {avg && (
               <span style={{ fontSize: "13px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)" }}>
-                ★ {avg} · {reviews.length} {reviews.length === 1 ? "Bewertung" : "Bewertungen"}
+                ★ {avg} · {reviews.length} {reviews.length === 1 ? t("count_one") : t("count_many")}
               </span>
             )}
           </div>
@@ -171,7 +172,7 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
                   {t("no_reviews")}
                 </p>
               ) : (
-                reviews.map((r) => <ReviewCard key={r.id} review={r} />)
+                reviews.map((r) => <ReviewCard key={r.id} review={r} locale={locale} />)
               )}
             </div>
 
@@ -180,13 +181,13 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
               {submitted ? (
                 <div style={{ border: "1px solid rgba(26,48,64,0.1)", borderRadius: "12px", padding: "40px", textAlign: "center", background: "#FFFFFF" }}>
                   <div style={{ fontSize: "28px", color: "#D4AF37", marginBottom: "12px" }}>★</div>
-                  <p style={{ fontSize: "14px", color: "#1A3040", fontWeight: 600, marginBottom: "6px" }}>Danke für deine Bewertung!</p>
+                  <p style={{ fontSize: "14px", color: "#1A3040", fontWeight: 600, marginBottom: "6px" }}>{t("thanks")}</p>
                   <p style={{ fontSize: "12px", color: "rgba(26,48,64,0.5)" }}>{t("submitted")}</p>
                   <button
                     onClick={() => setSubmitted(false)}
                     style={{ marginTop: "24px", fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.5)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "3px", letterSpacing: "0.1em" }}
                   >
-                    Weitere Bewertung →
+                    {t("another")}
                   </button>
                 </div>
               ) : (
@@ -199,7 +200,7 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
                     <div>
                       <label style={labelStyle}>
                         {t("name_label")}
-                        <span style={{ marginLeft: "6px", fontSize: "9px", color: "rgba(26,48,64,0.35)", letterSpacing: "0.1em" }}>— optional</span>
+                        <span style={{ marginLeft: "6px", fontSize: "9px", color: "rgba(26,48,64,0.35)", letterSpacing: "0.1em" }}>— {t("name_optional")}</span>
                       </label>
                       <input
                         type="text"
@@ -216,7 +217,7 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
                       <label style={labelStyle}>{t("rating_label")}</label>
                       <Stars value={rating} onChange={setRating} />
                       {error === "rating" && (
-                        <p style={{ fontSize: "11px", color: "#C0392B", marginTop: "6px" }}>Bitte Bewertung auswählen</p>
+                        <p style={{ fontSize: "11px", color: "#C0392B", marginTop: "6px" }}>{t("error_rating")}</p>
                       )}
                     </div>
 
@@ -231,10 +232,18 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
                         onFocus={(e) => (e.target.style.borderColor = "#1A3040")}
                         onBlur={(e) => (e.target.style.borderColor = error === "comment" ? "#C0392B" : "rgba(26,48,64,0.15)")}
                       />
+                      {error === "comment" && (
+                        <p style={{ fontSize: "11px", color: "#C0392B", marginTop: "6px" }}>{t("error_comment")}</p>
+                      )}
                     </div>
+
+                    {error === "submit" && (
+                      <p style={{ fontSize: "11px", color: "#C0392B" }}>{t("error_submit")}</p>
+                    )}
 
                     <button
                       type="submit"
+                      disabled={submitting}
                       style={{
                         width: "100%",
                         padding: "14px",
@@ -247,13 +256,14 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
                         fontWeight: 700,
                         letterSpacing: "0.12em",
                         textTransform: "uppercase",
-                        cursor: "pointer",
+                        cursor: submitting ? "wait" : "pointer",
+                        opacity: submitting ? 0.7 : 1,
                         transition: "opacity 0.2s",
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.8")}
-                      onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                      onMouseEnter={(e) => { if (!submitting) e.currentTarget.style.opacity = "0.8"; }}
+                      onMouseLeave={(e) => { if (!submitting) e.currentTarget.style.opacity = "1"; }}
                     >
-                      {t("submit")}
+                      {submitting ? t("submitting") : t("submit")}
                     </button>
                   </form>
                 </div>
