@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase";
+import { query } from "@/lib/db";
 import { getCjOrderDetail } from "@/lib/cj";
 import { sendShippingNotification } from "@/lib/email";
 import { isAdminRequest } from "@/lib/adminAuth";
+
+interface OrderRow {
+  id: string;
+  order_number: number;
+  customer_email: string;
+  customer_name: string | null;
+  cj_order_id: string;
+  locale: string | null;
+}
 
 /**
  * Fragt bei CJ den Status offener Bestellungen ab. Sobald CJ eine Tracking-Nummer
@@ -20,47 +29,36 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
   }
 
-  const db = createServiceClient();
-
   // Bestellungen, die bei CJ liegen, aber noch keine Tracking-Nummer haben
-  let { data: orders, error } = await db
-    .from("orders")
-    .select("id, order_number, customer_email, customer_name, cj_order_id, locale")
-    .not("cj_order_id", "is", null)
-    .is("tracking_number", null)
-    .in("status", ["ordered"]);
-
-  if (error?.message?.includes("locale")) {
-    // Spalte locale evtl. noch nicht angelegt (SQL-Migration ausstehend) — Fallback ohne sie
-    const fallback = await db
-      .from("orders")
-      .select("id, order_number, customer_email, customer_name, cj_order_id")
-      .not("cj_order_id", "is", null)
-      .is("tracking_number", null)
-      .in("status", ["ordered"]);
-    orders = fallback.data?.map((o) => ({ ...o, locale: null })) ?? null;
-    error = fallback.error;
+  let orders: OrderRow[];
+  try {
+    orders = await query<OrderRow>(
+      `SELECT id, order_number, customer_email, customer_name, cj_order_id, locale
+       FROM orders
+       WHERE cj_order_id IS NOT NULL AND tracking_number IS NULL AND status IN ('ordered')`
+    );
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Fehler" }, { status: 500 });
   }
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const results: Array<{ order: number; status: string }> = [];
 
-  for (const order of orders ?? []) {
+  for (const order of orders) {
     try {
       const detail = await getCjOrderDetail(order.cj_order_id);
 
-      const update: Record<string, unknown> = { cj_order_status: detail.orderStatus };
+      const setClauses = ["cj_order_status = ?"];
+      const setValues: unknown[] = [detail.orderStatus];
 
       if (detail.trackNumber) {
-        update.tracking_number = detail.trackNumber;
-        update.tracking_provider = detail.trackingProvider ?? null;
-        update.status = "shipped";
+        setClauses.push("tracking_number = ?", "tracking_provider = ?", "status = ?");
+        setValues.push(detail.trackNumber, detail.trackingProvider ?? null, "shipped");
       } else if (detail.orderStatus === "CANCELLED") {
-        update.status = "cancelled";
+        setClauses.push("status = ?");
+        setValues.push("cancelled");
       }
 
-      await db.from("orders").update(update).eq("id", order.id);
+      await query(`UPDATE orders SET ${setClauses.join(", ")} WHERE id = ?`, [...setValues, order.id]);
 
       // Versand-Mail nur beim ersten Mal (wenn Tracking neu gesetzt wurde)
       if (detail.trackNumber && order.customer_email) {

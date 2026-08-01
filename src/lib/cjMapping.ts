@@ -288,32 +288,49 @@ export const cjProductMap: Record<string, CjVariantMap> = {
     },
   },
   // European And American Ladies Split Bikini Striped Tie-dye Hollow Bikini Swimsuit
+  // CJ nennt die Muster "Print 1"…"Print 6", im Shop heissen sie anders.
+  // Die Zuordnung ist über die vids der Einzelprodukte (riviera-boho-tuerkis
+  // usw.) verifiziert — nicht über die Reihenfolge geraten.
   "riviera-stripe-bikini": {
     variants: {
-      "Print 1|S": "2406080849451614200",
-      "Print 1|M": "2406080849451614400",
-      "Print 1|L": "2406080849451614600",
-      "Print 1|XL": "2406080849451614900",
-      "Print 2|S": "2406080849451616400",
-      "Print 2|M": "2406080849451616600",
-      "Print 2|L": "2406080849451617000",
-      "Print 2|XL": "2406080849451617200",
-      "Print 3|S": "2406080849451618000",
-      "Print 3|M": "2406080849451618200",
-      "Print 3|L": "2406080849451618400",
-      "Print 3|XL": "2406080849451618500",
-      "Print 4|S": "2406080849451619500",
-      "Print 4|M": "2406080849451619700",
-      "Print 4|L": "2406080849451619800",
-      "Print 4|XL": "2406080849461610000",
-      "Print 5|S": "2406080849461610800",
-      "Print 5|M": "2406080849461611000",
-      "Print 5|L": "2406080849461611100",
-      "Print 5|XL": "2406080849461611300",
-      "Print 6|S": "2406080849461612100",
-      "Print 6|M": "2406080849461612300",
-      "Print 6|L": "2406080849461612400",
-      "Print 6|XL": "2406080849461612600",
+      // Print 1
+      "Boho Türkis|S": "2406080849451614200",
+      "Boho Turquoise|S": "2406080849451614200",
+      "Boho Türkis|M": "2406080849451614400",
+      "Boho Turquoise|M": "2406080849451614400",
+      "Boho Türkis|L": "2406080849451614600",
+      "Boho Turquoise|L": "2406080849451614600",
+      "Boho Türkis|XL": "2406080849451614900",
+      "Boho Turquoise|XL": "2406080849451614900",
+      // Print 2
+      "Violett Rays|S": "2406080849451616400",
+      "Violet Rays|S": "2406080849451616400",
+      "Violett Rays|M": "2406080849451616600",
+      "Violet Rays|M": "2406080849451616600",
+      "Violett Rays|L": "2406080849451617000",
+      "Violet Rays|L": "2406080849451617000",
+      "Violett Rays|XL": "2406080849451617200",
+      "Violet Rays|XL": "2406080849451617200",
+      // Print 3
+      "Melon Rays|S": "2406080849451618000",
+      "Melon Rays|M": "2406080849451618200",
+      "Melon Rays|L": "2406080849451618400",
+      "Melon Rays|XL": "2406080849451618500",
+      // Print 4
+      "Lime Rays|S": "2406080849451619500",
+      "Lime Rays|M": "2406080849451619700",
+      "Lime Rays|L": "2406080849451619800",
+      "Lime Rays|XL": "2406080849461610000",
+      // Print 5
+      "Silver Rays|S": "2406080849461610800",
+      "Silver Rays|M": "2406080849461611000",
+      "Silver Rays|L": "2406080849461611100",
+      "Silver Rays|XL": "2406080849461611300",
+      // Print 6
+      "Monochrome|S": "2406080849461612100",
+      "Monochrome|M": "2406080849461612300",
+      "Monochrome|L": "2406080849461612400",
+      "Monochrome|XL": "2406080849461612600",
     },
   },
   // Women's Bikini Rope Mesh Colorful Bikini Swimsuit

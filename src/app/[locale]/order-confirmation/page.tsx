@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import ShopShell from "@/components/ui/ShopShell";
 import ClearCartOnSuccess from "@/components/ui/ClearCartOnSuccess";
-import { createServiceClient } from "@/lib/supabase";
+import { queryOne } from "@/lib/db";
 import { renderSwissQrDataUrl } from "@/lib/swissQr";
 import type { Locale } from "@/types";
 
@@ -29,23 +29,10 @@ export default async function OrderConfirmationPage({
   // Bestellung über die (nicht erratbare) UUID laden
   let order: OrderRow | null = null;
   if (id && /^[0-9a-f-]{36}$/i.test(id)) {
-    const db = createServiceClient();
-    const { data, error } = await db
-      .from("orders")
-      .select("id, order_number, subtotal, status, payment_currency, payment_amount")
-      .eq("id", id)
-      .maybeSingle();
-    if (error) {
-      // Spalten payment_currency/payment_amount evtl. noch nicht angelegt (SQL-Migration ausstehend)
-      const fallback = await db
-        .from("orders")
-        .select("id, order_number, subtotal, status")
-        .eq("id", id)
-        .maybeSingle();
-      order = fallback.data ?? null;
-    } else {
-      order = data ?? null;
-    }
+    order = await queryOne<OrderRow>(
+      "SELECT id, order_number, subtotal, status, payment_currency, payment_amount FROM orders WHERE id = ?",
+      [id]
+    );
   }
 
   const iban = process.env.PAYMENT_IBAN || "";

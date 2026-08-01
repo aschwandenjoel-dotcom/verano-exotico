@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { query } from "@/lib/db";
 import { createCjOrder } from "@/lib/cj";
 import { resolveVid } from "@/lib/cjMapping";
 
@@ -6,11 +6,11 @@ interface FulfillmentItem {
   product_slug: string;
   product_name: string;
   quantity: number;
-  color_name?: string;
-  size?: string;
+  color_name?: string | null;
+  size?: string | null;
 }
 
-interface ShippingAddress {
+export interface ShippingAddress {
   line1?: string | null;
   line2?: string | null;
   city?: string | null;
@@ -26,8 +26,7 @@ function countryNameFor(code: string): string {
 }
 
 interface FulfillOrderParams {
-  db: SupabaseClient;
-  orderId: string; // Supabase orders.id
+  orderId: string; // orders.id
   orderNumber: number; // orders.order_number
   customerName: string;
   phone: string;
@@ -37,11 +36,10 @@ interface FulfillOrderParams {
 
 /**
  * Löst automatisch die CJ-Dropshipping-Bestellung aus und schreibt Status/CJ-ID
- * zurück in Supabase. Fehler werden geloggt und in `fulfillment_error` gespeichert,
- * damit sie im Admin sichtbar sind — sie brechen den Webhook NICHT ab.
+ * zurück in die Datenbank. Fehler werden geloggt und in `fulfillment_error`
+ * gespeichert, damit sie im Admin sichtbar sind — sie brechen den Aufruf NICHT ab.
  */
 export async function fulfillOrder({
-  db,
   orderId,
   orderNumber,
   customerName,
@@ -56,7 +54,7 @@ export async function fulfillOrder({
 
     // Varianten auflösen — jede Position muss auf eine CJ-vid zeigen
     const products = items.map((item) => {
-      const vid = resolveVid(item.product_slug, item.color_name, item.size);
+      const vid = resolveVid(item.product_slug, item.color_name ?? undefined, item.size ?? undefined);
       if (!vid) {
         throw new Error(
           `Keine CJ-Variante für "${item.product_slug}" (${item.color_name ?? "-"} / ${item.size ?? "-"}) — in cjMapping.ts ergänzen`
@@ -78,21 +76,16 @@ export async function fulfillOrder({
       products,
     });
 
-    await db
-      .from("orders")
-      .update({
-        cj_order_id: cjOrder.orderId,
-        cj_order_status: cjOrder.orderStatus,
-        status: "ordered",
-        fulfillment_error: null,
-      })
-      .eq("id", orderId);
+    await query(
+      "UPDATE orders SET cj_order_id = ?, cj_order_status = ?, status = ?, fulfillment_error = NULL WHERE id = ?",
+      [cjOrder.orderId, cjOrder.orderStatus, "ordered", orderId]
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`[fulfillment] Bestellung ${orderNumber} fehlgeschlagen:`, message);
-    await db
-      .from("orders")
-      .update({ status: "fulfillment_failed", fulfillment_error: message })
-      .eq("id", orderId);
+    await query(
+      "UPDATE orders SET status = ?, fulfillment_error = ? WHERE id = ?",
+      ["fulfillment_failed", message, orderId]
+    );
   }
 }

@@ -1,5 +1,6 @@
+import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase";
+import { query } from "@/lib/db";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -12,15 +13,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Ungültige E-Mail-Adresse" }, { status: 400 });
   }
 
-  const db = createServiceClient();
-  const { error } = await db.from("newsletter_subscribers").insert({ email, locale });
-
-  if (error) {
+  try {
+    await query(
+      "INSERT INTO newsletter_subscribers (id, email, locale) VALUES (?, ?, ?)",
+      [randomUUID(), email, locale]
+    );
+  } catch (err) {
+    const code = (err as { code?: string })?.code;
     // Bereits angemeldet → als Erfolg behandeln (idempotent)
-    if (error.code === "23505") return NextResponse.json({ ok: true });
-    const missing = error.code === "PGRST205" || /Could not find the table/i.test(error.message);
+    if (code === "ER_DUP_ENTRY") return NextResponse.json({ ok: true });
+    const message = err instanceof Error ? err.message : String(err);
+    const missing = /doesn't exist|no such table/i.test(message);
     return NextResponse.json(
-      { error: missing ? "Anmeldung derzeit nicht möglich." : error.message },
+      { error: missing ? "Anmeldung derzeit nicht möglich." : message },
       { status: missing ? 503 : 500 }
     );
   }

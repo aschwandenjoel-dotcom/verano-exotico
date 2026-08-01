@@ -94,8 +94,8 @@ function PrivacyContent() {
         <p style={{ marginTop: "12px" }}>Weitere Informationen: <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: "#1A3040" }}>vercel.com/legal/privacy-policy</a></p>
       </Section>
 
-      <Section title="7. Datenbank (Supabase)">
-        <p>Zur Speicherung von Bestelldaten nutzen wir Supabase, angeboten von Supabase Inc., 970 Toa Payoh North, #07-04, Singapore 318992. Bestelldaten werden verschlüsselt übertragen und gespeichert. Mit Supabase besteht ein Datenverarbeitungsvertrag gemäss Art. 28 DSGVO.</p>
+      <Section title="7. Datenbank (Hostpoint)">
+        <p>Zur Speicherung von Bestelldaten nutzen wir eine Datenbank bei Hostpoint AG, Neue Jonastrasse 60, 8640 Rapperswil-Jona, Schweiz. Bestelldaten werden verschlüsselt übertragen und gespeichert. Mit Hostpoint besteht ein Auftragsverarbeitungsvertrag; die Datenverarbeitung erfolgt in der Schweiz.</p>
       </Section>
 
       <Section title="8. Logistik & Auftragsabwicklung (CJ Dropshipping)">
@@ -110,7 +110,7 @@ function PrivacyContent() {
       </Section>
 
       <Section title="9. Newsletter & Produktbewertungen">
-        <p><strong>Newsletter:</strong> Wenn Sie sich für unseren Newsletter anmelden, speichern wir Ihre E-Mail-Adresse in unserer Datenbank (Supabase), bis Sie sich abmelden. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO); Sie können diese jederzeit per E-Mail an uns widerrufen.</p>
+        <p><strong>Newsletter:</strong> Wenn Sie sich für unseren Newsletter anmelden, speichern wir Ihre E-Mail-Adresse in unserer Datenbank (Hostpoint), bis Sie sich abmelden. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO); Sie können diese jederzeit per E-Mail an uns widerrufen.</p>
         <p style={{ marginTop: "12px" }}><strong>Produktbewertungen:</strong> Wenn Sie eine Bewertung hinterlassen, speichern wir den von Ihnen angegebenen Namen (freiwillig, auch Pseudonym möglich), die Bewertung und den Kommentartext. Die Bewertung wird öffentlich auf der jeweiligen Produktseite angezeigt. Sie können die Löschung jederzeit per E-Mail verlangen.</p>
       </Section>
 

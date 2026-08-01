@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase";
+import { query } from "@/lib/db";
 import { isAdminRequest } from "@/lib/adminAuth";
 
 export async function PATCH(
@@ -9,11 +9,13 @@ export async function PATCH(
   if (!isAdminRequest(req)) {
     return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
   }
-  const { slug } = await params;
+  const { slug: id } = await params;
   const { active } = await req.json();
-  const db = createServiceClient();
 
-  const { error } = await db.from("products").update({ active }).eq("id", slug);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  try {
+    await query("UPDATE products SET active = ? WHERE id = ?", [active, id]);
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Fehler" }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

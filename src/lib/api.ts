@@ -1,4 +1,4 @@
-import { createServiceClient } from "@/lib/supabase";
+import { query, queryOne, parseJson } from "@/lib/db";
 import type { Product } from "@/types";
 import { products as localProducts } from "@/lib/products";
 
@@ -9,32 +9,29 @@ function rowToProduct(row: Record<string, unknown>): Product {
     price: Number(row.price),
     category: row.category as Product["category"],
     isNew: row.is_new as boolean,
-    colors: (row.colors as string[]) ?? [],
+    colors: parseJson<string[]>(row.colors, []),
     colorNames: {
-      de: (row.color_names_de as string[]) ?? [],
-      en: (row.color_names_en as string[]) ?? [],
+      de: parseJson<string[]>(row.color_names_de, []),
+      en: parseJson<string[]>(row.color_names_en, []),
     },
-    sizes: (row.sizes as string[]) ?? [],
-    images: (row.images as string[]) ?? [],
-    colorImages: (row.color_images as string[]) ?? [],
+    sizes: parseJson<string[]>(row.sizes, []),
+    images: parseJson<string[]>(row.images, []),
+    colorImages: parseJson<string[]>(row.color_images, []),
     description: { de: row.description_de as string, en: row.description_en as string },
     material: { de: row.material_de as string, en: row.material_en as string },
     care: { de: row.care_de as string, en: row.care_en as string },
     ...(row.measurements_de ? { measurements: { de: row.measurements_de as string, en: row.measurements_en as string } } : {}),
-    ...(row.size_chart ? { sizeChart: row.size_chart as Product["sizeChart"] } : {}),
+    ...(row.size_chart ? { sizeChart: parseJson<Product["sizeChart"]>(row.size_chart, undefined) } : {}),
   };
 }
 
 export async function fetchProducts(): Promise<Product[]> {
   try {
-    const db = createServiceClient();
-    const { data, error } = await db
-      .from("products")
-      .select("*")
-      .eq("active", true)
-      .order("created_at", { ascending: true });
-    if (error || !data || data.length === 0) return localProducts;
-    return data.map(rowToProduct);
+    const rows = await query(
+      "SELECT * FROM products WHERE active = true ORDER BY created_at ASC"
+    );
+    if (rows.length === 0) return localProducts;
+    return rows.map(rowToProduct);
   } catch {
     return localProducts;
   }
@@ -43,15 +40,12 @@ export async function fetchProducts(): Promise<Product[]> {
 /** Die zuletzt hinzugefügten aktiven Produkte (für die Startseite). */
 export async function fetchLatestProducts(limit = 6): Promise<Product[]> {
   try {
-    const db = createServiceClient();
-    const { data, error } = await db
-      .from("products")
-      .select("*")
-      .eq("active", true)
-      .order("created_at", { ascending: false })
-      .limit(limit);
-    if (error || !data || data.length === 0) return localProducts.slice(0, limit);
-    return data.map(rowToProduct);
+    const rows = await query(
+      "SELECT * FROM products WHERE active = true ORDER BY created_at DESC LIMIT ?",
+      [limit]
+    );
+    if (rows.length === 0) return localProducts.slice(0, limit);
+    return rows.map(rowToProduct);
   } catch {
     return localProducts.slice(0, limit);
   }
@@ -59,15 +53,12 @@ export async function fetchLatestProducts(limit = 6): Promise<Product[]> {
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const db = createServiceClient();
-    const { data, error } = await db
-      .from("products")
-      .select("*")
-      .eq("slug", slug)
-      .eq("active", true)
-      .single();
-    if (error || !data) return localProducts.find((p) => p.slug === slug) ?? null;
-    return rowToProduct(data);
+    const row = await queryOne(
+      "SELECT * FROM products WHERE slug = ? AND active = true",
+      [slug]
+    );
+    if (!row) return localProducts.find((p) => p.slug === slug) ?? null;
+    return rowToProduct(row);
   } catch {
     return localProducts.find((p) => p.slug === slug) ?? null;
   }

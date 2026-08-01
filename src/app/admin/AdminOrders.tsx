@@ -19,8 +19,8 @@ interface OrderItem {
   product_name: string;
   quantity: number;
   price: number;
-  size?: string;
-  color_name?: string;
+  size?: string | null;
+  color_name?: string | null;
 }
 
 interface Order {

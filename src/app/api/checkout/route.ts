@@ -1,5 +1,6 @@
+import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase";
+import { query, queryOne } from "@/lib/db";
 import { calcShipping, isShippingCountry } from "@/lib/shipping";
 import { CURRENCIES, DEFAULT_CURRENCY, convert } from "@/lib/currency";
 import { sendOrderConfirmation } from "@/lib/email";
@@ -13,6 +14,18 @@ interface CheckoutItem {
   colorName?: string;
   color?: string;
   image?: string;
+}
+
+interface ProductRow {
+  slug: string;
+  name_de: string;
+  name_en: string;
+  price: number;
+}
+
+interface OrderRow {
+  id: string;
+  order_number: number;
 }
 
 /**
@@ -51,18 +64,19 @@ export async function POST(req: Request) {
   if (!isShippingCountry(address.country)) return NextResponse.json({ error: "country" }, { status: 400 });
   if (rawItems.length === 0 || rawItems.length > 50) return NextResponse.json({ error: "items" }, { status: 400 });
 
-  const db = createServiceClient();
-
   // Serverseitige Preise + Namen aus der DB
   const slugs = [...new Set(rawItems.map((i) => String(i.productSlug)))];
-  const { data: products, error: prodError } = await db
-    .from("products")
-    .select("slug, name_de, name_en, price")
-    .in("slug", slugs)
-    .eq("active", true);
-  if (prodError) return NextResponse.json({ error: prodError.message }, { status: 500 });
+  let products: ProductRow[];
+  try {
+    products = await query<ProductRow>(
+      "SELECT slug, name_de, name_en, price FROM products WHERE slug IN (?) AND active = true",
+      [slugs]
+    );
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "DB-Fehler" }, { status: 500 });
+  }
 
-  const bySlug = new Map((products ?? []).map((p) => [p.slug, p]));
+  const bySlug = new Map(products.map((p) => [p.slug, p]));
   const items = [];
   let goodsTotal = 0;
   let itemCount = 0;
@@ -92,50 +106,47 @@ export async function POST(req: Request) {
   const paymentAmount = Math.round(convert(total, currency) * 100) / 100;
 
   // Bestellung anlegen — Telefon wandert mit in die Lieferadresse (für CJ nötig)
-  let { data: order, error } = await db
-    .from("orders")
-    .insert({
-      customer_email: email,
-      customer_name: name,
-      shipping_address: { ...address, phone },
-      subtotal: total,
-      payment_currency: currency,
-      payment_amount: paymentAmount,
-      locale,
-      status: "pending",
-    })
-    .select()
-    .single();
-  if (error?.code === "PGRST204" || error?.message?.includes("payment_currency") || error?.message?.includes("payment_amount") || error?.message?.includes("locale")) {
-    // Spalten payment_currency/payment_amount/locale noch nicht angelegt (SQL-Migration ausstehend) — Fallback ohne diese Felder
-    ({ data: order, error } = await db
-      .from("orders")
-      .insert({
-        customer_email: email,
-        customer_name: name,
-        shipping_address: { ...address, phone },
-        subtotal: total,
-        status: "pending",
-      })
-      .select()
-      .single());
-  }
-  if (error || !order) {
-    return NextResponse.json({ error: error?.message ?? "Bestellung fehlgeschlagen" }, { status: 500 });
+  const orderId = randomUUID();
+  try {
+    await query(
+      `INSERT INTO orders (id, customer_email, customer_name, shipping_address, subtotal, payment_currency, payment_amount, locale, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+      [orderId, email, name, { ...address, phone }, total, currency, paymentAmount, locale]
+    );
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Bestellung fehlgeschlagen" }, { status: 500 });
   }
 
-  const { error: itemsError } = await db.from("order_items").insert([
-    ...items.map((i) => ({ ...i, order_id: order.id })),
-    {
-      order_id: order.id,
-      product_slug: "_shipping",
-      product_name: locale === "en" ? "Shipping" : "Versand",
-      price: shippingCost,
-      quantity: 1,
-    },
-  ]);
-  if (itemsError) {
-    return NextResponse.json({ error: itemsError.message }, { status: 500 });
+  const order = await queryOne<OrderRow>("SELECT id, order_number FROM orders WHERE id = ?", [orderId]);
+  if (!order) {
+    return NextResponse.json({ error: "Bestellung fehlgeschlagen" }, { status: 500 });
+  }
+
+  try {
+    const itemRows = [
+      ...items.map((i) => ({ ...i, id: randomUUID(), order_id: order.id })),
+      {
+        id: randomUUID(),
+        order_id: order.id,
+        product_slug: "_shipping",
+        product_name: locale === "en" ? "Shipping" : "Versand",
+        price: shippingCost,
+        quantity: 1,
+        size: null,
+        color_name: null,
+        color: null,
+        image: null,
+      },
+    ];
+    for (const item of itemRows) {
+      await query(
+        `INSERT INTO order_items (id, order_id, product_slug, product_name, price, quantity, color, color_name, size, image)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [item.id, item.order_id, item.product_slug, item.product_name, item.price, item.quantity, item.color, item.color_name, item.size, item.image]
+      );
+    }
+  } catch (err) {
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Bestellung fehlgeschlagen" }, { status: 500 });
   }
 
   await sendOrderConfirmation({

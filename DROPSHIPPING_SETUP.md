@@ -17,16 +17,12 @@ ist der Zahlbetrag inkl. Versand.
 
 Damit es **funktioniert**, sind 4 Dinge nötig:
 
-## 1. Supabase-Spalten anlegen
-Im Supabase SQL-Editor ausführen:
-
-```sql
-alter table orders add column if not exists cj_order_id       text;
-alter table orders add column if not exists cj_order_status   text;
-alter table orders add column if not exists tracking_number   text;
-alter table orders add column if not exists tracking_provider text;
-alter table orders add column if not exists fulfillment_error text;
-```
+## 1. Datenbank-Spalten
+Die Datenbank ist Hostpoint-MySQL (Supabase wurde abgelöst). `cj_order_id`,
+`cj_order_status`, `tracking_number`, `tracking_provider` und
+`fulfillment_error` sind bereits Teil von `hostpoint-schema.sql` (Projekt-Root)
+— beim einmaligen Einrichten der Datenbank mit ausführen, keine separate
+Migration nötig.
 
 ## 2. Umgebungsvariablen (.env.local)
 ```bash

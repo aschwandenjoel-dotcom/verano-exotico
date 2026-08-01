@@ -45,3 +45,6 @@ next-env.d.ts
 
 # temporary processing files
 .tmp/
+
+# Datenbank-Backups — enthalten Kundendaten (E-Mail, Lieferadressen)
+/backups/

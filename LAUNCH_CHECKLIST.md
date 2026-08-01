@@ -3,47 +3,27 @@
 Stand: 6. Juli 2026 (aktualisiert nach Umstellung auf Vorkasse-Checkout).
 Punkte mit ☐ musst du selbst erledigen, alles andere ist bereits im Code.
 
-## 1. ☐ SQL in Supabase ausführen (einmalig, ~30 Sekunden)
+## 1. ☐ MySQL-Datenbank bei Hostpoint einrichten (Datenbank, nicht Hosting!)
 
-Supabase-Dashboard → SQL Editor → einfügen → Run:
+Die App läuft komplett auf Vercel — Hostpoint wird nur noch als MySQL-Datenbank
+genutzt (Supabase/Postgres wurde abgelöst). Schritte:
 
-```sql
--- Echte Produkt-Reviews (ersetzt localStorage)
-CREATE TABLE IF NOT EXISTS reviews (
-  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_slug text NOT NULL,
-  name         text NOT NULL DEFAULT 'Anonym',
-  rating       int  NOT NULL CHECK (rating BETWEEN 1 AND 5),
-  comment      text NOT NULL,
-  approved     boolean NOT NULL DEFAULT true,
-  created_at   timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS reviews_product_idx ON reviews (product_slug, created_at DESC);
-ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+1. Im Hostpoint Control Panel eine MySQL-Datenbank + Benutzer anlegen.
+2. Unter „Datenbank-Benutzer" → Reiter „Hosts" die IP(s) freigeben, von denen
+   aus zugegriffen werden darf. **Wichtig:** Vercel-Serverless-Functions haben
+   keine feste ausgehende IP — entweder alle Hosts (`%`) freigeben (mit starkem,
+   für diese DB einzigartigem Passwort) oder Vercel Secure Compute (feste IP,
+   kostenpflichtig) nutzen.
+3. `hostpoint-schema.sql` (Projekt-Root) im Hostpoint-DB-Tool (phpMyAdmin o.ä.) ausführen.
+4. Die 57 aktuellen Produkte und ggf. bestehende Bestellungen manuell aus
+   Supabase exportieren und ins neue Schema importieren (nicht automatisiert,
+   da kein Zugriff auf beide Zugangsdaten gleichzeitig bestand).
+5. Verbindungsdaten als `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+   in `.env.local` und in Vercel eintragen (siehe Abschnitt 3).
 
--- Newsletter-Anmeldungen
-CREATE TABLE IF NOT EXISTS newsletter_subscribers (
-  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  email      text NOT NULL UNIQUE,
-  locale     text,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-ALTER TABLE newsletter_subscribers ENABLE ROW LEVEL SECURITY;
-
--- Zahlungswährung (Kasse: Kundin kann in CHF/EUR/USD/GBP/CAD/AUD zahlen)
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_currency text DEFAULT 'CHF';
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_amount numeric(10,2);
-
--- Website-Sprache zum Bestellzeitpunkt (damit Bestätigungs-/Versand-Mail in der
--- richtigen Sprache rausgehen, nicht immer auf Deutsch)
-ALTER TABLE orders ADD COLUMN IF NOT EXISTS locale text DEFAULT 'de';
-```
-
-Bis das ausgeführt ist: Shop läuft normal, aber Review-/Newsletter-Formulare
-zeigen eine „derzeit nicht möglich"-Meldung, die Kasse speichert Bestellungen
-weiterhin nur in CHF (Fremdwährungs-Auswahl wird ignoriert), und alle Mails
-gehen auf Deutsch raus (Sprachauswahl wird ignoriert) — bricht nichts, zeigt
-nur nicht die neuen Felder an, bis die Spalten existieren.
+Bis das erledigt ist: Shop-Seiten, die Produkte/Bestellungen brauchen, zeigen
+Fehler bzw. fallen auf die statischen Fallback-Produkte in `src/lib/products.ts`
+zurück (siehe `src/lib/api.ts`).
 
 ## 2. ☐ Bankverbindung eintragen (WICHTIG — ohne sie keine Zahlungen!)
 
@@ -71,12 +51,14 @@ Referenznummer (VE-Nr) zuordnen.
 
 | Variable | Status |
 |---|---|
+| `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | ☐ Zugangsdaten der Hostpoint-MySQL-Datenbank (siehe Abschnitt 1) in Vercel setzen. |
 | `ADMIN_PASSWORD` | ✅ Lokal bereits auf ein starkes Passwort rotiert (Wert in `.env.local`, Backup in `.env.local.backup-…`). ☐ Denselben Wert in Vercel setzen. |
 | `PAYMENT_IBAN` / `PAYMENT_ACCOUNT_HOLDER` | ☐ In Vercel setzen (siehe oben). |
 | `CRON_SECRET` | gesetzt lassen — Tracking-Sync ist fail-closed. |
 | `NEXT_PUBLIC_SITE_URL` | echte Domain — für Sitemap, OG, JSON-LD. |
 | `RESEND_FROM_EMAIL` | ☐ Eigene Domain bei Resend verifizieren und hier eintragen (Fallback `onboarding@resend.dev` wirkt wie Spam). Ohne eigene Domain nicht änderbar — braucht deinen Domain-Kauf/DNS-Zugang. |
 | `STRIPE_*` | Nicht mehr verwendet — Stripe ist vollständig entfernt. Können in Vercel gelöscht werden. |
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Nicht mehr verwendet — Supabase wurde durch Hostpoint-MySQL ersetzt. Können in Vercel gelöscht werden. |
 
 ## 4. Das neue Verkaufssystem (Vorkasse — 0 % Zahlungsgebühren)
 
