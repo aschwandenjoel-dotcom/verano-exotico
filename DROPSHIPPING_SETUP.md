@@ -47,10 +47,21 @@ beim Produkt. Beispiel:
 Farbname + Grösse müssen exakt wie in `src/lib/products.ts` geschrieben sein.
 
 ## 4. Cron-Job für Tracking-Sync
-Ruft alle ~30 Min den Sync auf. Bei Vercel z.B. `vercel.json`:
+Konfiguriert in `vercel.json`:
 ```json
-{ "crons": [{ "path": "/api/fulfillment/sync", "schedule": "*/30 * * * *" }] }
+{ "crons": [{ "path": "/api/fulfillment/sync", "schedule": "0 6 * * *" }] }
 ```
+**Achtung, zwei Fallstricke:**
+- Der Vercel-**Hobby**-Plan erlaubt Cron-Jobs nur **einmal täglich**. Ein
+  häufigerer Ausdruck (z.B. `0 */2 * * *`) lässt das Deployment fehlschlagen.
+  Daher täglich um 06:00 UTC = 08:00 Schweizer Sommerzeit. Folge: Tracking-Nummern
+  erreichen die Kundin im schlechtesten Fall knapp 24 h verspätet.
+- `vercel.json` wird streng gegen ein Schema validiert — **keine zusätzlichen
+  Felder** (auch kein `_comment`), sonst bricht das Deployment ab.
+
+Häufigerer Takt ohne Vercel Pro: externer Dienst (z.B. cron-job.org) ruft
+`https://<domain>/api/fulfillment/sync` mit dem Header
+`Authorization: Bearer <CRON_SECRET>` auf.
 Der Cron muss den Header `Authorization: Bearer <CRON_SECRET>` senden
 (Vercel-Cron macht das automatisch, wenn CRON_SECRET gesetzt ist).
 

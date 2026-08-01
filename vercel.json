@@ -1,5 +1,4 @@
 {
-  "_comment": "Der Vercel-Hobby-Plan erlaubt Cron-Jobs nur einmal taeglich — ein haeufigerer Ausdruck laesst das Deployment fehlschlagen. 06:00 UTC = 08:00 Sommerzeit in der Schweiz.",
   "crons": [
     {
       "path": "/api/fulfillment/sync",
