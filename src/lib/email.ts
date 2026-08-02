@@ -1,58 +1,9 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { renderSwissQrPng, type SwissQrCurrency } from "@/lib/swissQr";
 
-/**
- * Transaktionsmails gehen direkt über das Gmail-Konto veranoexotico@gmail.com
- * (SMTP + App-Passwort). GMAIL_APP_PASSWORD ist ein 16-stelliges App-Passwort
- * aus den Google-Kontoeinstellungen — nicht das normale Gmail-Passwort.
- */
-const GMAIL_USER = process.env.GMAIL_USER ?? "veranoexotico@gmail.com";
-const GMAIL_APP_PASSWORD = (process.env.GMAIL_APP_PASSWORD ?? "").replace(/\s+/g, "");
-const FROM = process.env.MAIL_FROM ?? `Verano Exotico <${GMAIL_USER}>`;
-const REPLY_TO = process.env.MAIL_REPLY_TO ?? GMAIL_USER;
-
-let transporter: nodemailer.Transporter | null = null;
-
-function getTransporter() {
-  if (!GMAIL_APP_PASSWORD) {
-    throw new Error(
-      "GMAIL_APP_PASSWORD fehlt — ohne App-Passwort kann keine Mail über veranoexotico@gmail.com versendet werden."
-    );
-  }
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
-    });
-  }
-  return transporter;
-}
-
-interface MailAttachment {
-  filename: string;
-  content: Buffer;
-  contentType: string;
-  /** Für <img src="cid:…"> im HTML */
-  cid?: string;
-}
-
-async function sendMail(options: {
-  to: string;
-  subject: string;
-  html: string;
-  attachments?: MailAttachment[];
-}) {
-  await getTransporter().sendMail({
-    from: FROM,
-    replyTo: REPLY_TO,
-    to: options.to,
-    subject: options.subject,
-    html: options.html,
-    attachments: options.attachments,
-  });
-}
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
+const REPLY_TO = process.env.RESEND_REPLY_TO ?? "veranoexotico@gmail.com";
 
 export type EmailLocale = "de" | "en";
 
@@ -359,12 +310,14 @@ export async function sendOrderConfirmation({
 </body>
 </html>`;
 
-  await sendMail({
+  await resend.emails.send({
+    from: FROM,
     to,
+    replyTo: REPLY_TO,
     subject: t.subjectPay(orderNumber, isForeignCurrency ? `${currency} ${paymentAmount!.toFixed(2)}` : `CHF ${total.toFixed(2)}`),
     html,
     attachments: qrBuffer
-      ? [{ filename: "qr-zahlung.png", content: qrBuffer, contentType: "image/png", cid: "qr-payment" }]
+      ? [{ filename: "qr-zahlung.png", content: qrBuffer, contentType: "image/png", contentId: "qr-payment" }]
       : undefined,
   });
 }
@@ -419,8 +372,10 @@ export async function sendShippingNotification({
 </body>
 </html>`;
 
-  await sendMail({
+  await resend.emails.send({
+    from: FROM,
     to,
+    replyTo: REPLY_TO,
     subject: t.subjectShipped(orderNumber),
     html,
   });

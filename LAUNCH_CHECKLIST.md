@@ -56,8 +56,7 @@ Referenznummer (VE-Nr) zuordnen.
 | `PAYMENT_IBAN` / `PAYMENT_ACCOUNT_HOLDER` | ☐ In Vercel setzen (siehe oben). |
 | `CRON_SECRET` | gesetzt lassen — Tracking-Sync ist fail-closed. |
 | `NEXT_PUBLIC_SITE_URL` | echte Domain — für Sitemap, OG, JSON-LD. |
-| `GMAIL_USER` / `GMAIL_APP_PASSWORD` | ☐ In Vercel setzen. `GMAIL_USER=veranoexotico@gmail.com`, `GMAIL_APP_PASSWORD` = 16-stelliges App-Passwort aus dem Google-Konto (myaccount.google.com → Sicherheit → 2-Schritt-Verifizierung → App-Passwörter). Ohne App-Passwort wird keine Mail versendet. Gmail-Limit: ~500 Mails/Tag. |
-| `RESEND_*` | Nicht mehr verwendet — Mailversand läuft über Gmail-SMTP. Können in Vercel gelöscht werden. |
+| `RESEND_FROM_EMAIL` | ☐ Eigene Domain bei Resend verifizieren und hier eintragen (Fallback `onboarding@resend.dev` wirkt wie Spam). Ohne eigene Domain nicht änderbar — braucht deinen Domain-Kauf/DNS-Zugang. |
 | `STRIPE_*` | Nicht mehr verwendet — Stripe ist vollständig entfernt. Können in Vercel gelöscht werden. |
 | `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Nicht mehr verwendet — Supabase wurde durch Hostpoint-MySQL ersetzt. Können in Vercel gelöscht werden. |
 
