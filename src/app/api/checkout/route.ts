@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { query, queryOne, parseJson, toJson } from "@/lib/db";
 import { calcShipping, isShippingCountry } from "@/lib/shipping";
-import { CURRENCIES, DEFAULT_CURRENCY, convert } from "@/lib/currency";
+import { CURRENCIES, convert } from "@/lib/currency";
 import { sendOrderConfirmation } from "@/lib/email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -46,8 +46,10 @@ export async function POST(req: Request) {
   if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
 
   const locale = body.locale === "en" ? "en" : "de";
-  const currencyInput = String(body.currency ?? DEFAULT_CURRENCY).toUpperCase();
-  const currency = CURRENCIES.some((c) => c.code === currencyInput) ? currencyInput : DEFAULT_CURRENCY;
+  // Die Zahlungswährung wird an der Kasse aktiv gewählt und steht später auf
+  // Bestätigungsseite, Rechnung und QR-Code. Ein stiller Rückfall auf CHF würde
+  // eine Angabe erfinden, die die Kundin so nie gemacht hat.
+  const currency = String(body.currency ?? "").toUpperCase();
   const name = String(body.customer?.name ?? "").trim().slice(0, 120);
   const email = String(body.customer?.email ?? "").trim().toLowerCase();
   const phone = String(body.customer?.phone ?? "").trim().slice(0, 40);
@@ -65,6 +67,9 @@ export async function POST(req: Request) {
   if (phone.replace(/\D/g, "").length < 7) return NextResponse.json({ error: "phone" }, { status: 400 });
   if (!address.line1 || !address.city || !address.postal_code) return NextResponse.json({ error: "address" }, { status: 400 });
   if (!isShippingCountry(address.country)) return NextResponse.json({ error: "country" }, { status: 400 });
+  if (!CURRENCIES.some((c) => c.code === currency)) {
+    return NextResponse.json({ error: "currency", allowed: CURRENCIES.map((c) => c.code) }, { status: 400 });
+  }
   if (rawItems.length === 0 || rawItems.length > 50) return NextResponse.json({ error: "items" }, { status: 400 });
 
   // Serverseitige Preise + Namen aus der DB

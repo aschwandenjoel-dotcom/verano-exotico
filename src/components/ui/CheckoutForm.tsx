@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCart } from "@/context/CartContext";
 import { calcShipping, SHIPPING_COUNTRIES, type ShippingCountry } from "@/lib/shipping";
-import { CURRENCIES, DEFAULT_CURRENCY, formatPrice } from "@/lib/currency";
+import { CURRENCIES, formatPrice } from "@/lib/currency";
 import type { Locale } from "@/types";
 
 /** Bevorzugte Länder oben in der Auswahl, Rest alphabetisch danach. */
@@ -50,7 +50,7 @@ const invalidStyle: React.CSSProperties = {
   background: "#FDF5F3",
 };
 
-type FeldName = "name" | "email" | "phone" | "line1" | "postal" | "city";
+type FeldName = "name" | "email" | "phone" | "line1" | "postal" | "city" | "country" | "currency";
 
 const labelStyle: React.CSSProperties = {
   display: "block",
@@ -84,8 +84,10 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
   const [line2, setLine2] = useState("");
   const [postal, setPostal] = useState("");
   const [city, setCity] = useState("");
-  const [country, setCountry] = useState<ShippingCountry>("CH");
-  const [payCurrency, setPayCurrency] = useState(DEFAULT_CURRENCY);
+  // Land und Zahlungswährung starten bewusst leer — die Kundin soll beides
+  // aktiv wählen, statt eine Vorgabe zu übersehen.
+  const [country, setCountry] = useState<ShippingCountry>("");
+  const [payCurrency, setPayCurrency] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   // Wird erst beim Absenden gefüllt — nicht schon beim Tippen, sonst wird die
@@ -102,6 +104,8 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
       line1: !line1.trim(),
       postal: !postal.trim(),
       city: !city.trim(),
+      country: !country,
+      currency: !payCurrency,
     };
   }
 
@@ -117,12 +121,21 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
   }
 
   const itemCount = items.reduce((s, i) => s + i.quantity, 0);
-  const shipping = calcShipping(country, itemCount);
-  const total = Math.round((totalPrice + shipping) * 100) / 100;
+  // Ohne Zielland sind die Versandkosten unbekannt. calcShipping() würde 0
+  // liefern und damit eine zu niedrige Gesamtsumme anzeigen — deshalb null
+  // und in der Übersicht ein Platzhalter statt einer falschen Zahl.
+  const shipping = country ? calcShipping(country, itemCount) : null;
+  const total = shipping === null ? null : Math.round((totalPrice + shipping) * 100) / 100;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
+
+    const springeZu = (id: string) => {
+      const el = document.getElementById(id);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      el?.focus({ preventScroll: true });
+    };
 
     const gefunden = pruefe();
     if (Object.values(gefunden).some(Boolean)) {
@@ -130,12 +143,9 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
       setError(t("incomplete"));
       // Zum ersten beanstandeten Feld springen, damit es auf dem Handy
       // nicht ausserhalb des Sichtbereichs rot wird.
-      const reihenfolge: FeldName[] = ["name", "email", "phone", "line1", "postal", "city"];
+      const reihenfolge: FeldName[] = ["name", "email", "phone", "line1", "postal", "city", "country", "currency"];
       const erstes = reihenfolge.find((f) => gefunden[f]);
-      if (erstes) {
-        document.getElementById(`feld-${erstes}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-        document.getElementById(`feld-${erstes}`)?.focus({ preventScroll: true });
-      }
+      if (erstes) springeZu(`feld-${erstes}`);
       return;
     }
 
@@ -172,6 +182,8 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
           email: ["email"],
           phone: ["phone"],
           address: ["line1", "postal", "city"],
+          country: ["country"],
+          currency: ["currency"],
         };
         const felder = zuFeld[String(data.error)];
         if (felder) {
@@ -260,24 +272,36 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
                   </div>
                 </div>
                 <div>
-                  <label style={labelStyle}>{t("country")}</label>
+                  <label style={labelStyle} htmlFor="feld-country">{t("country")}</label>
                   <select
+                    id="feld-country"
                     value={country}
-                    onChange={(e) => setCountry(e.target.value as ShippingCountry)}
-                    style={{ ...inputStyle, cursor: "pointer" }}
+                    aria-invalid={!!fehler.country}
+                    onChange={(e) => {
+                      setCountry(e.target.value as ShippingCountry);
+                      if (fehler.country) setFehler((p) => ({ ...p, country: false }));
+                    }}
+                    style={{ ...feldStil("country"), cursor: "pointer" }}
                   >
+                    <option value="" disabled>{t("choose")}</option>
                     {countryOptions.map((c) => (
                       <option key={c.code} value={c.code}>{c.name}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label style={labelStyle}>{t("pay_currency")}</label>
+                  <label style={labelStyle} htmlFor="feld-currency">{t("pay_currency")}</label>
                   <select
+                    id="feld-currency"
                     value={payCurrency}
-                    onChange={(e) => setPayCurrency(e.target.value)}
-                    style={{ ...inputStyle, cursor: "pointer" }}
+                    aria-invalid={!!fehler.currency}
+                    onChange={(e) => {
+                      setPayCurrency(e.target.value);
+                      if (fehler.currency) setFehler((p) => ({ ...p, currency: false }));
+                    }}
+                    style={{ ...feldStil("currency"), cursor: "pointer" }}
                   >
+                    <option value="" disabled>{t("choose")}</option>
                     {CURRENCIES.map((c) => (
                       <option key={c.code} value={c.code}>{c.code}</option>
                     ))}
@@ -298,10 +322,10 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
                   {t("amount_to_transfer")}
                 </span>
                 <span style={{ fontSize: "22px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#D4AF37" }}>
-                  {formatPrice(total, payCurrency)}
+                  {total === null ? "—" : formatPrice(total, payCurrency)}
                 </span>
               </div>
-              {payCurrency !== "CHF" && (
+              {total !== null && payCurrency && payCurrency !== "CHF" && (
                 <p style={{ fontSize: "11px", color: "rgba(248,243,232,0.55)", lineHeight: 1.6, margin: "10px 0 0" }}>
                   {t("pay_currency_note", { chf: total.toFixed(2) })}
                 </p>
@@ -338,13 +362,15 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
                 <span>{formatPrice(totalPrice, payCurrency)}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.6)" }}>
-                <span>{t("shipping")} · {countryName(locale, country)}</span>
-                <span>{formatPrice(shipping, payCurrency)}</span>
+                <span>{t("shipping")}{country ? ` · ${countryName(locale, country)}` : ""}</span>
+                <span>{shipping === null ? "—" : formatPrice(shipping, payCurrency)}</span>
               </div>
-              <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.4)", margin: 0 }}>{t("shipping_hint")}</p>
+              <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.4)", margin: 0 }}>
+                {shipping === null ? t("shipping_pending") : t("shipping_hint")}
+              </p>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderTop: "2px solid #1A3040", paddingTop: "12px", marginTop: "6px" }}>
                 <span style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#1A3040" }}>{t("total")}</span>
-                <span style={{ fontSize: "20px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#1A3040" }}>{formatPrice(total, payCurrency)}</span>
+                <span style={{ fontSize: "20px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#1A3040" }}>{total === null ? "—" : formatPrice(total, payCurrency)}</span>
               </div>
             </div>
 
