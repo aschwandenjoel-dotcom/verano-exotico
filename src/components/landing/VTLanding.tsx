@@ -57,7 +57,10 @@ function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; 
     <Link
       href={`/${locale}/product/${product.slug}`}
       style={{
-        flexShrink: 0, width: "520px", display: "block", textDecoration: "none",
+        // Feste 520px passten auf keinem Handy aufs Display (375px Viewport).
+        // 78vw laesst die naechste Karte anschneiden - das zeigt, dass sich
+        // seitlich wischen laesst.
+        flexShrink: 0, width: "min(520px, 78vw)", display: "block", textDecoration: "none",
         transform: hovered ? "translateY(-6px)" : "translateY(0)",
         transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
       }}
@@ -66,7 +69,7 @@ function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; 
     >
       <div style={{ position: "relative", aspectRatio: "1/1", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
         {image ? (
-          <Image src={image} alt={name} fill sizes="520px" style={{ objectFit: "contain" }} priority={index < 2} />
+          <Image src={image} alt={name} fill sizes="(max-width: 768px) 78vw, 520px" style={{ objectFit: "contain" }} priority={index < 2} />
         ) : (
           <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
             {product.colors.slice(0, 3).map((c, i) => (
@@ -169,8 +172,15 @@ export default function VTLanding({ locale, products }: Props) {
   const tn = useTranslations("nav");
   const year = new Date().getFullYear();
   const shopScrollRef = useRef<HTMLDivElement>(null);
-  const scrollShop = (dir: number) =>
-    shopScrollRef.current?.scrollBy({ left: dir * 540, behavior: "smooth" });
+  // Schrittweite aus der tatsaechlichen Kartenbreite statt fester 540px -
+  // sonst springt der Pfeil auf schmalen Displays ueber mehrere Karten.
+  const scrollShop = (dir: number) => {
+    const row = shopScrollRef.current;
+    if (!row) return;
+    const card = row.firstElementChild as HTMLElement | null;
+    const step = card ? card.getBoundingClientRect().width + 20 : 540;
+    row.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
 
   return (
     <div className="min-h-screen" style={{ background: "#F8F3E8", color: "#1A3040" }}>

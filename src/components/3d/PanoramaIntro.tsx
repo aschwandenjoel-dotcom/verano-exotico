@@ -23,8 +23,72 @@ declare global {
 /* ─── Component ──────────────────────────────────────────────────── */
 export default function PanoramaIntro() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const viewerRef = useRef<PannellumViewer | null>(null);
   const [loading, setLoading] = useState(true);
+
+  /* Auf dem Handy: seitlich wischen dreht das Panorama, senkrecht wischen
+     scrollt die Seite.
+
+     Pannellum haengt seine Touch-Handler an den Viewer-Container und ruft dort
+     preventDefault() - dadurch verschluckt es JEDE Wischgeste, auch senkrechte,
+     und die Seite laesst sich nicht mehr scrollen.
+
+     Gegenmittel in zwei Schichten:
+     1. touch-action: pan-y im CSS. Damit uebernimmt der Browser senkrechtes
+        Scrollen selbst und ignoriert dabei preventDefault.
+     2. Dieser Handler in der CAPTURE-Phase auf der Section, also einer Ebene
+        UEBER dem Viewer. Er legt nach den ersten Pixeln die Richtung fest und
+        stoppt bei senkrechten Gesten die Weitergabe - so dreht sich das
+        Panorama beim Scrollen nicht nebenbei ein Stueck mit. */
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const THRESHOLD = 8; // Pixel, bis die Richtung als erkannt gilt
+    let startX = 0;
+    let startY = 0;
+    let axis: "x" | "y" | null = null;
+
+    const onStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) {
+        axis = "x"; // Mehrfingergesten dem Viewer ueberlassen
+        return;
+      }
+      axis = null;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    };
+
+    const onMove = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+
+      if (axis === null) {
+        if (Math.abs(dx) < THRESHOLD && Math.abs(dy) < THRESHOLD) {
+          e.stopPropagation(); // Richtung noch offen: Viewer nicht reagieren lassen
+          return;
+        }
+        axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      }
+      if (axis === "y") e.stopPropagation();
+    };
+
+    const onEnd = () => { axis = null; };
+
+    const opts = { capture: true, passive: true } as const;
+    el.addEventListener("touchstart", onStart, opts);
+    el.addEventListener("touchmove", onMove, opts);
+    el.addEventListener("touchend", onEnd, opts);
+    el.addEventListener("touchcancel", onEnd, opts);
+    return () => {
+      el.removeEventListener("touchstart", onStart, true);
+      el.removeEventListener("touchmove", onMove, true);
+      el.removeEventListener("touchend", onEnd, true);
+      el.removeEventListener("touchcancel", onEnd, true);
+    };
+  }, []);
 
   useEffect(() => {
     let destroyed = false;
@@ -87,10 +151,11 @@ export default function PanoramaIntro() {
 
   return (
     <section
+      ref={sectionRef}
+      className="pano-hero"
       style={{
         position: "relative",
         width: "100%",
-        height: "100vh",
         overflow: "hidden",
         background: "#080808",
       }}
@@ -104,6 +169,18 @@ export default function PanoramaIntro() {
         .pnlm-controls-container { display: none !important; }
         #pano-mount { width: 100% !important; height: 100% !important; }
         #pano-mount .pnlm-container { width: 100% !important; height: 100% !important; }
+
+        /* Pannellum setzt touch-action: none und sperrt damit das Scrollen der
+           Seite. pan-y gibt senkrechte Gesten an den Browser zurueck, waehrend
+           waagrechte weiterhin beim Viewer landen. Gilt auch fuer die intern
+           erzeugten Kindelemente (.pnlm-dragfix, .pnlm-render-container). */
+        #pano-mount,
+        #pano-mount * { touch-action: pan-y !important; }
+
+        /* 100vh rechnet auf Handys die ein- und ausblendende Browserleiste mit,
+           wodurch der Abschnitt zu hoch wird. svh nimmt die kleinste Variante
+           und bleibt beim Scrollen ruhig. */
+        .pano-hero { height: 100vh; height: 100svh; }
       `}</style>
 
       {/* Pannellum mount */}
