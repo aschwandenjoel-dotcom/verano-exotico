@@ -1,6 +1,5 @@
 import { query, queryOne, parseJson } from "@/lib/db";
 import type { Product } from "@/types";
-import { products as localProducts } from "@/lib/products";
 
 function rowToProduct(row: Record<string, unknown>): Product {
   return {
@@ -25,41 +24,33 @@ function rowToProduct(row: Record<string, unknown>): Product {
   };
 }
 
+/**
+ * Kein Rückfall auf statische Produkte mehr: Früher lieferten diese Funktionen
+ * bei einem Datenbankfehler die alten Beispielprodukte aus `products.ts` aus.
+ * Der Shop sah dann funktionsfähig aus, zeigte aber ein falsches Sortiment mit
+ * falschen Preisen — ein Ausfall blieb dadurch unbemerkt. Fehler werden jetzt
+ * durchgereicht, ein leerer Katalog bleibt leer.
+ */
 export async function fetchProducts(): Promise<Product[]> {
-  try {
-    const rows = await query(
-      "SELECT * FROM products WHERE active = true ORDER BY created_at ASC"
-    );
-    if (rows.length === 0) return localProducts;
-    return rows.map(rowToProduct);
-  } catch {
-    return localProducts;
-  }
+  const rows = await query(
+    "SELECT * FROM products WHERE active = true ORDER BY created_at ASC"
+  );
+  return rows.map(rowToProduct);
 }
 
 /** Die zuletzt hinzugefügten aktiven Produkte (für die Startseite). */
 export async function fetchLatestProducts(limit = 6): Promise<Product[]> {
-  try {
-    const rows = await query(
-      "SELECT * FROM products WHERE active = true ORDER BY created_at DESC LIMIT ?",
-      [limit]
-    );
-    if (rows.length === 0) return localProducts.slice(0, limit);
-    return rows.map(rowToProduct);
-  } catch {
-    return localProducts.slice(0, limit);
-  }
+  const rows = await query(
+    "SELECT * FROM products WHERE active = true ORDER BY created_at DESC LIMIT ?",
+    [limit]
+  );
+  return rows.map(rowToProduct);
 }
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
-  try {
-    const row = await queryOne(
-      "SELECT * FROM products WHERE slug = ? AND active = true",
-      [slug]
-    );
-    if (!row) return localProducts.find((p) => p.slug === slug) ?? null;
-    return rowToProduct(row);
-  } catch {
-    return localProducts.find((p) => p.slug === slug) ?? null;
-  }
+  const row = await queryOne(
+    "SELECT * FROM products WHERE slug = ? AND active = true",
+    [slug]
+  );
+  return row ? rowToProduct(row) : null;
 }

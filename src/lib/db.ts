@@ -62,6 +62,19 @@ export function parseJson<T>(value: unknown, fallback: T): T {
   return value as T;
 }
 
+/**
+ * Gegenstück zu parseJson() für das Schreiben in eine JSON-Spalte.
+ *
+ * mysql2 serialisiert Objekte NICHT als JSON — ein direkt übergebenes Objekt
+ * landet als "[object Object]" in der Spalte und MariaDB weist es wegen der
+ * json_valid()-Bedingung zurück. Der Supabase-Client hat das früher selbst
+ * erledigt, deshalb fehlte es nach der Migration.
+ */
+export function toJson(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  return typeof value === "string" ? value : JSON.stringify(value);
+}
+
 interface OrderItemRow {
   id: string;
   order_id: string;

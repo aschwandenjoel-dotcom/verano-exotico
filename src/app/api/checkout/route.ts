@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { query, queryOne, parseJson } from "@/lib/db";
+import { query, queryOne, parseJson, toJson } from "@/lib/db";
 import { calcShipping, isShippingCountry } from "@/lib/shipping";
 import { CURRENCIES, DEFAULT_CURRENCY, convert } from "@/lib/currency";
 import { sendOrderConfirmation } from "@/lib/email";
@@ -22,6 +22,8 @@ interface ProductRow {
   name_en: string;
   price: number;
   sizes: unknown;
+  color_names_de: unknown;
+  color_names_en: unknown;
 }
 
 interface OrderRow {
@@ -70,7 +72,7 @@ export async function POST(req: Request) {
   let products: ProductRow[];
   try {
     products = await query<ProductRow>(
-      "SELECT slug, name_de, name_en, price, sizes FROM products WHERE slug IN (?) AND active = true",
+      "SELECT slug, name_de, name_en, price, sizes, color_names_de, color_names_en FROM products WHERE slug IN (?) AND active = true",
       [slugs]
     );
   } catch (err) {
@@ -99,6 +101,21 @@ export async function POST(req: Request) {
       );
     }
 
+    // Dasselbe für die Farbe: resolveVid() sucht nach "Farbe|Grösse", ein
+    // fehlender oder erfundener Farbname macht die Bestellung unlieferbar.
+    // Beide Sprachvarianten sind gültig, weil der Shop de/en ausliefert.
+    const colorNames = [
+      ...parseJson<string[]>(product.color_names_de, []),
+      ...parseJson<string[]>(product.color_names_en, []),
+    ];
+    const colorName = raw.colorName ? String(raw.colorName).slice(0, 60) : null;
+    if (colorNames.length > 0 && (!colorName || !colorNames.includes(colorName))) {
+      return NextResponse.json(
+        { error: "color", productSlug: product.slug, allowed: [...new Set(colorNames)] },
+        { status: 400 }
+      );
+    }
+
     const price = Number(product.price);
     goodsTotal += price * quantity;
     itemCount += quantity;
@@ -108,7 +125,7 @@ export async function POST(req: Request) {
       price,
       quantity,
       size,
-      color_name: raw.colorName ? String(raw.colorName).slice(0, 60) : null,
+      color_name: colorName,
       color: raw.color ? String(raw.color).slice(0, 20) : null,
       image: raw.image ? String(raw.image).slice(0, 300) : null,
     });
@@ -125,7 +142,7 @@ export async function POST(req: Request) {
     await query(
       `INSERT INTO orders (id, customer_email, customer_name, shipping_address, subtotal, payment_currency, payment_amount, locale, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-      [orderId, email, name, { ...address, phone }, total, currency, paymentAmount, locale]
+      [orderId, email, name, toJson({ ...address, phone }), total, currency, paymentAmount, locale]
     );
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Bestellung fehlgeschlagen" }, { status: 500 });

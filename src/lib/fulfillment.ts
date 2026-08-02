@@ -48,8 +48,26 @@ export async function fulfillOrder({
   items,
 }: FulfillOrderParams): Promise<void> {
   try {
-    if (!address?.line1 || !address.country) {
-      throw new Error("Lieferadresse unvollständig (line1/country fehlt)");
+    // Alle Felder prüfen, die CJ für eine zustellbare Sendung braucht. Früher
+    // wurden nur line1/country geprüft und der Rest als leerer String gesendet —
+    // CJ nimmt die Bestellung dann an, das Paket ist aber nicht zustellbar.
+    const empfaenger = customerName?.trim() ?? "";
+    const telefon = phone?.trim() ?? "";
+    const strasse = address?.line1?.trim() ?? "";
+    const ort = address?.city?.trim() ?? "";
+    const plz = address?.postal_code?.trim() ?? "";
+    const land = address?.country?.trim() ?? "";
+
+    const fehlend = [
+      !strasse && "Strasse",
+      !ort && "Ort",
+      !plz && "PLZ",
+      !land && "Land",
+      !empfaenger && "Empfängername",
+      !telefon && "Telefonnummer",
+    ].filter(Boolean);
+    if (fehlend.length) {
+      throw new Error(`Lieferadresse unvollständig: ${fehlend.join(", ")} fehlt`);
     }
 
     // Varianten auflösen — jede Position muss auf eine CJ-vid zeigen
@@ -65,14 +83,14 @@ export async function fulfillOrder({
 
     const cjOrder = await createCjOrder({
       orderNumber: `VE-${orderNumber}`, // eindeutig → Schutz vor Doppelbestellung
-      shippingCustomerName: customerName || "Kunde",
-      shippingCountryCode: address.country,
-      shippingCountry: countryNameFor(address.country),
-      shippingProvince: address.state ?? "",
-      shippingCity: address.city ?? "",
-      shippingAddress: [address.line1, address.line2].filter(Boolean).join(", "),
-      shippingPhone: phone || "",
-      shippingZip: address.postal_code ?? "",
+      shippingCustomerName: empfaenger,
+      shippingCountryCode: land,
+      shippingCountry: countryNameFor(land),
+      shippingProvince: address?.state ?? "", // von CJ für CH/DE/AT nicht verlangt
+      shippingCity: ort,
+      shippingAddress: [strasse, address?.line2].filter(Boolean).join(", "),
+      shippingPhone: telefon,
+      shippingZip: plz,
       products,
     });
 
