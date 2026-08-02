@@ -85,8 +85,8 @@ function PrivacyContent() {
       </Section>
 
       <Section title="5. E-Mail-Versand (Bestellbestätigung)">
-        <p>Zur Versendung von Bestellbestätigungen nutzen wir den Dienst Resend, angeboten von Resend Inc., 2261 Market Street #5039, San Francisco, CA 94114, USA. Ihre E-Mail-Adresse wird ausschliesslich für den transaktionalen Versand der Bestellbestätigung verwendet und nicht für Werbezwecke genutzt.</p>
-        <p style={{ marginTop: "12px" }}>Mit Resend besteht ein Datenverarbeitungsvertrag (DPA) gemäss Art. 28 DSGVO. Die Übertragung in die USA erfolgt auf Basis der Standardvertragsklauseln (SCCs) der EU-Kommission.</p>
+        <p>Zur Versendung von Bestellbestätigungen nutzen wir das Gmail-Postfach veranoexotico@gmail.com, betrieben von Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Ihre E-Mail-Adresse wird ausschliesslich für den transaktionalen Versand der Bestellbestätigung und der Versandbenachrichtigung verwendet und nicht für Werbezwecke genutzt.</p>
+        <p style={{ marginTop: "12px" }}>Die Verarbeitung durch Google erfolgt auf Basis der Google-Workspace-/Gmail-Datenschutzbestimmungen; für Übermittlungen in die USA gelten die Standardvertragsklauseln (SCCs) der EU-Kommission.</p>
       </Section>
 
       <Section title="6. Hosting (Vercel)">
