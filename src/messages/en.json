@@ -85,6 +85,7 @@
     "submit": "Place binding order",
     "submitting": "Sending…",
     "error": "Order failed — please check your details and try again.",
+    "incomplete": "Please complete the fields marked in red.",
     "empty": "Your cart is empty.",
     "to_shop": "To the shop →",
     "legal_note": "By placing your order you accept our <agb>terms & conditions</agb> and our <widerruf>returns & complaints policy</widerruf>.",

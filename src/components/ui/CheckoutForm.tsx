@@ -43,6 +43,15 @@ const inputStyle: React.CSSProperties = {
   boxSizing: "border-box",
 };
 
+/** Rot umrandetes Feld, sobald die Eingabe beim Absenden fehlt oder ungültig ist. */
+const invalidStyle: React.CSSProperties = {
+  ...inputStyle,
+  borderColor: "#B4553C",
+  background: "#FDF5F3",
+};
+
+type FeldName = "name" | "email" | "phone" | "line1" | "postal" | "city";
+
 const labelStyle: React.CSSProperties = {
   display: "block",
   fontSize: "10px",
@@ -79,7 +88,33 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
   const [payCurrency, setPayCurrency] = useState(DEFAULT_CURRENCY);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  // Wird erst beim Absenden gefüllt — nicht schon beim Tippen, sonst wird die
+  // Kundin gerügt, bevor sie das Feld überhaupt fertig ausgefüllt hat.
+  const [fehler, setFehler] = useState<Partial<Record<FeldName, boolean>>>({});
   const countryOptions = useCountryOptions(locale);
+
+  /** Dieselben Regeln wie serverseitig in /api/checkout — sonst rot hier, 400 dort. */
+  function pruefe(): Partial<Record<FeldName, boolean>> {
+    return {
+      name: name.trim().length < 2,
+      email: !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()),
+      phone: phone.replace(/\D/g, "").length < 7,
+      line1: !line1.trim(),
+      postal: !postal.trim(),
+      city: !city.trim(),
+    };
+  }
+
+  /** Markierung eines Feldes aufheben, sobald daran weitergeschrieben wird. */
+  function feldStil(feld: FeldName): React.CSSProperties {
+    return fehler[feld] ? invalidStyle : inputStyle;
+  }
+  function beiEingabe(feld: FeldName, setzen: (v: string) => void) {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      setzen(e.target.value);
+      if (fehler[feld]) setFehler((p) => ({ ...p, [feld]: false }));
+    };
+  }
 
   const itemCount = items.reduce((s, i) => s + i.quantity, 0);
   const shipping = calcShipping(country, itemCount);
@@ -88,6 +123,23 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submitting) return;
+
+    const gefunden = pruefe();
+    if (Object.values(gefunden).some(Boolean)) {
+      setFehler(gefunden);
+      setError(t("incomplete"));
+      // Zum ersten beanstandeten Feld springen, damit es auf dem Handy
+      // nicht ausserhalb des Sichtbereichs rot wird.
+      const reihenfolge: FeldName[] = ["name", "email", "phone", "line1", "postal", "city"];
+      const erstes = reihenfolge.find((f) => gefunden[f]);
+      if (erstes) {
+        document.getElementById(`feld-${erstes}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        document.getElementById(`feld-${erstes}`)?.focus({ preventScroll: true });
+      }
+      return;
+    }
+
+    setFehler({});
     setSubmitting(true);
     setError("");
     try {
@@ -113,7 +165,21 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
       if (res.ok && data.orderId) {
         router.push(`/${locale}/order-confirmation?id=${data.orderId}`);
       } else {
-        setError(t("error"));
+        // Feldbezogene Ablehnungen des Servers ebenfalls rot markieren, statt
+        // nur eine allgemeine Meldung zu zeigen.
+        const zuFeld: Record<string, FeldName[]> = {
+          name: ["name"],
+          email: ["email"],
+          phone: ["phone"],
+          address: ["line1", "postal", "city"],
+        };
+        const felder = zuFeld[String(data.error)];
+        if (felder) {
+          setFehler(Object.fromEntries(felder.map((f) => [f, true])));
+          setError(t("incomplete"));
+        } else {
+          setError(t("error"));
+        }
         setSubmitting(false);
       }
     } catch {
@@ -144,7 +210,9 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
         {t("title")}
       </h1>
 
-      <form onSubmit={handleSubmit}>
+      {/* noValidate: die Browser-Sprechblasen würden unsere eigene, rote
+          Markierung verhindern — geprüft wird stattdessen in pruefe(). */}
+      <form onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
 
           {/* ── Formular ── */}
@@ -153,17 +221,17 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
               <h2 style={sectionTitle}>{t("contact")}</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div>
-                  <label style={labelStyle}>{t("name")}</label>
-                  <input required value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} autoComplete="name" />
+                  <label style={labelStyle} htmlFor="feld-name">{t("name")}</label>
+                  <input id="feld-name" required aria-invalid={!!fehler.name} value={name} onChange={beiEingabe("name", setName)} style={feldStil("name")} autoComplete="name" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label style={labelStyle}>{t("email")}</label>
-                    <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} autoComplete="email" />
+                    <label style={labelStyle} htmlFor="feld-email">{t("email")}</label>
+                    <input id="feld-email" required type="email" aria-invalid={!!fehler.email} value={email} onChange={beiEingabe("email", setEmail)} style={feldStil("email")} autoComplete="email" />
                   </div>
                   <div>
-                    <label style={labelStyle}>{t("phone")}</label>
-                    <input required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} autoComplete="tel" placeholder="+41 79 …" />
+                    <label style={labelStyle} htmlFor="feld-phone">{t("phone")}</label>
+                    <input id="feld-phone" required type="tel" aria-invalid={!!fehler.phone} value={phone} onChange={beiEingabe("phone", setPhone)} style={feldStil("phone")} autoComplete="tel" placeholder="+41 79 …" />
                     <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.4)", marginTop: "4px" }}>{t("phone_hint")}</p>
                   </div>
                 </div>
@@ -174,21 +242,21 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
               <h2 style={sectionTitle}>{t("address")}</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div>
-                  <label style={labelStyle}>{t("line1")}</label>
-                  <input required value={line1} onChange={(e) => setLine1(e.target.value)} style={inputStyle} autoComplete="address-line1" />
+                  <label style={labelStyle} htmlFor="feld-line1">{t("line1")}</label>
+                  <input id="feld-line1" required aria-invalid={!!fehler.line1} value={line1} onChange={beiEingabe("line1", setLine1)} style={feldStil("line1")} autoComplete="address-line1" />
                 </div>
                 <div>
-                  <label style={labelStyle}>{t("line2")}</label>
-                  <input value={line2} onChange={(e) => setLine2(e.target.value)} style={inputStyle} autoComplete="address-line2" />
+                  <label style={labelStyle} htmlFor="feld-line2">{t("line2")}</label>
+                  <input id="feld-line2" value={line2} onChange={(e) => setLine2(e.target.value)} style={inputStyle} autoComplete="address-line2" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label style={labelStyle}>{t("postal")}</label>
-                    <input required value={postal} onChange={(e) => setPostal(e.target.value)} style={inputStyle} autoComplete="postal-code" />
+                    <label style={labelStyle} htmlFor="feld-postal">{t("postal")}</label>
+                    <input id="feld-postal" required aria-invalid={!!fehler.postal} value={postal} onChange={beiEingabe("postal", setPostal)} style={feldStil("postal")} autoComplete="postal-code" />
                   </div>
                   <div className="sm:col-span-2">
-                    <label style={labelStyle}>{t("city")}</label>
-                    <input required value={city} onChange={(e) => setCity(e.target.value)} style={inputStyle} autoComplete="address-level2" />
+                    <label style={labelStyle} htmlFor="feld-city">{t("city")}</label>
+                    <input id="feld-city" required aria-invalid={!!fehler.city} value={city} onChange={beiEingabe("city", setCity)} style={feldStil("city")} autoComplete="address-level2" />
                   </div>
                 </div>
                 <div>

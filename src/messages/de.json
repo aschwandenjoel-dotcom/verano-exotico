@@ -85,6 +85,7 @@
     "submit": "Zahlungspflichtig bestellen",
     "submitting": "Wird gesendet…",
     "error": "Bestellung fehlgeschlagen — bitte prüfe deine Angaben und versuche es erneut.",
+    "incomplete": "Bitte fülle die rot markierten Felder aus.",
     "empty": "Dein Warenkorb ist leer.",
     "to_shop": "Zum Shop →",
     "legal_note": "Mit deiner Bestellung akzeptierst du unsere <agb>AGB</agb> und hast unsere Bedingungen zu <widerruf>Rückgabe & Reklamation</widerruf> zur Kenntnis genommen.",
