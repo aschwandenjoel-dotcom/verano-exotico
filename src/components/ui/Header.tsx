@@ -57,6 +57,10 @@ export default function Header({ locale }: Props) {
   const { openCart, totalCount } = useCart();
   const t = useTranslations("nav");
   const tc = useTranslations("cart");
+  const pathname = usePathname() ?? "";
+
+  // Auf der Kasse lenkt der Warenkorb nur vom Ausfuellen ab.
+  const showCart = !pathname.split("/").includes("checkout");
 
   const navLinks = [
     { href: `/${locale}`, label: t("home") },
@@ -112,22 +116,24 @@ export default function Header({ locale }: Props) {
         </Link>
 
         {/* Cart button */}
-        <button
-          onClick={openCart}
-          aria-label={tc("title")}
-          style={{ position: "relative", width: "40px", height: "40px", border: "1px solid rgba(26,48,64,0.15)", borderRadius: "50%", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#1A3040", flexShrink: 0 }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <path d="M16 10a4 4 0 01-8 0"/>
-          </svg>
-          {totalCount > 0 && (
-            <span style={{ position: "absolute", top: "-4px", right: "-4px", width: "18px", height: "18px", borderRadius: "50%", background: "#D4AF37", color: "#1A3040", fontSize: "9px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {totalCount > 9 ? "9+" : totalCount}
-            </span>
-          )}
-        </button>
+        {showCart && (
+          <button
+            onClick={openCart}
+            aria-label={tc("title")}
+            style={{ position: "relative", width: "40px", height: "40px", border: "1px solid rgba(26,48,64,0.15)", borderRadius: "50%", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#1A3040", flexShrink: 0 }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            {totalCount > 0 && (
+              <span style={{ position: "absolute", top: "-4px", right: "-4px", width: "18px", height: "18px", borderRadius: "50%", background: "#D4AF37", color: "#1A3040", fontSize: "9px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {totalCount > 9 ? "9+" : totalCount}
+              </span>
+            )}
+          </button>
+        )}
 
         <button
           className="md:hidden"
