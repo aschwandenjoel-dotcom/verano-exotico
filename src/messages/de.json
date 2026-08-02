@@ -74,6 +74,7 @@
     "line2": "Adresszusatz (optional)",
     "postal": "PLZ",
     "city": "Ort",
+    "city_hint": "Tippe deinen Ort — passende Vorschläge füllen PLZ und Land automatisch aus (CH, LI, AT, DE)",
     "country": "Land",
     "summary": "Bestellübersicht",
     "subtotal": "Zwischensumme",

@@ -74,6 +74,7 @@
     "line2": "Address line 2 (optional)",
     "postal": "Postal code",
     "city": "City",
+    "city_hint": "Start typing your city — matching suggestions fill in postal code and country (CH, LI, AT, DE)",
     "country": "Country",
     "summary": "Order summary",
     "subtotal": "Subtotal",

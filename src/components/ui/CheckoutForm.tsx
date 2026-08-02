@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCart } from "@/context/CartContext";
 import { calcShipping, SHIPPING_COUNTRIES, type ShippingCountry } from "@/lib/shipping";
+import type { Ort } from "@/app/api/orte/route";
 import { CURRENCIES, formatPrice } from "@/lib/currency";
 import type { Locale } from "@/types";
 
@@ -94,6 +95,56 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
   // Kundin gerügt, bevor sie das Feld überhaupt fertig ausgefüllt hat.
   const [fehler, setFehler] = useState<Partial<Record<FeldName, boolean>>>({});
   const countryOptions = useCountryOptions(locale);
+
+  // Ortsvorschläge: echte PLZ-Ort-Kombinationen aus /api/orte. Ein Klick füllt
+  // PLZ, Ort und Land in einem Zug — das ist die häufigste Fehlerquelle beim
+  // Adresseintippen und zugleich das, was CJ für die Zustellung braucht.
+  const [vorschlaege, setVorschlaege] = useState<Ort[]>([]);
+  const [vorschlaegeOffen, setVorschlaegeOffen] = useState(false);
+  const [aktiver, setAktiver] = useState(-1);
+  const anfrageNr = useRef(0);
+  const ortGewaehlt = useRef(false);
+
+  useEffect(() => {
+    // Nach einem Klick auf einen Vorschlag nicht sofort wieder suchen.
+    if (ortGewaehlt.current) {
+      ortGewaehlt.current = false;
+      return;
+    }
+    if (city.trim().length < 2) {
+      setVorschlaege([]);
+      return;
+    }
+    const nr = ++anfrageNr.current;
+    const timer = setTimeout(async () => {
+      try {
+        const url = `/api/orte?q=${encodeURIComponent(city.trim())}${country ? `&land=${country}` : ""}`;
+        const res = await fetch(url);
+        const daten: Ort[] = res.ok ? await res.json() : [];
+        // Nur die Antwort auf die zuletzt gestellte Frage anzeigen
+        if (nr === anfrageNr.current) {
+          setVorschlaege(daten);
+          setVorschlaegeOffen(daten.length > 0);
+          setAktiver(-1);
+        }
+      } catch {
+        // Ohne Vorschläge bleibt das Formular normal von Hand ausfüllbar
+        if (nr === anfrageNr.current) setVorschlaege([]);
+      }
+    }, 220);
+    return () => clearTimeout(timer);
+  }, [city, country]);
+
+  function vorschlagUebernehmen(o: Ort) {
+    ortGewaehlt.current = true;
+    setCity(o.ort);
+    setPostal(o.plz);
+    setCountry(o.land as ShippingCountry);
+    setVorschlaege([]);
+    setVorschlaegeOffen(false);
+    setAktiver(-1);
+    setFehler((p) => ({ ...p, city: false, postal: false, country: false }));
+  }
 
   /** Dieselben Regeln wie serverseitig in /api/checkout — sonst rot hier, 400 dort. */
   function pruefe(): Partial<Record<FeldName, boolean>> {
@@ -266,9 +317,78 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
                     <label style={labelStyle} htmlFor="feld-postal">{t("postal")}</label>
                     <input id="feld-postal" required aria-invalid={!!fehler.postal} value={postal} onChange={beiEingabe("postal", setPostal)} style={feldStil("postal")} autoComplete="postal-code" />
                   </div>
-                  <div className="sm:col-span-2">
+                  <div className="sm:col-span-2" style={{ position: "relative" }}>
                     <label style={labelStyle} htmlFor="feld-city">{t("city")}</label>
-                    <input id="feld-city" required aria-invalid={!!fehler.city} value={city} onChange={beiEingabe("city", setCity)} style={feldStil("city")} autoComplete="address-level2" />
+                    <input
+                      id="feld-city"
+                      required
+                      aria-invalid={!!fehler.city}
+                      value={city}
+                      onChange={beiEingabe("city", setCity)}
+                      onFocus={() => setVorschlaegeOffen(vorschlaege.length > 0)}
+                      // Kurz warten, sonst schliesst der Fokusverlust die Liste,
+                      // bevor der Klick auf einen Vorschlag ankommt.
+                      onBlur={() => setTimeout(() => setVorschlaegeOffen(false), 150)}
+                      onKeyDown={(e) => {
+                        if (!vorschlaegeOffen || vorschlaege.length === 0) return;
+                        if (e.key === "ArrowDown") {
+                          e.preventDefault();
+                          setAktiver((i) => (i + 1) % vorschlaege.length);
+                        } else if (e.key === "ArrowUp") {
+                          e.preventDefault();
+                          setAktiver((i) => (i <= 0 ? vorschlaege.length - 1 : i - 1));
+                        } else if (e.key === "Enter" && aktiver >= 0) {
+                          e.preventDefault();
+                          vorschlagUebernehmen(vorschlaege[aktiver]);
+                        } else if (e.key === "Escape") {
+                          setVorschlaegeOffen(false);
+                        }
+                      }}
+                      style={feldStil("city")}
+                      autoComplete="off"
+                      role="combobox"
+                      aria-expanded={vorschlaegeOffen}
+                      aria-autocomplete="list"
+                    />
+                    {vorschlaegeOffen && vorschlaege.length > 0 && (
+                      <ul
+                        role="listbox"
+                        style={{
+                          position: "absolute", top: "100%", left: 0, right: 0, zIndex: 20,
+                          margin: "4px 0 0", padding: 0, listStyle: "none",
+                          background: "#FFFFFF", border: "1px solid rgba(26,48,64,0.15)",
+                          borderRadius: "8px", boxShadow: "0 8px 24px rgba(26,48,64,0.12)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {vorschlaege.map((o, i) => (
+                          <li
+                            key={`${o.land}-${o.plz}-${o.ort}`}
+                            role="option"
+                            aria-selected={i === aktiver}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => vorschlagUebernehmen(o)}
+                            onMouseEnter={() => setAktiver(i)}
+                            style={{
+                              padding: "10px 14px", cursor: "pointer", fontSize: "13px",
+                              display: "flex", justifyContent: "space-between", gap: "10px",
+                              background: i === aktiver ? "rgba(0,180,197,0.10)" : "transparent",
+                            }}
+                          >
+                            <span style={{ color: "#1A3040" }}>
+                              <strong style={{ fontFamily: "var(--font-geist-mono)", fontWeight: 600 }}>{o.plz}</strong>{" "}
+                              {o.ort}
+                            </span>
+                            <span style={{ color: "rgba(26,48,64,0.45)", fontSize: "11px", whiteSpace: "nowrap" }}>
+                              {countryName(locale, o.land)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.4)", marginTop: "4px" }}>
+                      {t("city_hint")}
+                    </p>
                   </div>
                 </div>
                 <div>

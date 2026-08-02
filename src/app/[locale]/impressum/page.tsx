@@ -58,6 +58,17 @@ function LegalContent() {
         <p>Diese Website wurde mit Next.js entwickelt und wird über Vercel Inc., 340 Pine Street, Suite 701, San Francisco, CA 94104, USA, gehostet.</p>
       </Section>
 
+      <Section title="Datenquellen">
+        <p>
+          Die Ortsvorschläge an der Kasse (Postleitzahlen und Ortsnamen für die Schweiz,
+          Liechtenstein, Österreich und Deutschland) basieren auf Daten von{" "}
+          <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer" style={{ color: "#00B4C5" }}>GeoNames</a>,
+          lizenziert unter{" "}
+          <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: "#00B4C5" }}>CC BY 4.0</a>.
+          Die Daten sind lokal hinterlegt; bei der Ortssuche werden keine Eingaben an Dritte übermittelt.
+        </p>
+      </Section>
+
       <Section title="Haftungsausschluss">
         <h3 style={h3}>Haftung für Inhalte</h3>
         <p>Die Inhalte dieser Website wurden mit grösster Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte übernimmt der Anbieter jedoch keine Gewähr. Als Einzelunternehmen sind wir gemäss den allgemeinen Gesetzen nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.</p>
