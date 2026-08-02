@@ -11,6 +11,7 @@ interface Props {
   labels: {
     color: string;
     size: string;
+    selectSize: string;
     addToCart: string;
     added: string;
     sizeGuide: string;

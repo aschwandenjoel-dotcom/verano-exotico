@@ -91,6 +91,7 @@ export default async function ProductPage({
           labels={{
             color: t("color"),
             size: t("size"),
+            selectSize: t("select_size"),
             addToCart: t("add_to_cart"),
             added: t("added"),
             sizeGuide: t("size_guide"),

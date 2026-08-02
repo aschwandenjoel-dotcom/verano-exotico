@@ -42,6 +42,7 @@
     "care": "Pflege",
     "measurements": "Masse",
     "size": "Grösse",
+    "select_size": "Bitte wähle zuerst eine Grösse",
     "color": "Farbe",
     "rotate_hint": "Ziehen zum Drehen",
     "sourced": "Sorgfältig kuratiert und weltweit versandt",

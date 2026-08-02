@@ -15,6 +15,7 @@ interface Props {
   labels: {
     color: string;
     size: string;
+    selectSize: string;
     addToCart: string;
     added: string;
     sizeGuide: string;
@@ -35,7 +36,14 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
 
+  // Produkte mit Grössenauswahl dürfen nicht ohne Grösse in den Warenkorb:
+  // die CJ-Variante wird über "Farbe|Grösse" aufgelöst (src/lib/cjMapping.ts),
+  // eine Position ohne Grösse liesse sich später nicht bestellen.
+  const needsSize = (product.sizes?.length ?? 0) > 0;
+  const sizeMissing = needsSize && !activeSize;
+
   function handleAddToCart() {
+    if (sizeMissing) return;
     const colorHex = product.colors[activeColor];
     const colorName = product.colorNames?.[loc]?.[activeColor];
     addItem({
@@ -147,16 +155,29 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
 
       <button
         onClick={handleAddToCart}
+        disabled={sizeMissing}
+        aria-disabled={sizeMissing}
         className="w-full py-4 font-semibold text-base transition-all mb-4"
         style={{
-          background: added ? "#2E7D5E" : "#D4AF37",
-          color: added ? "#F8F3E8" : "#1A3040",
+          background: sizeMissing ? "rgba(26,48,64,0.12)" : added ? "#2E7D5E" : "#D4AF37",
+          color: sizeMissing ? "rgba(26,48,64,0.45)" : added ? "#F8F3E8" : "#1A3040",
           borderRadius: "9999px",
+          cursor: sizeMissing ? "not-allowed" : "pointer",
           transition: "background 0.3s, color 0.3s",
         }}
       >
         {added ? t.added : t.addToCart}
       </button>
+
+      {sizeMissing && (
+        <p
+          className="text-xs font-mono text-center mb-4"
+          style={{ color: "#B4553C" }}
+          role="status"
+        >
+          {t.selectSize}
+        </p>
+      )}
 
       {/* Versand-Hinweis direkt bei der Kaufentscheidung */}
       <p className="text-xs font-mono text-center mb-4" style={{ color: "rgba(26,48,64,0.5)" }}>

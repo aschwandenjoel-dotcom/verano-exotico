@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { query, queryOne } from "@/lib/db";
+import { query, queryOne, parseJson } from "@/lib/db";
 import { calcShipping, isShippingCountry } from "@/lib/shipping";
 import { CURRENCIES, DEFAULT_CURRENCY, convert } from "@/lib/currency";
 import { sendOrderConfirmation } from "@/lib/email";
@@ -21,6 +21,7 @@ interface ProductRow {
   name_de: string;
   name_en: string;
   price: number;
+  sizes: unknown;
 }
 
 interface OrderRow {
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
   let products: ProductRow[];
   try {
     products = await query<ProductRow>(
-      "SELECT slug, name_de, name_en, price FROM products WHERE slug IN (?) AND active = true",
+      "SELECT slug, name_de, name_en, price, sizes FROM products WHERE slug IN (?) AND active = true",
       [slugs]
     );
   } catch (err) {
@@ -85,6 +86,19 @@ export async function POST(req: Request) {
     const quantity = Math.floor(Number(raw.quantity));
     if (!product) return NextResponse.json({ error: `Produkt nicht verfügbar: ${raw.productSlug}` }, { status: 400 });
     if (!Number.isFinite(quantity) || quantity < 1 || quantity > 20) return NextResponse.json({ error: "quantity" }, { status: 400 });
+
+    // Grösse gegen die im Shop hinterlegten Grössen prüfen. Ohne gültige Grösse
+    // findet das CJ-Fulfillment später keine Variante (src/lib/cjMapping.ts löst
+    // über "Farbe|Grösse" auf) — die Bestellung wäre bezahlt, aber nicht lieferbar.
+    const sizes = parseJson<string[]>(product.sizes, []);
+    const size = raw.size ? String(raw.size).slice(0, 20) : null;
+    if (sizes.length > 0 && (!size || !sizes.includes(size))) {
+      return NextResponse.json(
+        { error: "size", productSlug: product.slug, allowed: sizes },
+        { status: 400 }
+      );
+    }
+
     const price = Number(product.price);
     goodsTotal += price * quantity;
     itemCount += quantity;
@@ -93,7 +107,7 @@ export async function POST(req: Request) {
       product_name: locale === "en" ? product.name_en : product.name_de,
       price,
       quantity,
-      size: raw.size ? String(raw.size).slice(0, 20) : null,
+      size,
       color_name: raw.colorName ? String(raw.colorName).slice(0, 60) : null,
       color: raw.color ? String(raw.color).slice(0, 20) : null,
       image: raw.image ? String(raw.image).slice(0, 300) : null,

@@ -42,6 +42,7 @@
     "care": "Care",
     "measurements": "Measurements",
     "size": "Size",
+    "select_size": "Please select a size first",
     "color": "Colour",
     "rotate_hint": "Drag to rotate",
     "sourced": "Carefully curated and shipped worldwide",
