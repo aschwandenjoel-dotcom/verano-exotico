@@ -34,6 +34,10 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
   const [activeSize, setActiveSize] = useState<string | null>(null);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [added, setAdded] = useState(false);
+  // Der Hinweis erscheint erst nach einem Klick auf "In den Warenkorb" —
+  // eine Fehlermeldung schon beim Öffnen der Seite wäre eine Rüge für etwas,
+  // das die Kundin noch gar nicht falsch gemacht hat.
+  const [sizeHint, setSizeHint] = useState(false);
   const { addItem } = useCart();
 
   // Produkte mit Grössenauswahl dürfen nicht ohne Grösse in den Warenkorb:
@@ -42,8 +46,16 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
   const needsSize = (product.sizes?.length ?? 0) > 0;
   const sizeMissing = needsSize && !activeSize;
 
+  function chooseSize(size: string) {
+    setActiveSize(size);
+    setSizeHint(false);
+  }
+
   function handleAddToCart() {
-    if (sizeMissing) return;
+    if (sizeMissing) {
+      setSizeHint(true);
+      return;
+    }
     const colorHex = product.colors[activeColor];
     const colorName = product.colorNames?.[loc]?.[activeColor];
     addItem({
@@ -128,7 +140,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         <div className="mb-8">
           <p
             className="text-xs font-mono tracking-widest uppercase mb-3"
-            style={{ color: "#5E7A8A" }}
+            style={{ color: sizeHint && sizeMissing ? "#B4553C" : "#5E7A8A" }}
           >
             {t.size}
           </p>
@@ -137,7 +149,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
               <button
                 key={size}
                 type="button"
-                onClick={() => setActiveSize(size)}
+                onClick={() => chooseSize(size)}
                 className="px-4 py-2 text-xs font-mono transition-all"
                 style={{
                   border: `1px solid ${activeSize === size ? "#00B4C5" : "rgba(26,48,64,0.2)"}`,
@@ -155,25 +167,23 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
 
       <button
         onClick={handleAddToCart}
-        disabled={sizeMissing}
-        aria-disabled={sizeMissing}
         className="w-full py-4 font-semibold text-base transition-all mb-4"
         style={{
-          background: sizeMissing ? "rgba(26,48,64,0.12)" : added ? "#2E7D5E" : "#D4AF37",
-          color: sizeMissing ? "rgba(26,48,64,0.45)" : added ? "#F8F3E8" : "#1A3040",
+          background: added ? "#2E7D5E" : "#D4AF37",
+          color: added ? "#F8F3E8" : "#1A3040",
           borderRadius: "9999px",
-          cursor: sizeMissing ? "not-allowed" : "pointer",
+          cursor: "pointer",
           transition: "background 0.3s, color 0.3s",
         }}
       >
         {added ? t.added : t.addToCart}
       </button>
 
-      {sizeMissing && (
+      {sizeHint && sizeMissing && (
         <p
           className="text-xs font-mono text-center mb-4"
           style={{ color: "#B4553C" }}
-          role="status"
+          role="alert"
         >
           {t.selectSize}
         </p>
