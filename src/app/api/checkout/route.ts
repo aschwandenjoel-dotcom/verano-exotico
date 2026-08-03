@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { query, queryOne, parseJson, toJson } from "@/lib/db";
 import { calcShipping, isShippingCountry } from "@/lib/shipping";
 import { CURRENCIES, convert } from "@/lib/currency";
-import { sendOrderConfirmation } from "@/lib/email";
+import { sendOrderConfirmation, sendAdminNewOrderNotification } from "@/lib/email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -198,6 +198,17 @@ export async function POST(req: Request) {
     shippingAddress: address,
     locale,
   }).catch(console.error); // E-Mail-Fehler sollen die Bestellung nicht abbrechen
+
+  sendAdminNewOrderNotification({
+    orderNumber: order.order_number,
+    customerName: name,
+    customerEmail: email,
+    items,
+    total,
+    currency,
+    paymentAmount,
+    shippingAddress: address,
+  }).catch(console.error);
 
   return NextResponse.json({
     orderId: order.id,

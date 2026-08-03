@@ -79,13 +79,32 @@ export default function Header({ locale }: Props) {
         alignItems: "center",
       }}
     >
+      {/* Wortmarke in der Typografie der Marke: Archivo Black plus DM Serif
+          kursiv in Gold, wie im Hero und im Logo. Mit Akzent geschrieben -
+          vorher stand hier "EXOTICO", das Logo sagt aber "Exótico". */}
       <Link
         href={`/${locale}`}
-        className="text-[11px] font-black tracking-[0.2em] uppercase"
-        style={{ fontFamily: "var(--font-archivo-black), sans-serif", color: "#1A3040" }}
-        aria-label="Verano Exotico — Startseite"
+        className="text-[11px] md:text-[12px] whitespace-nowrap"
+        style={{ color: "#1A3040", textDecoration: "none", lineHeight: 1 }}
+        aria-label="Verano Exótico — Startseite"
       >
-        VERANO EXOTICO
+        <span
+          className="font-black tracking-[0.2em] uppercase"
+          style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}
+        >
+          Verano
+        </span>{" "}
+        <span
+          style={{
+            fontFamily: "var(--font-dm-serif)",
+            fontStyle: "italic",
+            color: "#D4AF37",
+            letterSpacing: "0.02em",
+            fontSize: "1.15em",
+          }}
+        >
+          Exótico
+        </span>
       </Link>
 
       <nav className="hidden md:flex items-center gap-8" aria-label="Hauptnavigation">
@@ -135,35 +154,96 @@ export default function Header({ locale }: Props) {
           </button>
         )}
 
+        {/* Vorher nur drei Striche ohne Rahmen: rund 24x14 px Trefferflaeche,
+            deutlich unter den empfohlenen 44 px. Jetzt 40 px wie der Warenkorb
+            daneben, und die Striche klappen im offenen Zustand zum X. */}
         <button
           className="md:hidden"
-          style={{ color: "#1A3040" }}
           onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Menu"
+          aria-label={menuOpen ? t("menu_close") : t("menu_open")}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
+          style={{
+            position: "relative", width: "40px", height: "40px", flexShrink: 0,
+            border: "1px solid rgba(26,48,64,0.15)", borderRadius: "50%",
+            background: menuOpen ? "rgba(26,48,64,0.06)" : "transparent",
+            color: "#1A3040", cursor: "pointer",
+            display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center", gap: "4px",
+          }}
         >
-          <span className="block w-6 h-0.5 bg-current mb-1.5" />
-          <span className="block w-6 h-0.5 bg-current mb-1.5" />
-          <span className="block w-4 h-0.5 bg-current" />
+          <span
+            className="block bg-current"
+            style={{
+              width: "16px", height: "1.5px", transition: "transform .25s ease",
+              transform: menuOpen ? "translateY(2.75px) rotate(45deg)" : "none",
+            }}
+          />
+          <span
+            className="block bg-current"
+            style={{
+              width: "16px", height: "1.5px", transition: "transform .25s ease, opacity .2s ease",
+              transform: menuOpen ? "translateY(-2.75px) rotate(-45deg)" : "none",
+            }}
+          />
         </button>
       </div>
 
       {menuOpen && (
         <div
-          className="absolute top-full left-0 right-0 flex flex-col px-6 py-6 gap-5 md:hidden"
-          style={{ background: "#F8F3E8", borderTop: "1px solid rgba(26,48,64,0.1)" }}
+          id="mobile-menu"
+          className="absolute top-full left-0 right-0 flex flex-col px-6 pt-2 pb-6 md:hidden"
+          style={{
+            background: "#F8F3E8",
+            borderTop: "1px solid rgba(26,48,64,0.1)",
+            boxShadow: "0 12px 24px -12px rgba(26,48,64,0.25)",
+          }}
         >
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className="text-base font-medium tracking-wide"
-              style={{ color: "#1A3040", fontFamily: "var(--font-syne)" }}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <LanguageSwitch locale={locale} onNavigate={() => setMenuOpen(false)} />
+          {navLinks.map((link) => {
+            // Aktuelle Seite markieren - vorher sahen alle Eintraege gleich aus.
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                aria-current={active ? "page" : undefined}
+                className="flex items-center justify-between text-base tracking-wide"
+                style={{
+                  color: "#1A3040",
+                  fontFamily: "var(--font-syne)",
+                  fontWeight: active ? 700 : 500,
+                  textDecoration: "none",
+                  minHeight: "52px", // bequeme Trefferflaeche statt 5px Zeilenabstand
+                  borderBottom: "1px solid rgba(26,48,64,0.08)",
+                }}
+              >
+                {link.label}
+                {active && <span aria-hidden="true" style={{ color: "#D4AF37" }}>•</span>}
+              </Link>
+            );
+          })}
+
+          {/* Auf dem Handy gab es bisher keinen Shop-Knopf: der Header-Button
+              ist hidden md:inline-flex und fehlte im Menue ersatzlos. */}
+          <Link
+            href={`/${locale}/collection`}
+            onClick={() => setMenuOpen(false)}
+            className="inline-flex items-center justify-center text-[11px] font-black tracking-[0.25em] uppercase mt-5"
+            style={{
+              fontFamily: "var(--font-archivo-black), sans-serif",
+              background: "#D4AF37",
+              color: "#1A3040",
+              minHeight: "48px",
+              textDecoration: "none",
+            }}
+          >
+            {t("cta")}
+          </Link>
+
+          <div className="mt-5 flex justify-center">
+            <LanguageSwitch locale={locale} onNavigate={() => setMenuOpen(false)} />
+          </div>
         </div>
       )}
     </header>

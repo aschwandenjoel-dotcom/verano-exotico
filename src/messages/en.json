@@ -3,7 +3,9 @@
     "home": "Home",
     "collection": "Shop",
     "about": "About us",
-    "cta": "Shop now"
+    "cta": "Shop now",
+    "menu_open": "Open menu",
+    "menu_close": "Close menu"
   },
   "hero": {
     "eyebrow": "New collection",

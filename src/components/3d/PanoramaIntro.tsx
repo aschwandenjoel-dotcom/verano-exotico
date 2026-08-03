@@ -71,6 +71,8 @@ export default function PanoramaIntro() {
           return;
         }
         axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+        // Erst die bewusste waagrechte Geste beendet die Eigendrehung.
+        if (axis === "x") viewerRef.current?.stopAutoRotate();
       }
       if (axis === "y") e.stopPropagation();
     };
@@ -139,10 +141,13 @@ export default function PanoramaIntro() {
       viewerRef.current = viewer;
       viewer.on("load", () => { if (!destroyed) setLoading(false); });
 
-      /* 4. Stop rotation on user drag */
-      const stop = () => viewer.stopAutoRotate();
-      containerRef.current.addEventListener("mousedown", stop);
-      containerRef.current.addEventListener("touchstart", stop, { passive: true });
+      /* 4. Drehung bei echter Bedienung stoppen.
+         Nur mousedown - NICHT touchstart: auf dem Handy loeste jede
+         Beruehrung das Stoppen aus, auch eine, die bloss die Seite scrollen
+         sollte. Dadurch stand das Panorama dort sofort still, waehrend es auf
+         dem Laptop weiterdrehte. Fuer Touch uebernimmt das der Achsen-Handler
+         weiter oben, sobald er eine waagrechte Geste erkennt. */
+      containerRef.current.addEventListener("mousedown", () => viewer.stopAutoRotate());
     };
 
     init();

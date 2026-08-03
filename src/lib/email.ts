@@ -322,6 +322,89 @@ export async function sendOrderConfirmation({
   });
 }
 
+const ADMIN_NOTIFY_EMAIL = process.env.ADMIN_NOTIFY_EMAIL ?? "aschwanden.joel@gmail.com";
+
+interface SendAdminNewOrderParams {
+  orderNumber: number;
+  customerName: string;
+  customerEmail: string;
+  items: OrderItem[];
+  total: number;
+  currency?: string;
+  paymentAmount?: number;
+  shippingAddress?: ShippingAddress | null;
+}
+
+/**
+ * Interne Benachrichtigung an den Shop-Betreiber, sobald eine neue Bestellung
+ * eingegangen ist — unabhängig von der Kundenmail. Fehler hier dürfen den
+ * Checkout nicht beeinflussen; das übernimmt der Aufrufer per .catch().
+ */
+export async function sendAdminNewOrderNotification({
+  orderNumber,
+  customerName,
+  customerEmail,
+  items,
+  total,
+  currency = "CHF",
+  paymentAmount,
+  shippingAddress,
+}: SendAdminNewOrderParams) {
+  const isForeignCurrency = currency !== "CHF" && typeof paymentAmount === "number";
+  const amountLabel = isForeignCurrency ? `${currency} ${paymentAmount!.toFixed(2)}` : `CHF ${total.toFixed(2)}`;
+
+  const itemRows = items
+    .map(
+      (item) => `
+      <tr>
+        <td style="padding:8px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;">
+          ${item.product_name}${item.size ? ` · ${item.size}` : ""}${item.color_name ? ` · ${item.color_name}` : ""}
+        </td>
+        <td style="padding:8px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;text-align:center;">${item.quantity}×</td>
+        <td style="padding:8px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">CHF ${(item.price * item.quantity).toFixed(2)}</td>
+      </tr>`
+    )
+    .join("");
+
+  const addressBlock = shippingAddress?.line1
+    ? `${shippingAddress.line1}${shippingAddress.line2 ? `, ${shippingAddress.line2}` : ""}<br>${shippingAddress.postal_code ?? ""} ${shippingAddress.city ?? ""}<br>${shippingAddress.country ?? ""}`
+    : "—";
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#F8F3E8;">
+  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
+    <div style="background:#1A3040;padding:24px 40px;text-align:center;">
+      <p style="color:#D4AF37;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 6px;">Verano Exotico · Admin</p>
+      <h1 style="color:#F8F3E8;font-family:sans-serif;font-size:20px;font-weight:900;text-transform:uppercase;margin:0;letter-spacing:0.05em;">Neue Bestellung #${orderNumber}</h1>
+    </div>
+    <div style="padding:28px 40px;">
+      <p style="font-family:sans-serif;font-size:13px;color:#1A3040;line-height:1.8;margin:0 0 20px;">
+        <strong>${customerName || "—"}</strong> · ${customerEmail}<br>
+        Betrag: <strong>${amountLabel}</strong> ${isForeignCurrency ? `(entspricht CHF ${total.toFixed(2)})` : ""}<br>
+        Referenz: <strong>VE-${orderNumber}</strong>
+      </p>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">${itemRows}</table>
+      <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#9E9E9E;margin:0 0 6px;">Lieferadresse</p>
+      <p style="font-family:sans-serif;font-size:13px;color:#1A3040;line-height:1.6;margin:0 0 20px;">${addressBlock}</p>
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.5);margin:0;">
+        Zahlungseingang im Bankkonto prüfen und Bestellung im <strong>/admin</strong> auf „Bezahlt" setzen, sobald das Geld da ist.
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  await resend.emails.send({
+    from: FROM,
+    to: ADMIN_NOTIFY_EMAIL,
+    subject: `Neue Bestellung #${orderNumber} — ${amountLabel}`,
+    html,
+  });
+}
+
 interface SendShippingParams {
   to: string;
   customerName: string;
