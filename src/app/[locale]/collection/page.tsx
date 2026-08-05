@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import Image from "next/image";
 import CollectionGrid from "@/components/sections/CollectionGrid";
+import ShopHeroCarousel from "@/components/sections/ShopHeroCarousel";
 import ShopShell from "@/components/ui/ShopShell";
 import { fetchProducts } from "@/lib/api";
 import type { Locale } from "@/types";
@@ -40,15 +40,8 @@ export default async function CollectionPage({
             zIndex: 0,
           }}
         >
-          {/* Background image — beach panorama cropped to cover */}
-          <Image
-            src="/images/shop-banner.webp"
-            alt="Verano Exotico SS25"
-            fill
-            priority
-            sizes="100vw"
-            style={{ objectFit: "cover", objectPosition: "center 36%" }}
-          />
+          {/* Background image — rotating beach panoramas, crossfade every 10s */}
+          <ShopHeroCarousel alt="Verano Exotico SS25" />
 
           {/* Dark gradient overlay — top + strong bottom */}
           <div
