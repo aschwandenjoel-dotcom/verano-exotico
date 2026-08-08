@@ -8,7 +8,6 @@ import Image from "next/image";
 // cover backdrop behind a fully-visible contain image instead.
 const SLIDES: { src: string; fit: "cover" | "contain" }[] = [
   { src: "/images/shop-hero-1.webp", fit: "cover" },
-  { src: "/images/shop-hero-2.webp", fit: "contain" },
   { src: "/images/shop-hero-3.webp", fit: "contain" },
   { src: "/images/shop-hero-4.webp", fit: "cover" },
 ];
