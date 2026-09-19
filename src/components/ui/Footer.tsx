@@ -3,6 +3,8 @@
 import type React from "react";
 import { useTranslations, useLocale } from "next-intl";
 
+const INSTAGRAM_URL = "https://www.instagram.com/veranoexotico/";
+
 const linkStyle: React.CSSProperties = {
   fontSize: "11px",
   fontFamily: "var(--font-geist-mono)",
@@ -41,6 +43,22 @@ export default function Footer() {
               <p style={{ marginTop: "6px", fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)", fontStyle: "italic" }}>
                 {t("tagline")}
               </p>
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                style={{ ...linkStyle, display: "inline-flex", alignItems: "center", gap: "8px", marginTop: "14px" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.55)")}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="2" y="2" width="20" height="20" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                </svg>
+                @veranoexotico
+              </a>
             </div>
 
             <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", rowGap: "12px" }}>

@@ -8,6 +8,7 @@ import { routing } from "@/i18n/routing";
 import type { Locale } from "@/types";
 import CursorGuard from "@/components/ui/CursorGuard";
 import ClientProviders from "@/components/ui/ClientProviders";
+import { Analytics } from "@vercel/analytics/next";
 import "../globals.css";
 
 const syne = Syne({
@@ -100,6 +101,8 @@ export default async function LocaleLayout({
             {children}
           </ClientProviders>
         </NextIntlClientProvider>
+        {/* Vercel Web Analytics: Besucher, Herkunft, Seitenaufrufe — im Vercel-Dashboard unter "Analytics" */}
+        <Analytics />
       </body>
     </html>
   );
