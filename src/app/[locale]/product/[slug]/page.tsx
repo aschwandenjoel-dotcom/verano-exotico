@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import ShopShell from "@/components/ui/ShopShell";
@@ -107,7 +108,11 @@ export default async function ProductPage({
         />
       </div>
 
-      <ReviewSection productSlug={product.slug} />
+      {/* Suspense: ReviewSection liest den Bewertungs-Token aus ?r= — ohne die
+          Grenze müsste Next.js die ganze Produktseite dynamisch rendern. */}
+      <Suspense fallback={null}>
+        <ReviewSection productSlug={product.slug} />
+      </Suspense>
       <div className="pb-20" style={{ background: "#F8F3E8" }} />
     </ShopShell>
   );

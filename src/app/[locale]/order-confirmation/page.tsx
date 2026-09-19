@@ -4,6 +4,7 @@ import ShopShell from "@/components/ui/ShopShell";
 import ClearCartOnSuccess from "@/components/ui/ClearCartOnSuccess";
 import { queryOne } from "@/lib/db";
 import { renderSwissQrDataUrl } from "@/lib/swissQr";
+import { paymentMode } from "@/lib/stripe";
 import type { Locale } from "@/types";
 
 interface OrderRow {
@@ -38,12 +39,20 @@ export default async function OrderConfirmationPage({
   const iban = process.env.PAYMENT_IBAN || "";
   const holder = process.env.PAYMENT_ACCOUNT_HOLDER || "Joel Aschwanden";
 
+  // Bei Kartenzahlung ist zum Zeitpunkt dieser Seite bereits bezahlt — Kontodaten
+  // und QR-Rechnung entfallen dann komplett.
+  const prepay = paymentMode() === "prepay";
+  // "pending" heisst bei Stripe: Der Webhook hat die Zahlung noch nicht bestätigt.
+  // Das dauert normalerweise Sekunden, kann aber auch heissen, dass gar nicht
+  // bezahlt wurde — deshalb wird hier nichts versprochen.
+  const paymentConfirmed = !!order && order.status !== "pending" && order.status !== "payment_failed";
+
   // QR-Code nur für CHF/EUR möglich (Spezifikation lässt keine anderen Währungen zu)
   const qrCurrency = !order?.payment_currency || order.payment_currency === "CHF" ? "CHF" : order.payment_currency === "EUR" ? "EUR" : null;
   const qrAmount = qrCurrency === "EUR" && order?.payment_amount ? Number(order.payment_amount) : Number(order?.subtotal ?? 0);
 
   let qrDataUrl: string | null = null;
-  if (order && iban && qrCurrency) {
+  if (prepay && order && iban && qrCurrency) {
     try {
       qrDataUrl = await renderSwissQrDataUrl({
         iban,
@@ -118,11 +127,44 @@ export default async function OrderConfirmationPage({
             </p>
           )}
           <p style={{ fontSize: "14px", color: "rgba(26,48,64,0.55)", lineHeight: 1.7, marginBottom: "28px", fontFamily: "var(--font-syne)" }}>
-            {t("body")}
+            {prepay ? t("body") : paymentConfirmed ? t("body_paid") : t("body_processing")}
           </p>
 
-          {/* Zahlungsanweisungen */}
-          {order && (
+          {/* Kartenzahlung: Bestätigung statt Kontodaten */}
+          {!prepay && order && (
+            <div style={{
+              background: paymentConfirmed ? "rgba(46,125,94,0.08)" : "rgba(212,175,55,0.12)",
+              border: `1px solid ${paymentConfirmed ? "rgba(46,125,94,0.3)" : "rgba(212,175,55,0.4)"}`,
+              borderRadius: "16px",
+              padding: "20px 24px",
+              textAlign: "left",
+              marginBottom: "28px",
+            }}>
+              <p style={{ ...mono, fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: paymentConfirmed ? "#2E7D5E" : "#8A6D1F", marginBottom: "10px" }}>
+                {paymentConfirmed ? t("paid_label") : t("processing_label")}
+              </p>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px", color: "#1A3040" }}>
+                <span style={{ color: "rgba(26,48,64,0.55)" }}>{t("amount")}</span>
+                <strong>
+                  {order.payment_currency && order.payment_currency !== "CHF" && order.payment_amount
+                    ? `${order.payment_currency} ${Number(order.payment_amount).toFixed(2)}`
+                    : `CHF ${Number(order.subtotal).toFixed(2)}`}
+                </strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px", color: "#1A3040", marginTop: "8px" }}>
+                <span style={{ color: "rgba(26,48,64,0.55)" }}>{t("reference")}</span>
+                <strong style={mono}>VE-{order.order_number}</strong>
+              </div>
+              {!paymentConfirmed && (
+                <p style={{ fontSize: "11px", color: "rgba(26,48,64,0.55)", lineHeight: 1.6, margin: "12px 0 0" }}>
+                  {t("processing_note")}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Vorkasse: Zahlungsanweisungen */}
+          {prepay && order && (
             <div style={{ background: "#1A3040", borderRadius: "16px", padding: "24px", textAlign: "left", marginBottom: "28px" }}>
               <p style={{ ...mono, fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#D4AF37", marginBottom: "4px" }}>
                 {t("payment_title")}
@@ -187,7 +229,7 @@ export default async function OrderConfirmationPage({
           )}
 
           <p style={{ fontSize: "12px", color: "rgba(26,48,64,0.5)", lineHeight: 1.7, marginBottom: "32px" }}>
-            {t("pending_note")}<br />
+            {prepay ? t("pending_note") : t("paid_delivery_note")}<br />
             {t("email_sent")}
           </p>
 

@@ -44,11 +44,15 @@ create table if not exists orders (
   payment_currency  varchar(3) default 'CHF',
   payment_amount    decimal(10,2),
   locale            varchar(5) default 'de',
+  stripe_session_id varchar(255),
+  stripe_payment_intent varchar(255),
   cj_order_id       varchar(100),
   cj_order_status   varchar(60),
   fulfillment_error text,
   tracking_number   varchar(100),
   tracking_provider varchar(100),
+  shipped_at        datetime,
+  review_request_sent_at datetime,
   created_at        datetime default current_timestamp,
   updated_at        datetime default current_timestamp on update current_timestamp
 );
@@ -69,6 +73,10 @@ create table if not exists order_items (
 );
 
 -- Produkt-Bewertungen (öffentlich einsehbar, siehe /api/reviews)
+-- `order_id` + `verified` werden gesetzt, wenn die Bewertung über den signierten
+-- Link aus der Bewertungs-Mail kommt → Anzeige als „Verifizierter Kauf".
+-- Der Unique-Key verhindert zwei Bewertungen desselben Artikels aus derselben
+-- Bestellung (mehrere NULL-order_id bleiben erlaubt — freie Bewertungen).
 create table if not exists reviews (
   id           char(36) primary key,
   product_slug varchar(190) not null,
@@ -76,7 +84,10 @@ create table if not exists reviews (
   rating       int not null,
   comment      text not null,
   approved     boolean default true,
-  created_at   datetime default current_timestamp
+  order_id     char(36),
+  verified     boolean default false,
+  created_at   datetime default current_timestamp,
+  unique key uniq_review_order_product (order_id, product_slug)
 );
 
 -- Newsletter-Anmeldungen

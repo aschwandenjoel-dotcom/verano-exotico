@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import type { ResultSetHeader } from "mysql2";
 
 // Hostpoint-Shared-Hosting-MySQL begrenzt gleichzeitige Verbindungen pro DB-User
 // meist auf eine niedrige Zahl. Der Pool bleibt daher bewusst klein, damit
@@ -38,6 +39,17 @@ export async function queryOne<T = Record<string, unknown>>(
 ): Promise<T | null> {
   const rows = await query<T>(sql, params);
   return rows[0] ?? null;
+}
+
+/**
+ * Führt ein UPDATE/INSERT/DELETE aus und gibt die Zahl der tatsächlich
+ * geänderten Zeilen zurück. Damit lässt sich ein Statuswechsel als Sperre
+ * benutzen: `UPDATE … WHERE status = 'pending'` ändert nur beim ersten Aufruf
+ * eine Zeile — nötig, weil Stripe Webhook-Events mehrfach zustellt.
+ */
+export async function execute(sql: string, params: unknown[] = []): Promise<number> {
+  const [result] = await pool.query(sql, params);
+  return (result as ResultSetHeader).affectedRows ?? 0;
 }
 
 /**

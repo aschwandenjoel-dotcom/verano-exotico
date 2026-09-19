@@ -56,6 +56,16 @@ export async function PATCH(
     return NextResponse.json({ error: err instanceof Error ? err.message : "Fehler" }, { status: 500 });
   }
 
+  // Wird der Versand von Hand gesetzt (statt über den CJ-Tracking-Sync), fehlt
+  // sonst der Startpunkt für die Bewertungsanfrage. Fehlertolerant, damit eine
+  // noch nicht eingespielte Migration die Statusänderung nicht blockiert.
+  if (effectiveStatus === "shipped" || effectiveStatus === "delivered") {
+    await query(
+      "UPDATE orders SET shipped_at = NOW() WHERE id = ? AND shipped_at IS NULL",
+      [id]
+    ).catch((err) => console.error("[orders] shipped_at:", err instanceof Error ? err.message : err));
+  }
+
   const order = await queryOne<OrderRow>("SELECT * FROM orders WHERE id = ?", [id]);
   if (!order) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 });
   const [data] = await attachOrderItems([order]);

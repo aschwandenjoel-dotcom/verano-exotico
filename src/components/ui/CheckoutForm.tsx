@@ -73,7 +73,18 @@ const sectionTitle: React.CSSProperties = {
   margin: "0 0 16px",
 };
 
-export default function CheckoutForm({ locale }: { locale: Locale }) {
+export default function CheckoutForm({
+  locale,
+  paymentMode = "prepay",
+  canceled = false,
+}: {
+  locale: Locale;
+  /** Aus der Server-Komponente durchgereicht (src/lib/stripe.ts) — bestimmt die Texte im Zahlungsblock. */
+  paymentMode?: "stripe" | "prepay";
+  /** Kundin ist von der Stripe-Bezahlseite über "Abbrechen" zurückgekommen. */
+  canceled?: boolean;
+}) {
+  const isCard = paymentMode === "stripe";
   const t = useTranslations("checkout");
   const router = useRouter();
   const { items, totalPrice } = useCart();
@@ -223,8 +234,15 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && data.orderId) {
+      if (res.ok && data.url) {
+        // Stripe-Modus: weiter zur gehosteten Bezahlseite. `submitting` bleibt
+        // absichtlich gesetzt — der Knopf soll bis zum Seitenwechsel gesperrt sein.
+        window.location.href = data.url;
+      } else if (res.ok && data.orderId) {
         router.push(`/${locale}/order-confirmation?id=${data.orderId}`);
+      } else if (data.error === "payment_unavailable") {
+        setError(t("payment_unavailable"));
+        setSubmitting(false);
       } else {
         // Feldbezogene Ablehnungen des Servers ebenfalls rot markieren, statt
         // nur eine allgemeine Meldung zu zeigen.
@@ -272,6 +290,22 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
       <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.6rem)", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", marginBottom: "32px" }}>
         {t("title")}
       </h1>
+
+      {/* Rückkehr von der Stripe-Bezahlseite ohne Zahlung */}
+      {canceled && (
+        <p style={{
+          fontSize: "13px",
+          lineHeight: 1.6,
+          color: "#1A3040",
+          background: "rgba(212,175,55,0.12)",
+          border: "1px solid rgba(212,175,55,0.4)",
+          borderRadius: "12px",
+          padding: "14px 18px",
+          marginBottom: "24px",
+        }}>
+          {t("canceled")}
+        </p>
+      )}
 
       {/* noValidate: die Browser-Sprechblasen würden unsere eigene, rote
           Markierung verhindern — geprüft wird stattdessen in pruefe(). */}
@@ -432,14 +466,14 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
             </div>
 
             <div style={{ background: "#1A3040", borderRadius: "16px", padding: "28px" }}>
-              <h2 style={{ ...sectionTitle, color: "#D4AF37" }}>{t("payment_title")}</h2>
+              <h2 style={{ ...sectionTitle, color: "#D4AF37" }}>{t(isCard ? "payment_title_card" : "payment_title")}</h2>
               <p style={{ fontSize: "13px", color: "rgba(248,243,232,0.75)", lineHeight: 1.7, margin: 0 }}>
-                {t("payment_info")}
+                {t(isCard ? "payment_info_card" : "payment_info")}
               </p>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: "18px", paddingTop: "16px", borderTop: "1px solid rgba(248,243,232,0.15)" }}>
                 <span style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(248,243,232,0.55)" }}>
-                  {t("amount_to_transfer")}
+                  {t(isCard ? "amount_to_pay" : "amount_to_transfer")}
                 </span>
                 <span style={{ fontSize: "22px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#D4AF37" }}>
                   {total === null ? "—" : formatPrice(total, payCurrency)}
@@ -447,7 +481,7 @@ export default function CheckoutForm({ locale }: { locale: Locale }) {
               </div>
               {total !== null && payCurrency && payCurrency !== "CHF" && (
                 <p style={{ fontSize: "11px", color: "rgba(248,243,232,0.55)", lineHeight: 1.6, margin: "10px 0 0" }}>
-                  {t("pay_currency_note", { chf: total.toFixed(2) })}
+                  {t(isCard ? "pay_currency_note_card" : "pay_currency_note", { chf: total.toFixed(2) })}
                 </p>
               )}
             </div>

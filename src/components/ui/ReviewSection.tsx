@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 
 interface Review {
@@ -8,6 +9,8 @@ interface Review {
   name: string;
   rating: number;
   comment: string;
+  /** true, wenn die Bewertung über den Link aus der Bewertungs-Mail kam */
+  verified?: boolean;
   created_at: string;
 }
 
@@ -46,7 +49,7 @@ function Stars({ value, onChange }: { value: number; onChange?: (v: number) => v
   );
 }
 
-function ReviewCard({ review, locale }: { review: Review; locale: string }) {
+function ReviewCard({ review, locale, verifiedLabel }: { review: Review; locale: string; verifiedLabel: string }) {
   const date = new Date(review.created_at).toLocaleDateString(
     locale === "de" ? "de-CH" : "en-GB",
     { year: "numeric", month: "short", day: "numeric" }
@@ -57,9 +60,28 @@ function ReviewCard({ review, locale }: { review: Review; locale: string }) {
       padding: "20px 0",
       borderBottom: "1px solid rgba(26,48,64,0.08)",
     }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "8px" }}>
-        <span style={{ fontSize: "13px", fontWeight: 700, color: "#1A3040" }}>{review.name}</span>
-        <span style={{ fontSize: "11px", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>{date}</span>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "8px", gap: "12px" }}>
+        <span style={{ fontSize: "13px", fontWeight: 700, color: "#1A3040" }}>
+          {review.name}
+          {review.verified && (
+            <span style={{
+              marginLeft: "8px",
+              fontSize: "9px",
+              fontFamily: "var(--font-geist-mono)",
+              fontWeight: 400,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: "#00B4C5",
+              border: "1px solid rgba(0,180,197,0.35)",
+              borderRadius: "9999px",
+              padding: "2px 8px",
+              whiteSpace: "nowrap",
+            }}>
+              ✓ {verifiedLabel}
+            </span>
+          )}
+        </span>
+        <span style={{ fontSize: "11px", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", whiteSpace: "nowrap" }}>{date}</span>
       </div>
       <Stars value={review.rating} />
       <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.7)", lineHeight: 1.7, marginTop: "10px" }}>
@@ -103,6 +125,11 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // Token aus der Bewertungs-Mail (…/product/slug?r=<token>). Die Produktseite
+  // bleibt statisch — deshalb steht die Sektion in page.tsx in einer Suspense-
+  // Grenze, wie es Next.js für useSearchParams verlangt.
+  const token = useSearchParams().get("r") ?? "";
+
   useEffect(() => {
     let cancelled = false;
     fetch(`/api/reviews?slug=${encodeURIComponent(productSlug)}`)
@@ -123,8 +150,9 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productSlug, name: name.trim(), rating, comment: comment.trim() }),
+        body: JSON.stringify({ productSlug, name: name.trim(), rating, comment: comment.trim(), token }),
       });
+      if (res.status === 409) { setError("duplicate"); return; }
       if (!res.ok) { setError("submit"); return; }
       const review: Review = await res.json();
       setReviews((prev) => [review, ...prev]);
@@ -135,14 +163,14 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
     } finally {
       setSubmitting(false);
     }
-  }, [productSlug, name, rating, comment]);
+  }, [productSlug, name, rating, comment, token]);
 
   const avg = reviews.length > 0
     ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
     : null;
 
   return (
-    <section style={{ background: "#F8F3E8", borderTop: "1px solid rgba(26,48,64,0.08)" }}>
+    <section id="reviews" style={{ background: "#F8F3E8", borderTop: "1px solid rgba(26,48,64,0.08)", scrollMarginTop: "80px" }}>
       <div style={{ maxWidth: "1152px", margin: "0 auto", padding: "64px clamp(1.5rem, 5vw, 2.5rem) 80px" }}>
 
         {/* Header */}
@@ -172,7 +200,9 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
                   {t("no_reviews")}
                 </p>
               ) : (
-                reviews.map((r) => <ReviewCard key={r.id} review={r} locale={locale} />)
+                reviews.map((r) => (
+                  <ReviewCard key={r.id} review={r} locale={locale} verifiedLabel={t("verified")} />
+                ))
               )}
             </div>
 
@@ -192,9 +222,25 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
                 </div>
               ) : (
                 <div style={{ background: "#FFFFFF", borderRadius: "12px", padding: "32px", border: "1px solid rgba(26,48,64,0.08)" }}>
-                  <h3 style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: "rgba(26,48,64,0.5)", textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: "28px" }}>
+                  <h3 style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: "rgba(26,48,64,0.5)", textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: token ? "16px" : "28px" }}>
                     {t("form_title")}
                   </h3>
+
+                  {/* Über den Link aus der Bewertungs-Mail gekommen */}
+                  {token && (
+                    <p style={{
+                      fontSize: "12px",
+                      lineHeight: 1.6,
+                      color: "#1A3040",
+                      background: "rgba(0,180,197,0.08)",
+                      border: "1px solid rgba(0,180,197,0.25)",
+                      borderRadius: "8px",
+                      padding: "12px 14px",
+                      marginBottom: "28px",
+                    }}>
+                      ✓ {t("verified_hint")}
+                    </p>
+                  )}
 
                   <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div>
@@ -239,6 +285,10 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
 
                     {error === "submit" && (
                       <p style={{ fontSize: "11px", color: "#C0392B" }}>{t("error_submit")}</p>
+                    )}
+
+                    {error === "duplicate" && (
+                      <p style={{ fontSize: "11px", color: "#C0392B" }}>{t("error_duplicate")}</p>
                     )}
 
                     <button

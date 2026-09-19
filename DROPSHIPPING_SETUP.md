@@ -1,14 +1,24 @@
 # CJ-Dropshipping Automatik — Einrichtung
 
-Automatischer Ablauf, der jetzt im Code steckt (Vorkasse-Modell, ohne Stripe):
+Automatischer Ablauf, der jetzt im Code steckt. Die ersten beiden Schritte
+hängen von `PAYMENT_MODE` ab (Details in `STRIPE_SETUP.md`):
 
 ```
-Kunde bestellt (/checkout, Vorkasse)
-  → POST /api/checkout             legt Bestellung an (Status "Wartet auf Zahlung")
-                                   + E-Mail mit IBAN & Referenz VE-<Nr> an Kunden
+Kunde bestellt (/checkout)
+  → POST /api/checkout             legt Bestellung an (Status "pending")
+
+  [PAYMENT_MODE=stripe]
+  → Weiterleitung zu Stripe        Kunde bezahlt per Karte / TWINT
+  → POST /api/stripe/webhook       Zahlung bestätigt → Status "Bezahlt"
+                                   → löst die CJ-Bestellung automatisch aus
+
+  [PAYMENT_MODE=prepay]
+  → E-Mail mit IBAN & Referenz VE-<Nr> an Kunden
   → Kunde überweist … Admin prüft Bankkonto und setzt in /admin den Status "Bezahlt"
   → PATCH /api/orders/[id]         löst dabei die CJ-Bestellung aus (blind, an Kundenadresse)
   → Cron /api/fulfillment/sync     holt Tracking-Nr. → Status "shipped" + Versand-Mail
+  → Cron /api/reviews/request      14 Tage nach Versand: Bitte um Produktbewertung
+                                   (Einrichtung: REVIEWS_SETUP.md)
 ```
 
 Versandkosten werden in `src/lib/shipping.ts` berechnet (Zielland-Zone + Artikelanzahl)

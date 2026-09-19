@@ -60,6 +60,16 @@ export async function GET(req: Request) {
 
       await query(`UPDATE orders SET ${setClauses.join(", ")} WHERE id = ?`, [...setValues, order.id]);
 
+      // Versandzeitpunkt für die spätere Bewertungsanfrage festhalten. Separat
+      // und fehlertolerant, damit die Versand-Mail auch dann rausgeht, wenn
+      // hostpoint-migration-reviews.sql noch nicht eingespielt wurde.
+      if (detail.trackNumber) {
+        await query(
+          "UPDATE orders SET shipped_at = now() WHERE id = ? AND shipped_at IS NULL",
+          [order.id]
+        ).catch((err) => console.error("[sync] shipped_at:", err instanceof Error ? err.message : err));
+      }
+
       // Versand-Mail nur beim ersten Mal (wenn Tracking neu gesetzt wurde)
       if (detail.trackNumber && order.customer_email) {
         await sendShippingNotification({

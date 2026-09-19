@@ -4,6 +4,7 @@ import { useState } from "react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending:            { label: "Wartet auf Zahlung", color: "#E8A830" },
+  payment_failed:     { label: "Zahlung fehlgeschlagen", color: "#C0392B" },
   paid:               { label: "Bezahlt",        color: "#2E7D5E" },
   ordered:            { label: "Bei CJ bestellt", color: "#7B61FF" },
   fulfillment_failed: { label: "CJ-Fehler",      color: "#C0392B" },

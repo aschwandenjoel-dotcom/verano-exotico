@@ -97,7 +97,13 @@
     "pay_currency": "Payment currency",
     "pay_currency_hint": "All prices below are shown in this currency",
     "amount_to_transfer": "Amount to transfer",
-    "pay_currency_note": "Converted at the current rate, equivalent to CHF {chf}. The exact amount may vary slightly depending on the exchange rate when we receive it — that's normal, what matters is the reference number."
+    "pay_currency_note": "Converted at the current rate, equivalent to CHF {chf}. The exact amount may vary slightly depending on the exchange rate when we receive it — that's normal, what matters is the reference number.",
+    "payment_title_card": "Secure payment by card & TWINT",
+    "payment_info_card": "After submitting you will be redirected to a secure payment page. Your card details are processed there and never touch our server. Your order ships as soon as the payment is confirmed.",
+    "amount_to_pay": "To pay",
+    "pay_currency_note_card": "Converted at the current rate, equals CHF {chf}. You will be charged exactly the amount shown above.",
+    "payment_unavailable": "Payment is currently unavailable. Please try again in a few minutes or get in touch with us.",
+    "canceled": "The payment was cancelled — nothing has been charged. Your cart is still here, you can try again any time."
   },
   "order": {
     "received_label": "Order received",
@@ -118,7 +124,13 @@
     "iban_missing": "You will receive our bank details by email.",
     "pending_note": "Delivery in 5–14 business days after payment is received.",
     "email_sent": "We have sent all details to your email.",
-    "continue": "Continue shopping →"
+    "continue": "Continue shopping →",
+    "body_paid": "Your payment has arrived. We are getting your order ready for shipping and will let you know once the parcel is on its way.",
+    "body_processing": "Thank you for your order. We are waiting for your payment to be confirmed — this usually takes only a few seconds.",
+    "paid_label": "Payment confirmed",
+    "processing_label": "Confirming payment",
+    "processing_note": "You will get an email automatically as soon as it is confirmed. Nothing further to do here.",
+    "paid_delivery_note": "Delivery in 5–14 business days."
   },
   "reviews": {
     "label": "Customer voices",
@@ -141,6 +153,9 @@
     "error_rating": "Please select a rating",
     "error_comment": "Please enter a comment",
     "error_submit": "Could not be saved — please try again later.",
+    "error_duplicate": "There's already a review for this item from your order.",
+    "verified": "Verified purchase",
+    "verified_hint": "You ordered this piece — your review will be shown as a verified purchase.",
     "rating_stars": "out of 5 stars"
   },
   "newsletter": {

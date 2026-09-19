@@ -97,7 +97,13 @@
     "pay_currency": "Zahlungswährung",
     "pay_currency_hint": "Alle Preise unten werden in dieser Währung angezeigt",
     "amount_to_transfer": "Zu überweisen",
-    "pay_currency_note": "Umgerechnet zum aktuellen Kurs, entspricht CHF {chf}. Dein Betrag kann je nach Kurs bei Zahlungseingang geringfügig abweichen — das ist normal, wichtig ist nur die Referenznummer."
+    "pay_currency_note": "Umgerechnet zum aktuellen Kurs, entspricht CHF {chf}. Dein Betrag kann je nach Kurs bei Zahlungseingang geringfügig abweichen — das ist normal, wichtig ist nur die Referenznummer.",
+    "payment_title_card": "Sichere Zahlung per Karte & TWINT",
+    "payment_info_card": "Nach dem Absenden wirst du zur gesicherten Bezahlseite weitergeleitet. Deine Kartendaten werden dort verarbeitet und landen nie auf unserem Server. Deine Bestellung geht in den Versand, sobald die Zahlung bestätigt ist.",
+    "amount_to_pay": "Zu bezahlen",
+    "pay_currency_note_card": "Umgerechnet zum aktuellen Kurs, entspricht CHF {chf}. Belastet wird genau der oben angezeigte Betrag.",
+    "payment_unavailable": "Die Zahlung ist gerade nicht verfügbar. Bitte versuche es in ein paar Minuten erneut oder melde dich kurz bei uns.",
+    "canceled": "Die Zahlung wurde abgebrochen — es wurde nichts belastet. Dein Warenkorb ist noch da, du kannst es jederzeit erneut versuchen."
   },
   "order": {
     "received_label": "Bestellung eingegangen",
@@ -118,7 +124,13 @@
     "iban_missing": "Du erhältst die Bankverbindung per E-Mail.",
     "pending_note": "Lieferung in 5–14 Werktagen nach Zahlungseingang.",
     "email_sent": "Alle Details haben wir dir per E-Mail geschickt.",
-    "continue": "Weiter shoppen →"
+    "continue": "Weiter shoppen →",
+    "body_paid": "Deine Zahlung ist eingegangen. Wir machen deine Bestellung versandbereit und melden uns, sobald das Paket unterwegs ist.",
+    "body_processing": "Danke für deine Bestellung. Wir warten gerade auf die Bestätigung deiner Zahlung — das dauert normalerweise nur wenige Sekunden.",
+    "paid_label": "Zahlung bestätigt",
+    "processing_label": "Zahlung wird geprüft",
+    "processing_note": "Sobald die Bestätigung da ist, erhältst du automatisch eine E-Mail. Du musst hier nichts weiter tun.",
+    "paid_delivery_note": "Lieferung in 5–14 Werktagen."
   },
   "reviews": {
     "label": "Kundenstimmen",
@@ -141,6 +153,9 @@
     "error_rating": "Bitte Bewertung auswählen",
     "error_comment": "Bitte Kommentar eingeben",
     "error_submit": "Konnte nicht gespeichert werden — bitte versuche es später erneut.",
+    "error_duplicate": "Für diesen Artikel liegt aus deiner Bestellung bereits eine Bewertung vor.",
+    "verified": "Verifizierter Kauf",
+    "verified_hint": "Du hast dieses Stück bestellt — deine Bewertung wird als verifizierter Kauf angezeigt.",
     "rating_stars": "von 5 Sternen"
   },
   "newsletter": {

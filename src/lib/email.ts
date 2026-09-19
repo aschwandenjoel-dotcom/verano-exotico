@@ -39,11 +39,26 @@ const T = {
     shippingMailNote: "Du erhältst eine weitere E-Mail mit Sendungsnummer, sobald deine Bestellung versandt wurde.",
     addressLabel: "Lieferadresse",
     subjectPay: (n: number, amt: string) => `Bestellung #${n} — bitte Zahlung abschliessen (${amt})`,
+    paidTitle: "Bestellung bestätigt",
+    paidIntro: "Danke für deine Bestellung — deine Zahlung ist eingegangen. Wir machen dein Paket versandbereit.",
+    paidBoxTitle: "Zahlung erhalten",
+    paidBoxNote: "Du bekommst eine weitere E-Mail mit Sendungsnummer, sobald dein Paket unterwegs ist.",
+    paidDeliveryNote: "Lieferzeit: 5–14 Werktage.",
+    subjectPaid: (n: number) => `Bestellung #${n} bestätigt — Verano Exotico`,
     shippedTitle: "Deine Bestellung ist unterwegs",
     shippedIntro: (n: number) => `Deine Bestellung #${n} wurde versandt. Mit der folgenden Nummer kannst du die Sendung verfolgen:`,
     trackingLabel: "Sendungsnummer",
     trackingHint: "Je nach Zielland kann es einige Stunden dauern, bis die Nummer im Tracking-System erscheint.",
     subjectShipped: (n: number) => `Bestellung #${n} versandt — Verano Exotico`,
+    reviewTitle: "Wie war's?",
+    reviewIntro: (n: number) =>
+      `Deine Bestellung #${n} sollte inzwischen bei dir sein. Wenn du zwei Minuten hast: Wie sitzt es, wie fühlt sich der Stoff an? Deine Ehrlichkeit hilft der Nächsten bei der Grössenwahl mehr als jedes Produktfoto.`,
+    reviewCta: "Bewerten →",
+    reviewVerifiedNote:
+      "Über diese Links wird deine Bewertung als verifizierter Kauf gekennzeichnet. Der Name ist freiwillig — Vorname oder Pseudonym genügt.",
+    reviewProblemNote:
+      "Und falls etwas nicht gepasst hat: Antworte einfach auf diese E-Mail, wir finden eine Lösung.",
+    subjectReview: (n: number) => `Wie war deine Bestellung #${n}?`,
   },
   en: {
     footerTagline: "Swimwear for endless summers",
@@ -75,11 +90,26 @@ const T = {
     shippingMailNote: "We'll send you another email with the tracking number once your order has shipped.",
     addressLabel: "Shipping address",
     subjectPay: (n: number, amt: string) => `Order #${n} — please complete payment (${amt})`,
+    paidTitle: "Order confirmed",
+    paidIntro: "Thank you for your order — your payment has arrived. We're getting your parcel ready for shipping.",
+    paidBoxTitle: "Payment received",
+    paidBoxNote: "You'll get another email with the tracking number as soon as your parcel is on its way.",
+    paidDeliveryNote: "Delivery time: 5–14 business days.",
+    subjectPaid: (n: number) => `Order #${n} confirmed — Verano Exotico`,
     shippedTitle: "Your order is on its way",
     shippedIntro: (n: number) => `Your order #${n} has shipped. You can track your package with this number:`,
     trackingLabel: "Tracking number",
     trackingHint: "Depending on the destination it can take a few hours before the number appears in the tracking system.",
     subjectShipped: (n: number) => `Order #${n} shipped — Verano Exotico`,
+    reviewTitle: "How was it?",
+    reviewIntro: (n: number) =>
+      `Your order #${n} should have arrived by now. If you have two minutes: how does it fit, how does the fabric feel? Your honest take helps the next person pick a size more than any product photo can.`,
+    reviewCta: "Write a review →",
+    reviewVerifiedNote:
+      "Reviews left through these links are marked as a verified purchase. Your name is optional — a first name or nickname is fine.",
+    reviewProblemNote:
+      "And if something wasn't right: just reply to this email and we'll sort it out.",
+    subjectReview: (n: number) => `How was your order #${n}?`,
   },
 } as const;
 
@@ -131,6 +161,12 @@ interface SendOrderConfirmationParams {
   shippingAddress?: ShippingAddress | null;
   /** Sprache der Website zum Zeitpunkt der Bestellung — die Mail folgt dieser Sprache. */
   locale?: EmailLocale;
+  /**
+   * Bereits bezahlt (Stripe). Statt Zahlungsanweisungen mit IBAN und QR-Code
+   * erscheint eine Zahlungsbestätigung; verschickt wird die Mail dann erst vom
+   * Webhook nach bestätigter Zahlung.
+   */
+  paid?: boolean;
 }
 
 /**
@@ -150,6 +186,7 @@ export async function sendOrderConfirmation({
   paymentAmount,
   shippingAddress,
   locale = "de",
+  paid = false,
 }: SendOrderConfirmationParams) {
   const t = T[locale];
   const iban = process.env.PAYMENT_IBAN || "";
@@ -164,7 +201,7 @@ export async function sendOrderConfirmation({
   const qrAmount = qrCurrency === "EUR" && typeof paymentAmount === "number" ? paymentAmount : total;
 
   let qrBuffer: Buffer | null = null;
-  if (iban && qrCurrency) {
+  if (iban && qrCurrency && !paid) {
     try {
       qrBuffer = await renderSwissQrPng({
         iban,
@@ -181,6 +218,19 @@ export async function sendOrderConfirmation({
       console.error("QR-Rechnung konnte nicht erzeugt werden:", err);
     }
   }
+
+  // Bereits bezahlt: keine Kontoangaben, kein QR-Code — nur die Bestätigung.
+  const paidBox = `
+      <div style="background:#1A3040;border-radius:12px;padding:24px;margin-top:28px;">
+        <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#D4AF37;margin:0 0 10px;">${t.paidBoxTitle}</p>
+        <p style="font-family:sans-serif;font-size:13px;color:#F8F3E8;line-height:1.8;margin:0;">
+          ${t.amountLabel}: <strong>${isForeignCurrency ? `${currency} ${paymentAmount!.toFixed(2)}` : `CHF ${total.toFixed(2)}`}</strong><br>
+          ${t.refLabel}: <strong style="font-family:monospace;">${reference}</strong>
+        </p>
+        <p style="font-family:sans-serif;font-size:11px;color:rgba(248,243,232,0.6);line-height:1.7;margin:14px 0 0;">
+          ${t.paidBoxNote}
+        </p>
+      </div>`;
 
   const paymentBox = `
       <div style="background:#1A3040;border-radius:12px;padding:24px;margin-top:28px;">
@@ -257,7 +307,7 @@ export async function sendOrderConfirmation({
     <div style="background:#1A3040;padding:32px 40px;text-align:center;">
       <p style="color:#D4AF37;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
       <h1 style="color:#F8F3E8;font-family:sans-serif;font-size:22px;font-weight:900;text-transform:uppercase;margin:0;letter-spacing:0.05em;">
-        ${t.orderReceivedTitle}
+        ${paid ? t.paidTitle : t.orderReceivedTitle}
       </h1>
     </div>
 
@@ -267,7 +317,7 @@ export async function sendOrderConfirmation({
         ${t.greeting(customerName || "")}
       </p>
       <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.6);line-height:1.6;margin:0 0 28px;">
-        ${t.intro}
+        ${paid ? t.paidIntro : t.intro}
       </p>
 
       <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#9E9E9E;margin:0 0 16px;">
@@ -295,11 +345,11 @@ export async function sendOrderConfirmation({
         </tr>
       </table>
 
-      ${paymentBox}
+      ${paid ? paidBox : paymentBox}
       ${addressBlock}
 
       <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);margin-top:28px;line-height:1.6;">
-        ${t.deliveryNote}<br>
+        ${paid ? t.paidDeliveryNote : t.deliveryNote}<br>
         ${t.shippingMailNote}
       </p>
     </div>
@@ -314,7 +364,9 @@ export async function sendOrderConfirmation({
     from: FROM,
     to,
     replyTo: REPLY_TO,
-    subject: t.subjectPay(orderNumber, isForeignCurrency ? `${currency} ${paymentAmount!.toFixed(2)}` : `CHF ${total.toFixed(2)}`),
+    subject: paid
+      ? t.subjectPaid(orderNumber)
+      : t.subjectPay(orderNumber, isForeignCurrency ? `${currency} ${paymentAmount!.toFixed(2)}` : `CHF ${total.toFixed(2)}`),
     html,
     attachments: qrBuffer
       ? [{ filename: "qr-zahlung.png", content: qrBuffer, contentType: "image/png", contentId: "qr-payment" }]
@@ -333,6 +385,8 @@ interface SendAdminNewOrderParams {
   currency?: string;
   paymentAmount?: number;
   shippingAddress?: ShippingAddress | null;
+  /** Zahlung ist bereits bestätigt (Stripe) — kein Bankabgleich nötig. */
+  paid?: boolean;
 }
 
 /**
@@ -349,6 +403,7 @@ export async function sendAdminNewOrderNotification({
   currency = "CHF",
   paymentAmount,
   shippingAddress,
+  paid = false,
 }: SendAdminNewOrderParams) {
   const isForeignCurrency = currency !== "CHF" && typeof paymentAmount === "number";
   const amountLabel = isForeignCurrency ? `${currency} ${paymentAmount!.toFixed(2)}` : `CHF ${total.toFixed(2)}`;
@@ -390,7 +445,9 @@ export async function sendAdminNewOrderNotification({
       <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#9E9E9E;margin:0 0 6px;">Lieferadresse</p>
       <p style="font-family:sans-serif;font-size:13px;color:#1A3040;line-height:1.6;margin:0 0 20px;">${addressBlock}</p>
       <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.5);margin:0;">
-        Zahlungseingang im Bankkonto prüfen und Bestellung im <strong>/admin</strong> auf „Bezahlt" setzen, sobald das Geld da ist.
+        ${paid
+          ? 'Zahlung ist über Stripe bestätigt — der CJ-Auftrag wurde automatisch ausgelöst. Im <strong>/admin</strong> prüfen, ob das Fulfillment durchgelaufen ist.'
+          : 'Zahlungseingang im Bankkonto prüfen und Bestellung im <strong>/admin</strong> auf „Bezahlt“ setzen, sobald das Geld da ist.'}
       </p>
     </div>
   </div>
@@ -460,6 +517,105 @@ export async function sendShippingNotification({
     to,
     replyTo: REPLY_TO,
     subject: t.subjectShipped(orderNumber),
+    html,
+  });
+}
+
+interface ReviewRequestItem {
+  product_slug: string;
+  product_name: string;
+  size?: string | null;
+  color_name?: string | null;
+}
+
+interface SendReviewRequestParams {
+  to: string;
+  customerName: string;
+  orderNumber: number;
+  items: ReviewRequestItem[];
+  /** Signierter Token aus createReviewToken() — schaltet „verifizierter Kauf" frei */
+  token: string;
+  locale?: EmailLocale;
+}
+
+/**
+ * Bitte um eine Produktbewertung, einige Tage nach Versand (siehe
+ * /api/reviews/request). Pro bestelltem Artikel ein Link auf die Produktseite
+ * mit `?r=<token>`; die Bewertung wird dadurch als verifizierter Kauf gespeichert.
+ */
+export async function sendReviewRequest({
+  to,
+  customerName,
+  orderNumber,
+  items,
+  token,
+  locale = "de",
+}: SendReviewRequestParams) {
+  const t = T[locale];
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+  // Mehrfach bestellte Varianten desselben Artikels ergeben nur einen Link —
+  // bewertet wird das Produkt, nicht die einzelne Position.
+  const uniqueItems = items.filter(
+    (item, i) => items.findIndex((other) => other.product_slug === item.product_slug) === i
+  );
+
+  const itemRows = uniqueItems
+    .map((item) => {
+      const url = `${base}/${locale}/product/${encodeURIComponent(item.product_slug)}?r=${token}#reviews`;
+      const variant = [item.size, item.color_name].filter(Boolean).join(" · ");
+      return `
+      <tr>
+        <td style="padding:14px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;">
+          <strong>${item.product_name}</strong>
+          ${variant ? `<br><span style="color:#9E9E9E;font-size:11px;">${variant}</span>` : ""}
+        </td>
+        <td style="padding:14px 0;border-bottom:1px solid #F0EDE8;text-align:right;white-space:nowrap;">
+          <a href="${url}" style="font-family:sans-serif;font-size:12px;font-weight:700;color:#1A3040;text-decoration:none;border-bottom:2px solid #D4AF37;padding-bottom:2px;">
+            ${t.reviewCta}
+          </a>
+        </td>
+      </tr>`;
+    })
+    .join("");
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#F8F3E8;">
+  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
+    <div style="background:#1A3040;padding:32px 40px;text-align:center;">
+      <p style="color:#D4AF37;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
+      <h1 style="color:#F8F3E8;font-family:sans-serif;font-size:22px;font-weight:900;text-transform:uppercase;margin:0;letter-spacing:0.05em;">
+        ${t.reviewTitle}
+      </h1>
+    </div>
+    <div style="padding:32px 40px;">
+      <p style="font-family:sans-serif;font-size:15px;color:#1A3040;margin:0 0 8px;">${t.greeting(customerName || "")}</p>
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.6);line-height:1.6;margin:0 0 28px;">
+        ${t.reviewIntro(orderNumber)}
+      </p>
+
+      <table style="width:100%;border-collapse:collapse;">
+        ${itemRows}
+      </table>
+
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);margin:24px 0 0;line-height:1.7;">
+        ${t.reviewVerifiedNote}<br>
+        ${t.reviewProblemNote}
+      </p>
+    </div>
+    ${footer(locale)}
+  </div>
+</body>
+</html>`;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    replyTo: REPLY_TO,
+    subject: t.subjectReview(orderNumber),
     html,
   });
 }

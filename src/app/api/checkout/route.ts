@@ -1,9 +1,11 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { query, queryOne, parseJson, toJson } from "@/lib/db";
 import { calcShipping, isShippingCountry } from "@/lib/shipping";
 import { CURRENCIES, convert } from "@/lib/currency";
 import { sendOrderConfirmation, sendAdminNewOrderNotification } from "@/lib/email";
+import { paymentMode, stripe, toMinorUnits } from "@/lib/stripe";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -32,18 +34,33 @@ interface OrderRow {
 }
 
 /**
- * Vorkasse-Checkout (Banküberweisung, keine Zahlungsgebühren):
+ * Checkout in zwei Ausprägungen, gesteuert über PAYMENT_MODE (src/lib/stripe.ts):
+ *
+ * Schritt 1–3 sind für beide identisch:
  * 1. Preise werden SERVERSEITIG aus der Datenbank gelesen (Client-Preise zählen nicht).
  * 2. Versand wird nach Zielland (Distanz-Zone) und Artikelanzahl berechnet
  *    und auf die Zwischensumme aufgeschlagen.
  * 3. Bestellung wird mit Status "pending" gespeichert; der Versand steht als
  *    eigene Position (_shipping) in den order_items. `subtotal` = Zahlbetrag inkl. Versand.
- * 4. Kunde erhält per E-Mail die Zahlungsanweisungen (IBAN + Referenz VE-Nr).
- *    CJ-Fulfillment startet erst, wenn der Admin die Zahlung bestätigt.
+ *
+ * Danach trennen sich die Wege:
+ * - `stripe`: Es wird eine Stripe-Checkout-Session erzeugt und deren URL
+ *   zurückgegeben. Bestätigungsmail und CJ-Fulfillment lösen NICHT hier aus,
+ *   sondern erst im Webhook nach bestätigter Zahlung (/api/stripe/webhook).
+ * - `prepay`: Kunde erhält sofort die Zahlungsanweisungen per E-Mail
+ *   (IBAN + Referenz VE-Nr); CJ-Fulfillment startet, wenn der Admin die
+ *   Zahlung im /admin bestätigt.
  */
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
+
+  // Fail closed: lieber gar keine Bestellung als eine, die still auf Vorkasse
+  // zurückfällt, obwohl der Shop auf Kartenzahlung eingestellt ist.
+  const mode = paymentMode();
+  if (mode === "stripe" && !process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json({ error: "payment_unavailable" }, { status: 503 });
+  }
 
   const locale = body.locale === "en" ? "en" : "de";
   // Die Zahlungswährung wird an der Kasse aktiv gewählt und steht später auf
@@ -139,7 +156,46 @@ export async function POST(req: Request) {
   goodsTotal = Math.round(goodsTotal * 100) / 100;
   const shippingCost = calcShipping(address.country, itemCount);
   const total = Math.round((goodsTotal + shippingCost) * 100) / 100;
-  const paymentAmount = Math.round(convert(total, currency) * 100) / 100;
+
+  // Bei Stripe wird jede Position einzeln umgerechnet und gerundet. Der
+  // Zahlbetrag ist deshalb die Summe der Positionen und nicht der umgerechnete
+  // Gesamtbetrag — sonst wichen Beleg und tatsächliche Belastung um Rappen ab.
+  const shippingLabel = locale === "en" ? "Shipping" : "Versand";
+  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
+    mode === "stripe"
+      ? [
+          ...items.map((item) => ({
+            quantity: item.quantity,
+            price_data: {
+              currency: currency.toLowerCase(),
+              unit_amount: toMinorUnits(convert(item.price, currency)),
+              product_data: {
+                name: item.product_name,
+                ...(([item.size, item.color_name].filter(Boolean).join(" · ") || null)
+                  ? { description: [item.size, item.color_name].filter(Boolean).join(" · ") }
+                  : {}),
+              },
+            },
+          })),
+          ...(shippingCost > 0
+            ? [
+                {
+                  quantity: 1,
+                  price_data: {
+                    currency: currency.toLowerCase(),
+                    unit_amount: toMinorUnits(convert(shippingCost, currency)),
+                    product_data: { name: shippingLabel },
+                  },
+                },
+              ]
+            : []),
+        ]
+      : [];
+
+  const paymentAmount =
+    mode === "stripe"
+      ? lineItems.reduce((sum, li) => sum + (li.price_data?.unit_amount ?? 0) * (li.quantity ?? 1), 0) / 100
+      : Math.round(convert(total, currency) * 100) / 100;
 
   // Bestellung anlegen — Telefon wandert mit in die Lieferadresse (für CJ nötig)
   const orderId = randomUUID();
@@ -183,6 +239,57 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Bestellung fehlgeschlagen" }, { status: 500 });
+  }
+
+  // Stripe: Zur gehosteten Bezahlseite weiterleiten. Erst der Webhook macht aus
+  // der Bestellung eine bezahlte Bestellung — hier wird bewusst noch keine
+  // Bestätigungsmail verschickt und kein CJ-Auftrag ausgelöst.
+  if (mode === "stripe") {
+    const base = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin;
+    let session: Stripe.Checkout.Session;
+    try {
+      session = await stripe().checkout.sessions.create({
+        mode: "payment",
+        line_items: lineItems,
+        customer_email: email,
+        client_reference_id: order.id,
+        // Der Webhook findet die Bestellung ausschliesslich hierüber — nicht
+        // über eine DB-Spalte, damit er auch ohne Migration funktioniert.
+        metadata: { orderId: order.id, orderNumber: String(order.order_number) },
+        payment_intent_data: {
+          description: `Verano Exotico VE-${order.order_number}`,
+          metadata: { orderId: order.id, orderNumber: String(order.order_number) },
+        },
+        locale: locale === "en" ? "en" : "de",
+        success_url: `${base}/${locale}/order-confirmation?id=${order.id}`,
+        cancel_url: `${base}/${locale}/checkout?canceled=1`,
+      });
+    } catch (err) {
+      // Ohne Bezahlseite gibt es keine Bestellung — Status entsprechend setzen,
+      // damit im /admin keine stille Karteileiche mit "pending" liegen bleibt.
+      const message = err instanceof Error ? err.message : "Stripe-Fehler";
+      console.error("[checkout] Stripe-Session fehlgeschlagen:", message);
+      await query("UPDATE orders SET status = 'payment_failed', fulfillment_error = ? WHERE id = ?", [
+        message,
+        order.id,
+      ]).catch(console.error);
+      return NextResponse.json({ error: "payment_unavailable" }, { status: 502 });
+    }
+
+    // Nur für die Nachvollziehbarkeit im Admin — fehlertolerant, damit eine noch
+    // nicht eingespielte Migration den Bezahlvorgang nicht blockiert.
+    await query("UPDATE orders SET stripe_session_id = ? WHERE id = ?", [session.id, order.id]).catch(
+      (err) => console.error("[checkout] stripe_session_id:", err instanceof Error ? err.message : err)
+    );
+
+    return NextResponse.json({
+      orderId: order.id,
+      orderNumber: order.order_number,
+      goodsTotal,
+      shippingCost,
+      total,
+      url: session.url,
+    });
   }
 
   await sendOrderConfirmation({

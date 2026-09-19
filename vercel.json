@@ -3,6 +3,10 @@
     {
       "path": "/api/fulfillment/sync",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/reviews/request",
+      "schedule": "0 9 * * *"
     }
   ]
 }

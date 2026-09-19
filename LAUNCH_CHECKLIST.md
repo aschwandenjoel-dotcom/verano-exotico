@@ -47,6 +47,10 @@ leicht vom auf der Website berechneten CHF-Betrag ab — beim Zahlungsabgleich i
 Admin daher nicht auf exakte Übereinstimmung prüfen, sondern anhand der
 Referenznummer (VE-Nr) zuordnen.
 
+> **Vor der ersten echten Bestellung:** `TESTLAUF.md` einmal komplett
+> durcharbeiten — Migrationen, Stripe-Keys, Webhook und eine Testbestellung bis
+> zum CJ-Auftrag, in Klickreihenfolge zum Abhaken.
+
 ## 3. ☐ Umgebungsvariablen in Vercel
 
 | Variable | Status |
@@ -55,9 +59,13 @@ Referenznummer (VE-Nr) zuordnen.
 | `ADMIN_PASSWORD` | ✅ Lokal bereits auf ein starkes Passwort rotiert (Wert in `.env.local`, Backup in `.env.local.backup-…`). ☐ Denselben Wert in Vercel setzen. |
 | `PAYMENT_IBAN` / `PAYMENT_ACCOUNT_HOLDER` | ☐ In Vercel setzen (siehe oben). |
 | `CRON_SECRET` | gesetzt lassen — Tracking-Sync ist fail-closed. |
+| `REVIEW_TOKEN_SECRET` | ☐ Langes Zufalls-Geheimnis setzen — signiert die Links in der Bewertungs-Mail. Ohne diese Variable wird keine Bewertungsanfrage verschickt (siehe `REVIEWS_SETUP.md`). |
+| `REVIEW_REQUEST_DELAY_DAYS` | optional — Tage zwischen Versand und Bewertungsanfrage (Standard 14). |
 | `NEXT_PUBLIC_SITE_URL` | echte Domain — für Sitemap, OG, JSON-LD. |
 | `RESEND_FROM_EMAIL` | ☐ Eigene Domain bei Resend verifizieren und hier eintragen (Fallback `onboarding@resend.dev` wirkt wie Spam). Ohne eigene Domain nicht änderbar — braucht deinen Domain-Kauf/DNS-Zugang. |
-| `STRIPE_*` | Nicht mehr verwendet — Stripe ist vollständig entfernt. Können in Vercel gelöscht werden. |
+| `PAYMENT_MODE` | ☐ Auf `stripe` setzen (oder `prepay` für die alte Vorkasse — siehe `STRIPE_SETUP.md`). |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | ☐ Aus dem Stripe-Dashboard setzen. Ohne Webhook-Secret wird nach der Zahlung weder bestätigt noch bei CJ bestellt. |
+| `PAYMENT_IBAN` / `PAYMENT_ACCOUNT_HOLDER` | Stehen lassen — werden im Prepay-Modus wieder gebraucht. |
 | `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Nicht mehr verwendet — Supabase wurde durch Hostpoint-MySQL ersetzt. Können in Vercel gelöscht werden. |
 
 ## 4. Das neue Verkaufssystem (Vorkasse — 0 % Zahlungsgebühren)
@@ -71,6 +79,7 @@ Referenznummer (VE-Nr) zuordnen.
   → Du prüfst dein Bankkonto und setzt im /admin den Status "Bezahlt"
   → Dabei wird automatisch die CJ-Bestellung ausgelöst
   → Cron-Sync holt Tracking → Kunde bekommt Versand-Mail
+  → 14 Tage später: Cron fragt per Mail nach einer Produktbewertung
 ```
 
 **Versandkosten** (in `src/lib/shipping.ts` anpassbar, überall einheitlich):
