@@ -469,6 +469,23 @@ export default function VTLanding({ locale, products }: Props) {
             <p className="text-[10px]" style={{ color: "rgba(248,243,232,0.35)", fontFamily: "var(--font-geist-mono)" }}>
               {t("footer_tagline")}
             </p>
+            <a
+              href="https://www.instagram.com/veranoexotico/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="inline-flex items-center gap-2 mt-3 text-[10px] tracking-[0.2em] uppercase transition-colors"
+              style={{ color: "rgba(248,243,232,0.35)", fontFamily: "var(--font-geist-mono)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#D4AF37")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(248,243,232,0.35)")}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
+              @veranoexotico
+            </a>
           </div>
 
           <nav className="flex items-center gap-6 flex-wrap" aria-label="Footer-Navigation">
