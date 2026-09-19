@@ -53,13 +53,13 @@ export default async function VersandPage({
         </p>
       </Section>
 
-      <Section title="Zahlung (Vorkasse)">
+      <Section title="Zahlung">
         <p>
-          Wir liefern gegen <strong>Vorkasse per Banküberweisung</strong> — ohne
-          Kartendaten und ohne Zusatzgebühren. Nach der Bestellung erhältst du unsere
-          Bankverbindung mit einer Referenznummer per E-Mail und auf der
-          Bestätigungsseite. Sobald deine Zahlung eingeht, wird die Bestellung
-          versandbereit gemacht.
+          Du bezahlst <strong>per Kreditkarte, Debitkarte oder TWINT</strong> — sicher
+          über Stripe, ohne Zusatzgebühren. Deine Kartendaten werden ausschliesslich auf
+          der gesicherten Bezahlseite erfasst und gelangen nicht zu uns. Sobald die
+          Zahlung bestätigt ist, erhältst du die Bestellbestätigung per E-Mail und die
+          Bestellung wird versandbereit gemacht.
         </p>
       </Section>
 

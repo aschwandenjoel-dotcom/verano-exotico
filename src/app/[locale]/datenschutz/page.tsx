@@ -34,7 +34,7 @@ function PrivacyContent() {
         Datenschutz&shy;erklärung
       </h1>
       <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", marginBottom: "48px" }}>
-        Stand: Juli 2026
+        Stand: September 2026
       </p>
 
       <Section title="1. Allgemeines">
@@ -76,12 +76,13 @@ function PrivacyContent() {
           <li>E-Mail-Adresse</li>
           <li>Bestelldetails (Artikel, Menge, Preis)</li>
         </ul>
-        <p>Die Zahlung erfolgt per Banküberweisung (Vorkasse). Kreditkartendaten werden von uns nicht erhoben und nicht verarbeitet.</p>
+        <p>Die Zahlung erfolgt per Karte oder TWINT über unseren Zahlungsdienstleister Stripe (siehe Abschnitt 4). Karten- und Zahlungsdaten werden von uns weder erhoben noch gespeichert.</p>
         <p style={{ marginTop: "12px" }}>Bestelldaten werden für die Dauer der gesetzlichen Aufbewahrungspflicht (10 Jahre gemäss OR Art. 958f) gespeichert und danach gelöscht.</p>
       </Section>
 
-      <Section title="4. Zahlungsabwicklung (Banküberweisung)">
-        <p>Die Bezahlung erfolgt per Überweisung auf unser Bankkonto (Vorkasse). Dabei erhalten wir von Ihrer Bank die üblichen Buchungsangaben (Name, IBAN, Betrag, Zahlungsreferenz). Diese Daten verwenden wir ausschliesslich zur Zuordnung und Abwicklung Ihrer Bestellung (Art. 6 Abs. 1 lit. b DSGVO) und bewahren sie im Rahmen der gesetzlichen Aufbewahrungspflichten auf. Eine Weitergabe an Dritte findet nicht statt.</p>
+      <Section title="4. Zahlungsabwicklung (Stripe)">
+        <p>Die Bezahlung erfolgt über Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland («Stripe»). Beim Bezahlvorgang werden Sie auf die gesicherte Bezahlseite von Stripe weitergeleitet. Dort erfasst Stripe die für die Zahlung erforderlichen Daten (Karten- bzw. TWINT-Daten, Name, E-Mail-Adresse, Rechnungs- und Lieferadresse, Betrag) und verarbeitet sie in eigener Verantwortung zur Zahlungsabwicklung und Betrugsprävention. Wir selbst erhalten keine vollständigen Kartendaten, sondern lediglich eine Zahlungsbestätigung, die Zahlungsreferenz und die letzten Ziffern des Zahlungsmittels.</p>
+        <p style={{ marginTop: "12px" }}>Rechtsgrundlage ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO bzw. Art. 31 Abs. 2 lit. a DSG). Stripe kann Daten in die USA übermitteln; dies erfolgt auf Basis der Standardvertragsklauseln der EU-Kommission. Weitere Informationen: <a href="https://stripe.com/ch/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#1A3040" }}>stripe.com/ch/privacy</a>.</p>
       </Section>
 
       <Section title="5. E-Mail-Versand (Bestellbestätigung)">
@@ -115,7 +116,8 @@ function PrivacyContent() {
       </Section>
 
       <Section title="10. Analyse & Tracking">
-        <p>Wir setzen <strong>keinerlei</strong> Web-Analyse-Tools (wie Google Analytics, Matomo o. ä.) und <strong>keine</strong> Werbe-Tracking-Pixel (wie Meta Pixel, TikTok Pixel o. ä.) ein. Es erfolgt keine Erstellung von Nutzerprofilen und keine Weitergabe Ihrer Daten an Werbenetzwerke.</p>
+        <p>Zur Reichweitenmessung setzen wir <strong>Vercel Web Analytics</strong> ein (Vercel Inc., siehe Abschnitt 6). Der Dienst arbeitet <strong>ohne Cookies</strong> und ohne geräteübergreifende Kennungen: Erfasst werden Seitenaufrufe, Referrer, Land, Gerätetyp und Browser; die IP-Adresse wird nur zur Bildung eines täglich wechselnden, anonymen Besucher-Hashes verwendet und nicht gespeichert. Eine Identifizierung einzelner Personen ist damit nicht möglich. Rechtsgrundlage ist unser berechtigtes Interesse an der Auswertung und Verbesserung unseres Angebots (Art. 6 Abs. 1 lit. f DSGVO).</p>
+        <p style={{ marginTop: "12px" }}>Wir setzen <strong>keine</strong> Werbe-Tracking-Pixel (wie Meta Pixel, TikTok Pixel o. ä.) ein. Es erfolgt keine Erstellung von Nutzerprofilen und keine Weitergabe Ihrer Daten an Werbenetzwerke.</p>
       </Section>
 
       <Section title="11. Ihre Rechte als betroffene Person">

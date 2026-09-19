@@ -53,9 +53,10 @@ export default async function FaqPage({
 
       <Section title="Wie kann ich bezahlen?">
         <p>
-          Per Banküberweisung (Vorkasse) — ganz ohne Kartendaten und ohne Zusatzgebühren.
-          Nach der Bestellung erhältst du unsere Bankverbindung mit einer Referenznummer
-          per E-Mail. Sobald deine Zahlung eingeht, machen wir dein Paket versandbereit.
+          Mit Kreditkarte, Debitkarte oder TWINT — sicher über Stripe und ohne
+          Zusatzgebühren. Nach dem Bestellen landest du auf der gesicherten Bezahlseite;
+          deine Kartendaten sehen wir nie. Sobald die Zahlung bestätigt ist, bekommst du
+          die Bestellbestätigung per E-Mail und wir machen dein Paket versandbereit.
         </p>
       </Section>
 

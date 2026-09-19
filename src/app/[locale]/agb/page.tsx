@@ -13,7 +13,7 @@ export default async function AgbPage({
   const { locale } = await params;
 
   return (
-    <LegalPage locale={locale as Locale} eyebrow="Rechtliches" title="AGB" stand="Stand: Juli 2026">
+    <LegalPage locale={locale as Locale} eyebrow="Rechtliches" title="AGB" stand="Stand: September 2026">
       <Section title="1. Geltungsbereich">
         <p>
           Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Bestellungen über den
@@ -42,11 +42,12 @@ export default async function AgbPage({
           auf der Seite «Versand &amp; Rückgabe».
         </p>
         <p style={{ marginTop: "12px" }}>
-          Die Zahlung erfolgt per <strong>Vorkasse (Banküberweisung)</strong>. Nach der
-          Bestellung erhalten Sie unsere Bankverbindung mit Referenznummer per E-Mail.
-          Der Gesamtbetrag ist innert 10 Tagen zu überweisen; geht innert dieser Frist
-          keine Zahlung ein, können wir die Bestellung stornieren. Es fallen keine
-          zusätzlichen Zahlungsgebühren an.
+          Die Zahlung erfolgt <strong>per Kreditkarte, Debitkarte oder TWINT</strong> über
+          unseren Zahlungsdienstleister Stripe. Nach dem Absenden der Bestellung werden Sie
+          auf die gesicherte Bezahlseite von Stripe weitergeleitet; Ihre Karten- und
+          Zahlungsdaten werden ausschliesslich dort erfasst und gelangen nicht auf unsere
+          Systeme. Der Kaufvertrag kommt mit erfolgreicher Zahlung zustande. Es fallen
+          keine zusätzlichen Zahlungsgebühren an.
         </p>
       </Section>
 
@@ -54,7 +55,7 @@ export default async function AgbPage({
         <p>
           Die Lieferung erfolgt aus internationalen Lagern unseres Logistikpartners direkt
           an die von Ihnen angegebene Lieferadresse. Die Lieferzeit beträgt in der Regel
-          5–14 Werktage <strong>ab Zahlungseingang</strong>. Sie erhalten eine
+          5–14 Werktage <strong>ab Zahlungsbestätigung</strong>. Sie erhalten eine
           Versandbestätigung mit Sendungsnummer, sobald Ihre Bestellung unterwegs ist.
           Details finden Sie auf der Seite «Versand &amp; Rückgabe». Allfällige
           Einfuhrabgaben, die im Einzelfall anfallen können, gehen zu Lasten der

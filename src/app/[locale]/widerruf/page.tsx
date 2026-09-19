@@ -17,7 +17,7 @@ export default async function WiderrufPage({
       locale={locale as Locale}
       eyebrow="Rechtliches"
       title={<>Rückgabe &amp; Reklamation</>}
-      stand="Stand: Juli 2026"
+      stand="Stand: September 2026"
     >
       <Section title="Kein allgemeines Rückgaberecht">
         <p>
@@ -43,7 +43,7 @@ export default async function WiderrufPage({
           </li>
           <li>Wir prüfen die Meldung und melden uns mit den weiteren Schritten (Umtausch, Nachbesserung oder Rückerstattung).</li>
           <li>Ist eine Rücksendung nötig, erhalten Sie von uns die Rücksendeadresse; die Kosten dafür übernehmen wir bei einem bestätigten Mangel.</li>
-          <li>Nach Eingang und Prüfung der Ware erstatten wir den Kaufpreis (oder den betroffenen Teil davon) auf das ursprüngliche Zahlungsmittel bzw. per Banküberweisung.</li>
+          <li>Nach Eingang und Prüfung der Ware erstatten wir den Kaufpreis (oder den betroffenen Teil davon) auf das ursprünglich verwendete Zahlungsmittel (Karte bzw. TWINT).</li>
         </ul>
       </Section>
 
