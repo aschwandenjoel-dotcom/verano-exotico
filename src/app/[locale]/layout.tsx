@@ -48,6 +48,8 @@ export async function generateMetadata({
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   return {
     metadataBase: new URL(base),
+    // Inhaber-Nachweis für Google Merchant Center / Search Console.
+    verification: { google: "YxSS3sAM_OByeW5eDyI_EA0Kz_X_sf4RqD4WAXsJnIU" },
     title: t("home_title"),
     description: t("home_description"),
     alternates: {
