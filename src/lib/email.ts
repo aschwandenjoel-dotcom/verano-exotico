@@ -3,6 +3,17 @@ import { renderSwissQrPng, type SwissQrCurrency } from "@/lib/swissQr";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
+
+/**
+ * Apple Mail / iOS Mail invertieren im Dark Mode die Farben von Mails, die kein
+ * Farbschema deklarieren — der dunkle Header wird dann hell und unleserlich.
+ * "light" erzwingt die gestaltete Darstellung. Gmail ignoriert das und färbt
+ * weiterhin selbst um; dagegen hilft nur ein von Grund auf dunkles Template.
+ */
+const EMAIL_HEAD = `<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<style>:root { color-scheme: light; supported-color-schemes: light; }</style>`;
 const REPLY_TO = process.env.RESEND_REPLY_TO ?? "veranoexotico@gmail.com";
 
 export type EmailLocale = "de" | "en";
@@ -299,7 +310,7 @@ export async function sendOrderConfirmation({
   const html = `
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"></head>
+<head>${EMAIL_HEAD}</head>
 <body style="margin:0;padding:0;background:#F8F3E8;">
   <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
 
@@ -428,7 +439,7 @@ export async function sendAdminNewOrderNotification({
   const html = `
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"></head>
+<head>${EMAIL_HEAD}</head>
 <body style="margin:0;padding:0;background:#F8F3E8;">
   <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
     <div style="background:#1A3040;padding:24px 40px;text-align:center;">
@@ -483,7 +494,7 @@ export async function sendShippingNotification({
   const html = `
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"></head>
+<head>${EMAIL_HEAD}</head>
 <body style="margin:0;padding:0;background:#F8F3E8;">
   <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
     <div style="background:#1A3040;padding:32px 40px;text-align:center;">
@@ -582,7 +593,7 @@ export async function sendReviewRequest({
   const html = `
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"></head>
+<head>${EMAIL_HEAD}</head>
 <body style="margin:0;padding:0;background:#F8F3E8;">
   <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
     <div style="background:#1A3040;padding:32px 40px;text-align:center;">
