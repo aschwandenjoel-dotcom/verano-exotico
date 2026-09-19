@@ -48,8 +48,11 @@ export async function generateMetadata({
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   return {
     metadataBase: new URL(base),
-    // Inhaber-Nachweis für Google Merchant Center / Search Console.
-    verification: { google: "YxSS3sAM_OByeW5eDyI_EA0Kz_X_sf4RqD4WAXsJnIU" },
+    // Inhaber-Nachweise: Google Merchant Center / Search Console, Pinterest-Katalog.
+    verification: {
+      google: "YxSS3sAM_OByeW5eDyI_EA0Kz_X_sf4RqD4WAXsJnIU",
+      other: { "p:domain_verify": "09ee50754cee25bb1ffb955151884e84" },
+    },
     title: t("home_title"),
     description: t("home_description"),
     alternates: {
