@@ -7,6 +7,9 @@ import { CURRENCIES, convert } from "@/lib/currency";
 import { sendOrderConfirmation, sendAdminNewOrderNotification } from "@/lib/email";
 import { paymentMode, stripe, toMinorUnits } from "@/lib/stripe";
 
+/** Label des Shop-Checkouts in Stripe (Dashboard → Checkout-Analysen). */
+const STRIPE_INTEGRATION_ID = "verano-shop-checkout-kqzmvtwe";
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 interface CheckoutItem {
@@ -248,22 +251,43 @@ export async function POST(req: Request) {
     const base = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin;
     let session: Stripe.Checkout.Session;
     try {
-      session = await stripe().checkout.sessions.create({
-        mode: "payment",
-        line_items: lineItems,
-        customer_email: email,
-        client_reference_id: order.id,
-        // Der Webhook findet die Bestellung ausschliesslich hierüber — nicht
-        // über eine DB-Spalte, damit er auch ohne Migration funktioniert.
-        metadata: { orderId: order.id, orderNumber: String(order.order_number) },
-        payment_intent_data: {
-          description: `Verano Exotico VE-${order.order_number}`,
+      session = await stripe().checkout.sessions.create(
+        {
+          mode: "payment",
+          line_items: lineItems,
+          customer_email: email,
+          client_reference_id: order.id,
+          // Der Webhook findet die Bestellung ausschliesslich hierüber — nicht
+          // über eine DB-Spalte, damit er auch ohne Migration funktioniert.
           metadata: { orderId: order.id, orderNumber: String(order.order_number) },
+          payment_intent_data: {
+            description: `Verano Exotico VE-${order.order_number}`,
+            metadata: { orderId: order.id, orderNumber: String(order.order_number) },
+            // Lieferadresse mitgeben: verbessert die Betrugserkennung (Radar) und
+            // liegt bei einer Rückbuchung als Beleg im Stripe-Dashboard.
+            shipping: {
+              name,
+              phone,
+              address: {
+                line1: address.line1,
+                line2: address.line2 ?? undefined,
+                city: address.city,
+                postal_code: address.postal_code,
+                country: address.country,
+              },
+            },
+          },
+          // Kennzeichnet diesen Checkout-Flow im Stripe-Dashboard (Auswertung
+          // pro Integration). Fester Wert, der Suffix ist Stripe-Konvention.
+          integration_identifier: STRIPE_INTEGRATION_ID,
+          locale: locale === "en" ? "en" : "de",
+          success_url: `${base}/${locale}/order-confirmation?id=${order.id}`,
+          cancel_url: `${base}/${locale}/checkout?canceled=1`,
         },
-        locale: locale === "en" ? "en" : "de",
-        success_url: `${base}/${locale}/order-confirmation?id=${order.id}`,
-        cancel_url: `${base}/${locale}/checkout?canceled=1`,
-      });
+        // Doppelklick auf "Bestellen" oder ein Netzwerk-Retry darf nicht zwei
+        // Sessions für dieselbe Bestellung erzeugen.
+        { idempotencyKey: `checkout-session-${order.id}` }
+      );
     } catch (err) {
       // Ohne Bezahlseite gibt es keine Bestellung — Status entsprechend setzen,
       // damit im /admin keine stille Karteileiche mit "pending" liegen bleibt.

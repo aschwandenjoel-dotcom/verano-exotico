@@ -43,6 +43,30 @@ NEXT_PUBLIC_SITE_URL=https://…     # muss stimmen — daraus werden success/ca
 `PAYMENT_IBAN` und `PAYMENT_ACCOUNT_HOLDER` bleiben stehen: Sie werden nur im
 Prepay-Modus verwendet und wären beim Zurückschalten sofort wieder nötig.
 
+### Restricted Key statt Secret Key (empfohlen)
+
+Statt des vollen `sk_…` reicht ein **Restricted Key** (`rk_…`), der nur das
+darf, was der Shop braucht. Stripe → Developers → API keys → **Create
+restricted key**:
+
+| Ressource | Berechtigung |
+|---|---|
+| Checkout Sessions | Write |
+| Alle anderen | None |
+
+Der Webhook prüft nur Signaturen und braucht keine Key-Berechtigung. Der
+`rk_…` wird genau wie ein `sk_…` als `STRIPE_SECRET_KEY` eingetragen.
+
+### Stripe Tax — bewusst nicht aktiviert
+
+Stripe Tax (`automatic_tax`) berechnet nur Steuern in Ländern mit einer im
+Stripe-Dashboard hinterlegten, **aktiven Steuerregistrierung**. Ohne
+Registrierung wird still keine Steuer erhoben, die Gebühr (0.5 %/Transaktion)
+fällt trotzdem an. In der Schweiz besteht MwSt-Pflicht erst ab CHF 100'000
+Jahresumsatz; für AT/DE (Einfuhr aus China, ggf. IOSS) ist die Frage mit einer
+Treuhänderin zu klären. Erst wenn eine Registrierung existiert, lohnt sich
+`automatic_tax: { enabled: true }` in `checkout.sessions.create`.
+
 ## 2. Migration einspielen
 
 `hostpoint-migration-stripe.sql` in phpMyAdmin ausführen — legt
