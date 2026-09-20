@@ -2,16 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import type { Locale, Product as ShopProduct } from "@/types";
 import Header from "@/components/ui/Header";
-
-const PanoramaIntro = dynamic(
-  () => import("@/components/3d/PanoramaIntro"),
-  { ssr: false }
-);
+// Frueher dynamisch ohne SSR geladen (WebGL). Jetzt reines Markup + CSS,
+// darf serverseitig gerendert werden - das Bild ist dann Teil des ersten HTML.
+import PanoramaIntro from "@/components/3d/PanoramaIntro";
 
 interface Props { locale: Locale; products: ShopProduct[]; }
 

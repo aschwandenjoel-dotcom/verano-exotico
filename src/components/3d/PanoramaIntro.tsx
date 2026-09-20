@@ -1,332 +1,92 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
-/* ─── Pannellum type stubs ───────────────────────────────────────── */
-interface PannellumViewer {
-  on: (event: string, cb: () => void) => PannellumViewer;
-  destroy: () => void;
-  stopAutoRotate: () => void;
-  startAutoRotate: (speed?: number) => void;
-}
-
-const AUTO_ROTATE_SPEED = -2.0;
-
 /**
- * Welche Panorama-Datei? Die 8192x4096-Version belegt als GPU-Textur rund
- * 128 MB (mit Mipmaps ~170 MB) - auf Rechnern mit vielen offenen Tabs oder
- * knappem Grafikspeicher wartet der Renderer dann auf die GPU, und Chrome
- * meldet "Seite reagiert nicht". Die 4096er-Version braucht ein Viertel.
- * Die grosse gibt es nur, wenn der Bildschirm sie ueberhaupt aufloesen kann
- * und die GPU sie sicher traegt.
+ * Strand-Panorama als Intro - ohne WebGL.
+ *
+ * Bis 20.09.2026 lief hier Pannellum (WebGL-360°-Viewer mit Eigendrehung).
+ * Chrome auf macOS blieb damit sporadisch mit "Seite reagiert nicht" haengen:
+ * Der GPU-Prozess blockierte beim laufenden Rendern (in Tests 2 von 3 Laeufen,
+ * unabhaengig von der Texturgroesse, auch in einem frischen Profil ohne
+ * Erweiterungen). Der Debugger konnte JavaScript dabei nicht unterbrechen -
+ * es war also keine Schleife im Code, sondern der Renderer wartete auf die
+ * Grafikkarte. Messprotokoll: siehe Commit-Text dieser Aenderung.
+ *
+ * Jetzt: Das 360°-Bild wird als horizontaler Streifen gezeigt und per
+ * CSS-Transform langsam durchgeschoben. Weil ein Equirectangular-Bild
+ * horizontal umlaeuft, ist der Loop nahtlos: zwei Kopien nebeneinander,
+ * Verschiebung um genau eine Bildbreite. Kostet die GPU so gut wie nichts
+ * (eine Compositor-Ebene, kein WebGL-Kontext) und funktioniert auch in
+ * In-App-Browsern ohne WebGL.
  */
-function pickPanorama(): string {
-  const small = "/images/panorama-360-4k.webp";
-  const large = "/images/panorama-360.webp";
-  try {
-    const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl");
-    if (!gl) return small;
-    const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
-    if (maxTex < 8192) return small;
-    const nav = navigator as Navigator & { deviceMemory?: number };
-    if (nav.deviceMemory !== undefined && nav.deviceMemory < 8) return small;
-    // Sichtbare Breite bei 100 Grad Blickwinkel: 8192 lohnt sich erst, wenn der
-    // Ausschnitt mehr als ~1100 physische Pixel breit ist.
-    const physical = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
-    return physical > 1400 ? large : small;
-  } catch {
-    return small;
-  }
-}
-
-declare global {
-  interface Window {
-    pannellum?: {
-      viewer: (
-        container: HTMLElement,
-        config: Record<string, unknown>
-      ) => PannellumViewer;
-    };
-  }
-}
-
-/* ─── Component ──────────────────────────────────────────────────── */
 export default function PanoramaIntro() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-  const viewerRef = useRef<PannellumViewer | null>(null);
-  /* Hat die Besucherin die Drehung selbst gestoppt? Dann nicht wieder starten. */
-  const userStopped = useRef(false);
-  const [loading, setLoading] = useState(true);
-  /* WebGL fehlt (In-App-Browser von Instagram/TikTok, Stromsparmodus, alte
-     Geraete) oder das 1.9-MB-Panorama laedt nicht: Vorher blieb der Hero dann
-     dauerhaft ein schwarzer Kasten mit "LOADING". Jetzt zeigt er nach einem
-     Pannellum-Fehler oder 8 s ohne "load" ein statisches Strandbild. */
-  const [failed, setFailed] = useState(false);
-
-  /* Auf dem Handy: seitlich wischen dreht das Panorama, senkrecht wischen
-     scrollt die Seite.
-
-     Pannellum haengt seine Touch-Handler an den Viewer-Container und ruft dort
-     preventDefault() - dadurch verschluckt es JEDE Wischgeste, auch senkrechte,
-     und die Seite laesst sich nicht mehr scrollen.
-
-     Gegenmittel in zwei Schichten:
-     1. touch-action: pan-y im CSS. Damit uebernimmt der Browser senkrechtes
-        Scrollen selbst und ignoriert dabei preventDefault.
-     2. Dieser Handler in der CAPTURE-Phase auf der Section, also einer Ebene
-        UEBER dem Viewer. Er legt nach den ersten Pixeln die Richtung fest und
-        stoppt bei senkrechten Gesten die Weitergabe - so dreht sich das
-        Panorama beim Scrollen nicht nebenbei ein Stueck mit. */
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    const THRESHOLD = 8; // Pixel, bis die Richtung als erkannt gilt
-    let startX = 0;
-    let startY = 0;
-    let axis: "x" | "y" | null = null;
-
-    const onStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) {
-        axis = "x"; // Mehrfingergesten dem Viewer ueberlassen
-        return;
-      }
-      axis = null;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    };
-
-    const onMove = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      const dx = e.touches[0].clientX - startX;
-      const dy = e.touches[0].clientY - startY;
-
-      if (axis === null) {
-        if (Math.abs(dx) < THRESHOLD && Math.abs(dy) < THRESHOLD) {
-          e.stopPropagation(); // Richtung noch offen: Viewer nicht reagieren lassen
-          return;
-        }
-        axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-        // Erst die bewusste waagrechte Geste beendet die Eigendrehung.
-        if (axis === "x") {
-          userStopped.current = true;
-          viewerRef.current?.stopAutoRotate();
-        }
-      }
-      if (axis === "y") e.stopPropagation();
-    };
-
-    const onEnd = () => { axis = null; };
-
-    const opts = { capture: true, passive: true } as const;
-    el.addEventListener("touchstart", onStart, opts);
-    el.addEventListener("touchmove", onMove, opts);
-    el.addEventListener("touchend", onEnd, opts);
-    el.addEventListener("touchcancel", onEnd, opts);
-    return () => {
-      el.removeEventListener("touchstart", onStart, true);
-      el.removeEventListener("touchmove", onMove, true);
-      el.removeEventListener("touchend", onEnd, true);
-      el.removeEventListener("touchcancel", onEnd, true);
-    };
-  }, []);
-
-  useEffect(() => {
-    let destroyed = false;
-    let visibility: IntersectionObserver | null = null;
-
-    const init = async () => {
-      /* 1. Pannellum CSS */
-      if (!document.querySelector('link[data-pannellum]')) {
-        const link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.setAttribute("data-pannellum", "");
-        link.href =
-          "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css";
-        document.head.appendChild(link);
-      }
-
-      /* 2. Pannellum JS */
-      await new Promise<void>((resolve) => {
-        if (window.pannellum) { resolve(); return; }
-        const s = document.createElement("script");
-        s.setAttribute("data-pannellum", "");
-        s.src =
-          "https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js";
-        s.onload = () => resolve();
-        document.head.appendChild(s);
-      });
-
-      if (destroyed || !containerRef.current || !window.pannellum) return;
-
-      /* 3. Init viewer
-         Primary:  /images/panorama-360.webp  (WebP, 1.9 MB — modern browsers)
-         Fallback: /images/beach-panorama.jpg (JPG — swap panorama value for Safari < 14 / IE11) */
-      const viewer = window.pannellum.viewer(containerRef.current, {
-        type: "equirectangular",
-        panorama: pickPanorama(),
-        autoLoad: true,
-        autoRotate: AUTO_ROTATE_SPEED,
-        autoRotateInactivityDelay: 1e9,
-        showControls: false,
-        showFullscreenCtrl: false,
-        showZoomCtrl: false,
-        mouseZoom: false,
-        compass: false,
-        hfov: 100,
-        pitch: 0,
-        yaw: 120,
-      });
-
-      viewerRef.current = viewer;
-      viewer.on("load", () => { if (!destroyed) { setLoading(false); clearTimeout(fallbackTimer); } });
-      viewer.on("error", () => { if (!destroyed) { setFailed(true); setLoading(false); clearTimeout(fallbackTimer); } });
-
-      /* 4. Drehung bei echter Bedienung stoppen.
-         Nur mousedown - NICHT touchstart: auf dem Handy loeste jede
-         Beruehrung das Stoppen aus, auch eine, die bloss die Seite scrollen
-         sollte. Dadurch stand das Panorama dort sofort still, waehrend es auf
-         dem Laptop weiterdrehte. Fuer Touch uebernimmt das der Achsen-Handler
-         weiter oben, sobald er eine waagrechte Geste erkennt. */
-      containerRef.current.addEventListener("mousedown", () => {
-        userStopped.current = true;
-        viewer.stopAutoRotate();
-      });
-
-      /* 5. Nicht im Bild = nicht rendern. Mit laufender Eigendrehung zeichnet
-         Pannellum 60-mal pro Sekunde das komplette Panorama - auch wenn die
-         Besucherin laengst bei den Produkten ist. Sobald der Hero den Viewport
-         verlaesst, wird die Drehung angehalten (dann rendert Pannellum nur
-         noch bei Aenderungen); kommt er zurueck, laeuft sie weiter - ausser
-         die Besucherin hat sie selbst gestoppt. */
-      if (sectionRef.current && "IntersectionObserver" in window) {
-        visibility = new IntersectionObserver(
-          ([entry]) => {
-            if (destroyed) return;
-            if (entry.isIntersecting) {
-              if (!userStopped.current) viewer.startAutoRotate(AUTO_ROTATE_SPEED);
-            } else {
-              viewer.stopAutoRotate();
-            }
-          },
-          { threshold: 0.05 }
-        );
-        visibility.observe(sectionRef.current);
-      }
-    };
-
-    // Sicherheitsnetz, falls weder "load" noch "error" kommt (Script-CDN
-    // blockiert, Bild haengt): nach 8 s auf das Standbild wechseln.
-    const fallbackTimer = setTimeout(() => {
-      if (!destroyed) { setFailed(true); setLoading(false); }
-    }, 8000);
-
-    init().catch(() => { if (!destroyed) { setFailed(true); setLoading(false); } });
-    return () => {
-      destroyed = true;
-      clearTimeout(fallbackTimer);
-      visibility?.disconnect();
-      viewerRef.current?.destroy();
-    };
-  }, []);
-
   return (
     <section
-      ref={sectionRef}
       className="pano-hero"
       style={{
         position: "relative",
         width: "100%",
         overflow: "hidden",
-        background: "#080808",
+        background: "#0A3D52",
       }}
-      aria-label="360° Strand-Panorama"
+      aria-label="Strand-Panorama"
     >
       <style>{`
-        @keyframes pano-spin { to { transform: rotate(360deg); } }
-        .pnlm-about-msg,
-        .pnlm-load-button,
-        .pnlm-orientation-button,
-        .pnlm-controls-container { display: none !important; }
-        #pano-mount { width: 100% !important; height: 100% !important; }
-        #pano-mount .pnlm-container { width: 100% !important; height: 100% !important; }
-
-        /* Pannellum setzt touch-action: none und sperrt damit das Scrollen der
-           Seite. pan-y gibt senkrechte Gesten an den Browser zurueck, waehrend
-           waagrechte weiterhin beim Viewer landen. Gilt auch fuer die intern
-           erzeugten Kindelemente (.pnlm-dragfix, .pnlm-render-container). */
-        #pano-mount,
-        #pano-mount * { touch-action: pan-y !important; }
-
         /* 100vh rechnet auf Handys die ein- und ausblendende Browserleiste mit,
            wodurch der Abschnitt zu hoch wird. svh nimmt die kleinste Variante
            und bleibt beim Scrollen ruhig. */
         .pano-hero { height: 100vh; height: 100svh; }
+
+        /* Zwei Kopien des Streifens nebeneinander; der Track wandert um genau
+           eine Kopie nach links und springt dann unsichtbar zurueck. */
+        .pano-track {
+          position: absolute;
+          inset: 0 auto 0 0;
+          height: 100%;
+          display: flex;
+          width: max-content;
+          will-change: transform;
+          animation: pano-pan 150s linear infinite;
+        }
+        .pano-track img {
+          height: 100%;
+          width: auto;
+          display: block;
+          flex: none;
+          user-select: none;
+          -webkit-user-drag: none;
+        }
+        @keyframes pano-pan {
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(-50%, 0, 0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .pano-track { animation: none; }
+        }
+        @keyframes scrollBounce {
+          0%,100% { transform: translateY(0); opacity: .4; }
+          50%     { transform: translateY(6px); opacity: .75; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          @keyframes scrollBounce { 0%,100% { transform: none; } }
+        }
       `}</style>
 
-      {/* Pannellum mount */}
-      <div
-        ref={containerRef}
-        id="pano-mount"
-        style={{ width: "100%", height: "100%", position: "absolute", inset: 0, visibility: failed ? "hidden" : "visible" }}
-      />
-
-      {/* Statisches Fallback statt Panorama (kein WebGL / Ladefehler) */}
-      {failed && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: "url(/images/shop-hero-1.webp)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            zIndex: 1,
-          }}
-        />
-      )}
-
-      {/* Loading spinner — disappears once viewer fires "load" */}
-      {loading && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "rgba(8,8,8,0.97)",
-            zIndex: 20,
-            pointerEvents: "none",
-          }}
-        >
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              border: "2px solid rgba(212,175,55,0.15)",
-              borderTopColor: "#D4AF37",
-              borderRadius: "50%",
-              animation: "pano-spin 0.85s linear infinite",
-              marginBottom: 18,
-            }}
+      {/* Panorama-Streifen (zweimal fuer den nahtlosen Loop). Bewusst ein
+          normales <img> statt next/image: die Datei ist bereits WebP in der
+          einen Groesse, die gebraucht wird - jede weitere Variante wuerde nur
+          das Transformations-Kontingent bei Vercel belasten. */}
+      <div className="pano-track" aria-hidden="true">
+        {[0, 1].map((i) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={i}
+            src="/images/panorama-strip.webp"
+            alt=""
+            decoding="async"
+            fetchPriority={i === 0 ? "high" : "low"}
           />
-          <p
-            style={{
-              color: "rgba(242,237,228,0.35)",
-              fontSize: 10,
-              letterSpacing: "0.35em",
-              textTransform: "uppercase",
-              fontFamily: "var(--font-geist-mono)",
-            }}
-          >
-            Loading
-          </p>
-        </div>
-      )}
+        ))}
+      </div>
 
       {/* Top + bottom vignette */}
       <div
@@ -422,15 +182,6 @@ export default function PanoramaIntro() {
               stroke="rgba(242,237,228,0.4)" strokeWidth="1.5"
               strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <style>{`
-            @keyframes scrollBounce {
-              0%,100% { transform: translateY(0); opacity:.4; }
-              50%      { transform: translateY(6px); opacity:.75; }
-            }
-            @media (prefers-reduced-motion:reduce) {
-              @keyframes scrollBounce { 0%,100%{ transform:none; } }
-            }
-          `}</style>
         </div>
       </div>
     </section>
