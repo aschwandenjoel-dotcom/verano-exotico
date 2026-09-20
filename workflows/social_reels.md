@@ -52,6 +52,30 @@ ffmpeg kommt als npm-Paket (`ffmpeg-static`), Schriften liegen in
    sobald Instagram Shopping freigeschaltet ist). Rhythmus: 3–4 pro Woche,
    nicht alle auf einmal.
 
+## Nutzen-Reels (Listen)
+
+Mehrere Produkte nacheinander unter einer Headline — bringen mehr Reichweite
+als reine Produkt-Reels, weil sie ein Problem lösen oder eine Auswahl geben.
+
+```bash
+node tools/make-list-reel.mjs --clip .tmp/clips/<clip>.mp4 \
+  --title "5 Ferienbikinis" --sub "unter CHF 40." \
+  --products safari-blau-fiesta,totem-mandala-petrol,micro-pushup-golden-python,tanga-leopard,ola-tie-dye-bikini
+
+node tools/make-list-reel.mjs --clip .tmp/clips/<clip>.mp4 \
+  --title "Welcher Schnitt" --sub "passt zu dir?" \
+  --products costa-alta-highwaist-bikini,safari-pushup-bikini,bahia-bandeau-bikini,totem-triangle-bikini,roma-onepiece-swimsuit \
+  --labels "High-Waist · kaschiert, betont die Taille|Push-Up · mehr Volumen|Bandeau · keine Träger-Abdrücke|Triangle · für kleine Oberweite|Badeanzug · maximaler Halt"
+```
+
+Je Produkt 2.4 s (`--per`), Zähler oben rechts, optionales Label pro Karte.
+Captions für Listen von Hand schreiben (Nummerierung + Frage zum Kommentieren,
+z. B. „Welcher kommt mit? Schreib die Nummer").
+
+Themen-Ideen: „5 Bikinis für Thailand", „3 Badeanzüge zum Schwimmen",
+„Unter CHF 30", „Neu diese Woche", „Leopard in 4 Varianten", „Was passt in
+den Koffer" (Set + Bikini + Tuch).
+
 ## Musik
 Standardmässig ohne Ton. **Empfehlung: Musik erst in der Instagram-/TikTok-App
 hinzufügen** — deren Bibliotheken sind für die Plattform lizenziert und die

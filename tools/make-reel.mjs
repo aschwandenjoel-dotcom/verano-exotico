@@ -30,42 +30,24 @@ import ffmpegPath from "ffmpeg-static";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const FONTS = path.join(ROOT, "assets", "fonts");
-const FONT = {
+export const FONT = {
   black: path.join(FONTS, "ArchivoBlack-Regular.ttf"),
   serifItalic: path.join(FONTS, "DMSerifDisplay-Italic.ttf"),
   mono: path.join(FONTS, "GeistMono[wght].ttf"),
 };
 // Markenfarben (globals.css / VTLanding.tsx)
-const COLOR = { sand: "F8F3E8", navy: "1A3040", gold: "D4AF37" };
-const W = 1080;
-const H = 1920;
-const FPS = 30;
+export const COLOR = { sand: "F8F3E8", navy: "1A3040", gold: "D4AF37" };
+export const W = 1080;
+export const H = 1920;
+export const FPS = 30;
 const PRODUCTS_API = "https://verano-exotico.ch/api/products";
 const FEED_URL = "https://verano-exotico.ch/feed/google.xml";
 const PRODUCTS_CACHE = path.join(ROOT, ".tmp", "products.json");
 
 // ---------- CLI ----------
-function arg(name, fallback) {
+export function arg(name, fallback) {
   const i = process.argv.indexOf(`--${name}`);
   return i >= 0 && process.argv[i + 1] && !process.argv[i + 1].startsWith("--") ? process.argv[i + 1] : fallback;
-}
-const clip = arg("clip");
-const slug = arg("product");
-const out = arg("out", path.join(ROOT, ".tmp", "reels", `${slug}.mp4`));
-const duration = Number(arg("duration", "8"));
-const locale = arg("locale", "de") === "en" ? "en" : "de";
-const music = arg("music");
-const cta = arg("cta", "verano-exotico.ch");
-const headline = arg("headline", locale === "en" ? "Golden Days," : "Ferien in Sicht?");
-const sub = arg("sub", locale === "en" ? "Timeless Wear." : "Dein Bikini wartet.");
-const eyebrow = arg("eyebrow", locale === "en" ? "VERANO EXOTICO · SWIMWEAR" : "VERANO EXOTICO · BADEMODE");
-
-if (!clip || !slug) {
-  console.error("Nutzung: --clip <video> --product <slug> [--out <mp4>]");
-  process.exit(1);
-}
-for (const [k, f] of Object.entries(FONT)) {
-  if (!existsSync(f)) throw new Error(`Schrift fehlt (${k}): ${f}`);
 }
 
 // ---------- Produktdaten ----------
@@ -74,7 +56,7 @@ for (const [k, f] of Object.entries(FONT)) {
  * (/feed/google.xml) — der Feed kennt auch die Farbbilder, die /api/products
  * nicht ausliefert, und ist exakt das, was Google und Pinterest zeigen.
  */
-async function loadProducts() {
+export async function loadProducts() {
   if (existsSync(PRODUCTS_CACHE)) {
     const cached = JSON.parse(readFileSync(PRODUCTS_CACHE, "utf8"));
     if (Date.now() - Number(cached.fetchedAt ?? 0) < 6 * 3600 * 1000) return cached.products;
@@ -100,7 +82,7 @@ async function loadProducts() {
 }
 
 /** Feed-Bild-URL → lokale Datei unter public/ (schneller und verlustfrei). */
-function mainImage(product) {
+export function mainImage(product) {
   if (product.feedImage) {
     const rel = product.feedImage.replace(/^https?:\/\/[^/]+/, "");
     const abs = path.join(ROOT, "public", rel);
@@ -110,7 +92,7 @@ function mainImage(product) {
 }
 
 // ---------- Produktkarte (PNG mit Alpha) ----------
-async function buildCard(imagePath, cardPath) {
+export async function buildCard(imagePath, cardPath) {
   const cardW = 800;
   const cardH = 1000;
   const radius = 28;
@@ -142,12 +124,17 @@ async function buildCard(imagePath, cardPath) {
 }
 
 // ---------- ffmpeg ----------
-/** drawtext-Sonderzeichen escapen (Doppelpunkt, Backslash, Apostroph, Prozent). */
-function esc(text) {
-  return String(text).replace(/\\/g, "\\\\").replace(/:/g, "\\:").replace(/'/g, "\\\\\\'").replace(/%/g, "%%");
+/**
+ * drawtext-Sonderzeichen escapen (Doppelpunkt, Backslash, Prozent). Der
+ * ASCII-Apostroph lässt sich innerhalb von text='…' praktisch nicht sauber
+ * escapen — er wird durch den typografischen Apostroph ’ ersetzt, der ohnehin
+ * die korrekte Form ist.
+ */
+export function esc(text) {
+  return String(text).replace(/'/g, "\u2019").replace(/\\/g, "\\\\").replace(/:/g, "\\:").replace(/%/g, "%%");
 }
 /** Buchstabenabstand wie im Web (letter-spacing) — drawtext kennt das nicht, Leerzeichen tun es. */
-function spaced(text) {
+export function spaced(text) {
   return text.split("").join(" ");
 }
 
@@ -157,18 +144,60 @@ function spaced(text) {
  * (Anteil der Schriftgrösse) ist pro Schrift geschätzt.
  */
 const AVG_CHAR = { [FONT.black]: 0.68, [FONT.serifItalic]: 0.44, [FONT.mono]: 0.6 };
-function fitSize(text, font, size, maxWidth = W - 120) {
+export function fitSize(text, font, size, maxWidth = W - 120) {
   const est = text.length * (AVG_CHAR[font] ?? 0.6) * size;
   return est <= maxWidth ? size : Math.floor((size * maxWidth) / est);
 }
 
-function drawtext({ text, font, size, color, y, x = "(w-text_w)/2", alpha = 1, start = 0 }) {
+export function drawtext({ text, font, size, color, y, x = "(w-text_w)/2", alpha = 1, start = 0, enable }) {
   size = fitSize(text, font, size);
   const a = start > 0 ? `alpha='if(lt(t,${start}),0,min(1,(t-${start})/0.5))'` : `alpha=${alpha}`;
-  return `drawtext=fontfile='${font}':text='${esc(text)}':fontsize=${size}:fontcolor=0x${color}:x=${x}:y=${y}:${a}`;
+  const en = enable ? `:enable='${enable}'` : "";
+  return `drawtext=fontfile='${font}':text='${esc(text)}':fontsize=${size}:fontcolor=0x${color}:x=${x}:y=${y}:${a}${en}`;
+}
+
+/**
+ * Hintergrund-Filterkette: Clip auf 9:16 zuschneiden (cover), langsamer Zoom
+ * über die ganze Laufzeit, leicht abdunkeln + Vignette. zoompan mit d=1
+ * verarbeitet jeden Videoframe einzeln; der Zoomfaktor hängt an der
+ * Eingangsframe-Nummer `in`, nicht am pro Frame zurückgesetzten `zoom`.
+ */
+export function backgroundChain(duration, label = "bg") {
+  const totalFrames = Math.round(duration * FPS);
+  return [
+    `[0:v]trim=duration=${duration},setpts=PTS-STARTPTS,fps=${FPS}`,
+    `scale=w='if(gt(a,${W}/${H}),-2,${W})':h='if(gt(a,${W}/${H}),${H},-2)':flags=lanczos`,
+    `crop=${W}:${H}`,
+    `zoompan=z='1+0.10*in/${totalFrames}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${W}x${H}:fps=${FPS}`,
+    `eq=brightness=-0.10:saturation=1.05`,
+    `vignette=angle=PI/4[${label}]`,
+  ].join(",");
+}
+
+/** Gemeinsame Encoder-Argumente. */
+export function encodeArgs(out, duration) {
+  return ["-t", String(duration), "-r", String(FPS), "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", out];
 }
 
 async function main() {
+  const clip = arg("clip");
+  const slug = arg("product");
+  const out = arg("out", path.join(ROOT, ".tmp", "reels", `${slug}.mp4`));
+  const duration = Number(arg("duration", "8"));
+  const locale = arg("locale", "de") === "en" ? "en" : "de";
+  const music = arg("music");
+  const cta = arg("cta", "verano-exotico.ch");
+  const headline = arg("headline", locale === "en" ? "Golden Days," : "Ferien in Sicht?");
+  const sub = arg("sub", locale === "en" ? "Timeless Wear." : "Dein Bikini wartet.");
+  const eyebrow = arg("eyebrow", locale === "en" ? "VERANO EXOTICO · SWIMWEAR" : "VERANO EXOTICO · BADEMODE");
+  if (!clip || !slug) {
+    console.error("Nutzung: --clip <video> --product <slug> [--out <mp4>]");
+    process.exit(1);
+  }
+  for (const [k, f] of Object.entries(FONT)) {
+    if (!existsSync(f)) throw new Error(`Schrift fehlt (${k}): ${f}`);
+  }
+
   const products = await loadProducts();
   const product = products.find((p) => p.slug === slug);
   if (!product) throw new Error(`Produkt nicht gefunden: ${slug}`);
@@ -188,19 +217,7 @@ async function main() {
   const yCta = 1740;
 
   const fadeOut = Math.max(0, duration - 0.6);
-  // Hintergrund: auf 9:16 zuschneiden (cover), dann langsamer Zoom über die
-  // ganze Laufzeit. zoompan mit d=1 verarbeitet jeden Videoframe einzeln; der
-  // Zoomfaktor hängt an der Eingangsframe-Nummer `in`, nicht am pro Frame
-  // zurückgesetzten `zoom`. Danach leicht abdunkeln + Vignette für Lesbarkeit.
-  const totalFrames = duration * FPS;
-  const bg = [
-    `[0:v]trim=duration=${duration},setpts=PTS-STARTPTS,fps=${FPS}`,
-    `scale=w='if(gt(a,${W}/${H}),-2,${W})':h='if(gt(a,${W}/${H}),${H},-2)':flags=lanczos`,
-    `crop=${W}:${H}`,
-    `zoompan=z='1+0.10*in/${totalFrames}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${W}x${H}:fps=${FPS}`,
-    `eq=brightness=-0.10:saturation=1.05`,
-    `vignette=angle=PI/4[bg]`,
-  ].join(",");
+  const bg = backgroundChain(duration);
 
   // Produktkarte: Standbild als Video, Einblendung ab 0.5 s
   const cardIn = `[1:v]format=rgba,fade=t=in:st=0.5:d=0.6:alpha=1,trim=duration=${duration},setpts=PTS-STARTPTS[card]`;
@@ -224,13 +241,15 @@ async function main() {
   args.push("-filter_complex", filter, "-map", "[v]");
   if (music) args.push("-map", "2:a", "-af", `afade=t=in:st=0:d=1,afade=t=out:st=${fadeOut}:d=0.6`, "-c:a", "aac", "-b:a", "160k", "-shortest");
   else args.push("-an");
-  args.push("-t", String(duration), "-r", String(FPS), "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", out);
+  args.push(...encodeArgs(out, duration));
 
   execFileSync(ffmpegPath, args, { stdio: "inherit" });
   console.log(`✅ ${path.relative(ROOT, out)}  (${name}, ${price})`);
 }
 
-main().catch((err) => {
-  console.error("❌", err.message);
-  process.exit(1);
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    console.error("❌", err.message);
+    process.exit(1);
+  });
+}
