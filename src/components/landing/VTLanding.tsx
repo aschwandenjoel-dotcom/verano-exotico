@@ -468,8 +468,9 @@ export default function VTLanding({ locale, products, highlights }: Props) {
             style={{ fontSize: "clamp(2rem, 6vw, 6rem)", fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.05, "--n": 6 } as React.CSSProperties}
           >
             <span className="block">
+              {/* Leerzeichen als eigener Textknoten - im Inline-Block wuerde es geschluckt */}
               {["Trends", "are"].map((w, i) => (
-                <span key={w} className="fx-word" style={{ "--i": i } as React.CSSProperties}>{w} </span>
+                <span key={w}><span className="fx-word" style={{ "--i": i } as React.CSSProperties}>{w}</span>{" "}</span>
               ))}
             </span>
             <span
@@ -480,7 +481,7 @@ export default function VTLanding({ locale, products, highlights }: Props) {
             </span>
             <span className="block">
               {["We", "are", "not."].map((w, i) => (
-                <span key={w} className="fx-word" style={{ "--i": 3 + i } as React.CSSProperties}>{w} </span>
+                <span key={w}><span className="fx-word" style={{ "--i": 3 + i } as React.CSSProperties}>{w}</span>{" "}</span>
               ))}
             </span>
           </blockquote>

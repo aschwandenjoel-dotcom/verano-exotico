@@ -49,7 +49,11 @@ export function useScrollProgress() {
         if (mode === "pin") {
           p = clamp(-rect.top / Math.max(1, rect.height - vh));
         } else if (mode === "top") {
-          p = clamp(window.scrollY / vh);
+          // Bezug ist die umgebende Sektion, nicht scrollY: Der Hero beginnt
+          // erst nach dem 100svh-Panorama. 0, solange die Sektion noch nicht
+          // oben anliegt; 1 nach 0.7 Viewport-Hoehen darueber hinaus.
+          const ref = el.closest("section") ?? el;
+          p = clamp(-ref.getBoundingClientRect().top / (vh * 0.7));
         } else {
           p = clamp((vh - rect.top) / (vh + rect.height));
         }
