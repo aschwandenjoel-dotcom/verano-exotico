@@ -79,35 +79,58 @@ export default function Header({ locale }: Props) {
         alignItems: "center",
       }}
     >
-      {/* Wortmarke in der Typografie der Marke: Archivo Black plus DM Serif
-          kursiv in Gold, wie im Hero und im Logo. Mit Akzent geschrieben -
-          vorher stand hier "EXOTICO", das Logo sagt aber "Exótico". */}
+      {/* Logo als horizontale Variante von public/images/logo.svg: Sonne mit
+          acht Strahlen links, rechts die Wortmarke wie im Logo - VERANO gesperrt
+          in Marine, goldene Linie, EXOTICO gesperrt in Gold. Vorher stand hier
+          nur eine 11px-Textzeile ohne Sonne, die kaum als Logo lesbar war. */}
       {/* Die drei Bereiche bekommen feste Grid-Spalten. Ohne das rutschte die
           rechte Gruppe auf dem Handy in die mittlere Spalte, sobald die
           Navigation (hidden md:flex) ausgeblendet war - Warenkorb und Menue
           hingen dann bei 75 % statt am rechten Rand. */}
       <Link
         href={`/${locale}`}
-        className="text-[11px] md:text-[12px] whitespace-nowrap"
+        className="inline-flex items-center gap-2.5 md:gap-3 whitespace-nowrap"
         style={{ color: "#1A3040", textDecoration: "none", lineHeight: 1, gridColumn: 1 }}
         aria-label="Verano Exótico — Startseite"
       >
-        <span
-          className="font-black tracking-[0.2em] uppercase"
-          style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}
+        {/* Sonne, identisch zur logo.svg (Kreis + 8 Strahlen), skaliert */}
+        <svg
+          className="w-8 h-8 md:w-10 md:h-10 shrink-0"
+          viewBox="0 0 48 48"
+          fill="none"
+          stroke="#D4AF37"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          aria-hidden="true"
         >
-          Verano
-        </span>{" "}
-        <span
-          style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
-            color: "#D4AF37",
-            letterSpacing: "0.02em",
-            fontSize: "1.15em",
-          }}
-        >
-          Exótico
+          <circle cx="24" cy="24" r="10" />
+          <line x1="24" y1="11" x2="24" y2="5" />
+          <line x1="24" y1="37" x2="24" y2="43" />
+          <line x1="11" y1="24" x2="5" y2="24" />
+          <line x1="37" y1="24" x2="43" y2="24" />
+          <line x1="33.2" y1="14.8" x2="37.4" y2="10.6" />
+          <line x1="14.8" y1="33.2" x2="10.6" y2="37.4" />
+          <line x1="33.2" y1="33.2" x2="37.4" y2="37.4" />
+          <line x1="14.8" y1="14.8" x2="10.6" y2="10.6" />
+        </svg>
+        <span className="flex flex-col items-start">
+          <span
+            className="text-[14px] md:text-[17px] font-black uppercase"
+            style={{ fontFamily: "var(--font-archivo-black), sans-serif", letterSpacing: "0.3em", marginRight: "-0.3em" }}
+          >
+            Verano
+          </span>
+          <span
+            aria-hidden="true"
+            className="my-[3px] md:my-1"
+            style={{ display: "block", width: "100%", height: "1px", background: "linear-gradient(to right, #D4AF37, rgba(212,175,55,0.35))" }}
+          />
+          <span
+            className="text-[8px] md:text-[9.5px] uppercase"
+            style={{ fontFamily: "var(--font-geist-mono)", color: "#D4AF37", letterSpacing: "0.42em", marginRight: "-0.42em" }}
+          >
+            Exotico
+          </span>
         </span>
       </Link>
 
