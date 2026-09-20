@@ -70,8 +70,9 @@ function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; 
       onMouseLeave={() => setHovered(false)}
     >
       {/* fx-media: das Bild faehrt beim Scrollen minimal langsamer mit als die
-          Karte (Parallax), der innere Rahmen ist dafuer etwas groesser. */}
-      <div className="fx-media" data-scroll style={{ position: "relative", aspectRatio: "1/1", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
+          Karte (Parallax), der innere Rahmen ist dafuer etwas groesser. Den
+          Fortschritt --p erbt es vom Reihen-Container (data-scroll dort). */}
+      <div className="fx-media" style={{ position: "relative", aspectRatio: "1/1", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
         {image ? (
           <div className="fx-media-inner">
             <Image src={image} alt={name} fill sizes="(max-width: 768px) 70vw, 520px" style={{ objectFit: "contain" }} priority={index < 2} />
@@ -221,7 +222,7 @@ export default function VTLanding({ locale, products, highlights }: Props) {
 
       {/* ── HERO ────────────────────────────────────────────────── */}
       <section
-        className="pt-20 min-h-screen px-6 md:px-10 pb-12"
+        className="hero-tl pt-20 min-h-screen px-6 md:px-10 pb-12"
         style={{ borderBottom: "1px solid rgba(26,48,64,0.1)", position: "relative", overflow: "hidden", display: "grid", gridTemplateRows: "auto 1fr auto" }}
       >
         {/* Meta row */}
@@ -328,7 +329,11 @@ export default function VTLanding({ locale, products, highlights }: Props) {
           </Link>
         </div>
 
-        <div style={{ position: "relative" }}>
+        {/* data-scroll auf dem Container statt auf jeder Karte: ein Fortschritt
+            fuer die ganze Reihe (die Karten staffeln sich ueber --i), und der
+            Scroller selbst wuerde als naechster Scroll-Ancestor die native
+            View-Timeline auf seine eigene Achse beziehen. */}
+        <div data-scroll style={{ position: "relative" }}>
           <div
             ref={shopScrollRef}
             onScroll={onShopScroll}
@@ -337,7 +342,7 @@ export default function VTLanding({ locale, products, highlights }: Props) {
           >
             {products.map((product, i) => (
               // fx-rise: die Karten steigen beim Hereinscrollen gestaffelt auf (--i = Verzoegerung)
-              <div key={product.slug} className="fx-rise" data-scroll style={{ scrollSnapAlign: "start", "--i": i } as React.CSSProperties}>
+              <div key={product.slug} className="fx-rise" style={{ scrollSnapAlign: "start", "--i": i } as React.CSSProperties}>
                 <ShopCard product={product} locale={locale} index={i} badgeNew={t("badge_new")} />
               </div>
             ))}

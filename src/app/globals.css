@@ -157,6 +157,39 @@ body {
    ══════════════════════════════════════════════════════════════════ */
 [data-scroll] { --p: 0; }
 
+/* Registriert als Zahl, damit --p animierbar ist und an Kinder vererbt
+   wird (Karten und Bilder lesen den Fortschritt ihres Containers). */
+@property --p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@keyframes scroll-progress {
+  from { --p: 0; }
+  to   { --p: 1; }
+}
+
+/* Wo der Browser es kann, treibt eine native Scroll-Timeline --p direkt in
+   der Style-Engine: kein JavaScript pro Frame, keine DOM-Mutationen (die
+   Erweiterungen wie Passwort-Manager per MutationObserver ausbremsen).
+   useScrollProgress erkennt das und laesst den Scroll-Listener dann aus.
+   animation-timeline/-range muessen NACH dem animation-Kurzschreib stehen. */
+@supports (animation-timeline: view()) {
+  .scrollfx [data-scroll] {
+    animation: scroll-progress linear both;
+    animation-timeline: view();
+  }
+  /* Angepinnte Sektion: 0 wenn oben anliegend, 1 wenn das Ende erreicht ist */
+  .scrollfx [data-scroll="pin"] { animation-range: contain 0% contain 100%; }
+  /* Hero: Kinder folgen der Timeline der Sektion - 0 wenn sie oben anliegt,
+     1 nach 70 % ihrer Hoehe (entspricht der JS-Formel) */
+  .scrollfx .hero-tl { view-timeline-name: --hero; }
+  .scrollfx [data-scroll="top"] {
+    animation-timeline: --hero;
+    animation-range: exit 0% exit 70%;
+  }
+}
+
 /* Hero: Headline faehrt langsamer mit als die Seite und blendet aus */
 .scrollfx .hero-fade {
   transform: translate3d(0, calc(var(--p) * 90px), 0);

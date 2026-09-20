@@ -34,6 +34,13 @@ export function useScrollProgress() {
     // Endzustaende - nichts bleibt unsichtbar haengen.
     document.documentElement.classList.add("scrollfx");
 
+    // Native Scroll-Timelines (Chrome, Edge, Safari 26+): das CSS treibt --p
+    // selbst, ohne JavaScript pro Frame. Der Listener hier ist nur der
+    // Fallback fuer Browser ohne animation-timeline (Firefox).
+    if (typeof CSS !== "undefined" && CSS.supports("animation-timeline: view()")) {
+      return () => document.documentElement.classList.remove("scrollfx");
+    }
+
     let ticking = false;
     const clamp = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
