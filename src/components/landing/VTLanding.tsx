@@ -7,15 +7,13 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Locale, Product as ShopProduct } from "@/types";
 import Header from "@/components/ui/Header";
-import Spotlight from "./Spotlight";
-import { useScrollProgress } from "./useScrollProgress";
 
 const PanoramaIntro = dynamic(
   () => import("@/components/3d/PanoramaIntro"),
   { ssr: false }
 );
 
-interface Props { locale: Locale; products: ShopProduct[]; highlights: ShopProduct[]; }
+interface Props { locale: Locale; products: ShopProduct[]; }
 
 // Slogan bleibt in beiden Sprachen gleich; nur die Kategorien-Zeile wird übersetzt
 function tickerItems(categories: string) {
@@ -69,14 +67,9 @@ function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; 
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* fx-media: das Bild faehrt beim Scrollen minimal langsamer mit als die
-          Karte (Parallax), der innere Rahmen ist dafuer etwas groesser. Den
-          Fortschritt --p erbt es vom Reihen-Container (data-scroll dort). */}
-      <div className="fx-media" style={{ position: "relative", aspectRatio: "1/1", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
+      <div style={{ position: "relative", aspectRatio: "1/1", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
         {image ? (
-          <div className="fx-media-inner">
-            <Image src={image} alt={name} fill sizes="(max-width: 768px) 70vw, 520px" style={{ objectFit: "contain" }} priority={index < 2} />
-          </div>
+          <Image src={image} alt={name} fill sizes="(max-width: 768px) 70vw, 520px" style={{ objectFit: "contain" }} priority={index < 2} />
         ) : (
           <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
             {product.colors.slice(0, 3).map((c, i) => (
@@ -172,9 +165,8 @@ function NewsletterInput() {
 }
 
 /* ─── Main Landing ───────────────────────────────────────────────── */
-export default function VTLanding({ locale, products, highlights }: Props) {
+export default function VTLanding({ locale, products }: Props) {
   useScrollReveal();
-  useScrollProgress();
   const t = useTranslations("landing");
   const tf = useTranslations("footer");
   const tn = useTranslations("nav");
@@ -197,20 +189,10 @@ export default function VTLanding({ locale, products, highlights }: Props) {
   const scrollShopTo = (index: number) => {
     shopScrollRef.current?.scrollTo({ left: index * cardStep(), behavior: "smooth" });
   };
-  // Per rAF gedrosselt und nur bei tatsaechlicher Aenderung ein State-Update:
-  // die Reihe feuert beim Wischen und beim Einrasten viele Scroll-Events.
-  const shopScrollTick = useRef(false);
   const onShopScroll = () => {
-    if (shopScrollTick.current) return;
-    shopScrollTick.current = true;
-    requestAnimationFrame(() => {
-      shopScrollTick.current = false;
-      const row = shopScrollRef.current;
-      if (!row) return;
-      const step = cardStep();
-      const next = step > 0 ? Math.round(row.scrollLeft / step) : 0;
-      setShopIndex((prev) => (prev === next ? prev : next));
-    });
+    const row = shopScrollRef.current;
+    if (!row) return;
+    setShopIndex(Math.round(row.scrollLeft / cardStep()));
   };
 
   return (
@@ -222,11 +204,11 @@ export default function VTLanding({ locale, products, highlights }: Props) {
 
       {/* ── HERO ────────────────────────────────────────────────── */}
       <section
-        className="hero-tl pt-20 min-h-screen px-6 md:px-10 pb-12"
+        className="pt-20 min-h-screen px-6 md:px-10 pb-12"
         style={{ borderBottom: "1px solid rgba(26,48,64,0.1)", position: "relative", overflow: "hidden", display: "grid", gridTemplateRows: "auto 1fr auto" }}
       >
         {/* Meta row */}
-        <div className="hero-fade-slow" data-scroll="top" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "clamp(3rem,8vw,5rem)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "clamp(3rem,8vw,5rem)" }}>
           <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>
             {t("season", { year })}
           </span>
@@ -235,8 +217,8 @@ export default function VTLanding({ locale, products, highlights }: Props) {
           </span>
         </div>
 
-        {/* Headline - faehrt beim Scrollen langsamer mit und blendet aus (hero-fade) */}
-        <div className="hero-fade" data-scroll="top" style={{ padding: "40px 0" }}>
+        {/* Headline */}
+        <div style={{ padding: "40px 0" }}>
           <div style={{ marginBottom: "28px" }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(26,48,64,0.06)", borderRadius: "9999px", padding: "6px 16px", fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(26,48,64,0.5)" }}>
               <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#D4AF37", display: "inline-block" }} />
@@ -254,7 +236,7 @@ export default function VTLanding({ locale, products, highlights }: Props) {
         </div>
 
         {/* Bottom row */}
-        <div className="hero-fade-slow flex flex-col md:flex-row items-start md:items-end justify-between gap-8" data-scroll="top">
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
           <p className="text-sm max-w-sm leading-relaxed md:max-w-xs" style={{ color: "rgba(26,48,64,0.65)", fontFamily: "var(--font-syne)" }}>
             {t("hero_sub_1")}
             <em style={{ color: "#D4AF37", fontFamily: "var(--font-dm-serif)" }}>Golden Days</em>
@@ -291,6 +273,58 @@ export default function VTLanding({ locale, products, highlights }: Props) {
           ))}
         </div>
       </div>
+
+      {/* ── PHILOSOPHY ──────────────────────────────────────────── */}
+      <section
+        className="px-6 md:px-10 py-24 md:py-36 relative overflow-hidden"
+        style={{ background: "#0A3D52", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+      >
+        {/* Grain overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.035] pointer-events-none"
+          style={{
+            backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+            backgroundSize: "200px",
+            mixBlendMode: "overlay",
+          }}
+          aria-hidden="true"
+        />
+
+        <div className="max-w-3xl mx-auto text-center relative">
+          <p
+            className="tracking-[0.4em] uppercase mb-8"
+            style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)", fontSize: "13px" }}
+          >
+            {t("philosophy_eyebrow")}
+          </p>
+
+          <h2
+            className="font-black uppercase leading-tight mb-10 reveal reveal-delay-1"
+            style={{
+              fontSize: "clamp(2rem, 5vw, 4.5rem)",
+              color: "#F8F3E8",
+              fontFamily: "var(--font-archivo-black), sans-serif",
+            }}
+          >
+            {t("philosophy_title")}
+          </h2>
+
+          <div
+            className="mx-auto mb-10 reveal reveal-delay-2"
+            style={{ width: "40px", height: "2px", background: "#D4AF37" }}
+          />
+
+          <p
+            className="text-base md:text-lg leading-loose reveal reveal-delay-3"
+            style={{ color: "rgba(228,244,247,0.75)", fontFamily: "var(--font-syne)" }}
+          >
+            <strong style={{ color: "#E4F4F7" }}>Golden Days</strong>
+            {t("phil_1")}
+            <strong style={{ color: "#E4F4F7" }}>Timeless Wear</strong>
+            {t("phil_2")}
+          </p>
+        </div>
+      </section>
 
       {/* ── PRODUCT GRID ────────────────────────────────────────── */}
       <section
@@ -329,11 +363,7 @@ export default function VTLanding({ locale, products, highlights }: Props) {
           </Link>
         </div>
 
-        {/* data-scroll auf dem Container statt auf jeder Karte: ein Fortschritt
-            fuer die ganze Reihe (die Karten staffeln sich ueber --i), und der
-            Scroller selbst wuerde als naechster Scroll-Ancestor die native
-            View-Timeline auf seine eigene Achse beziehen. */}
-        <div data-scroll style={{ position: "relative" }}>
+        <div style={{ position: "relative" }}>
           <div
             ref={shopScrollRef}
             onScroll={onShopScroll}
@@ -341,8 +371,7 @@ export default function VTLanding({ locale, products, highlights }: Props) {
             className="hide-scrollbar"
           >
             {products.map((product, i) => (
-              // fx-rise: die Karten steigen beim Hereinscrollen gestaffelt auf (--i = Verzoegerung)
-              <div key={product.slug} className="fx-rise" style={{ scrollSnapAlign: "start", "--i": i } as React.CSSProperties}>
+              <div key={product.slug} style={{ scrollSnapAlign: "start" }}>
                 <ShopCard product={product} locale={locale} index={i} badgeNew={t("badge_new")} />
               </div>
             ))}
@@ -408,61 +437,6 @@ export default function VTLanding({ locale, products, highlights }: Props) {
         </div>
       </section>
 
-      {/* ── SPOTLIGHT: Tag wird zur Nacht, Sets & Dreiteiler ────── */}
-      <Spotlight products={highlights} locale={locale} />
-
-      {/* ── PHILOSOPHY ──────────────────────────────────────────── */}
-      <section
-        className="px-6 md:px-10 py-24 md:py-36 relative overflow-hidden"
-        style={{ background: "#0A3D52", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
-      >
-        {/* Grain overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.035] pointer-events-none"
-          style={{
-            backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-            backgroundSize: "200px",
-            mixBlendMode: "overlay",
-          }}
-          aria-hidden="true"
-        />
-
-        <div className="max-w-3xl mx-auto text-center relative">
-          <p
-            className="tracking-[0.4em] uppercase mb-8"
-            style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)", fontSize: "13px" }}
-          >
-            {t("philosophy_eyebrow")}
-          </p>
-
-          <h2
-            className="font-black uppercase leading-tight mb-10 reveal reveal-delay-1"
-            style={{
-              fontSize: "clamp(2rem, 5vw, 4.5rem)",
-              color: "#F8F3E8",
-              fontFamily: "var(--font-archivo-black), sans-serif",
-            }}
-          >
-            {t("philosophy_title")}
-          </h2>
-
-          <div
-            className="mx-auto mb-10 reveal reveal-delay-2"
-            style={{ width: "40px", height: "2px", background: "#D4AF37" }}
-          />
-
-          <p
-            className="text-base md:text-lg leading-loose reveal reveal-delay-3"
-            style={{ color: "rgba(228,244,247,0.75)", fontFamily: "var(--font-syne)" }}
-          >
-            <strong style={{ color: "#E4F4F7" }}>Golden Days</strong>
-            {t("phil_1")}
-            <strong style={{ color: "#E4F4F7" }}>Timeless Wear</strong>
-            {t("phil_2")}
-          </p>
-        </div>
-      </section>
-
       {/* ── EDITORIAL STATEMENT ─────────────────────────────────── */}
       <section
         className="px-6 md:px-10 py-20 md:py-28"
@@ -475,30 +449,18 @@ export default function VTLanding({ locale, products, highlights }: Props) {
           >
             {t("manifest_eyebrow")}
           </span>
-          {/* fx-words: die Woerter hellen sich mit dem Scrollen nacheinander auf
-              (--i = Position, --n = Anzahl) statt alle auf einmal einzublenden. */}
           <blockquote
-            className="fx-words font-black uppercase leading-none tracking-tight"
-            data-scroll
-            style={{ fontSize: "clamp(2rem, 6vw, 6rem)", fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.05, "--n": 6 } as React.CSSProperties}
+            className="font-black uppercase leading-none tracking-tight"
+            style={{ fontSize: "clamp(2rem, 6vw, 6rem)", fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.05 }}
           >
-            <span className="block">
-              {/* Leerzeichen als eigener Textknoten - im Inline-Block wuerde es geschluckt */}
-              {["Trends", "are"].map((w, i) => (
-                <span key={w}><span className="fx-word" style={{ "--i": i } as React.CSSProperties}>{w}</span>{" "}</span>
-              ))}
-            </span>
+            <span className="block">Trends are</span>
             <span
               className="block"
               style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#00B4C5", textTransform: "none" }}
             >
-              <span className="fx-word" style={{ "--i": 2 } as React.CSSProperties}>temporary.</span>
+              temporary.
             </span>
-            <span className="block">
-              {["We", "are", "not."].map((w, i) => (
-                <span key={w}><span className="fx-word" style={{ "--i": 3 + i } as React.CSSProperties}>{w}</span>{" "}</span>
-              ))}
-            </span>
+            <span className="block">We are not.</span>
           </blockquote>
         </div>
       </section>
