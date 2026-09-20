@@ -146,3 +146,221 @@ body {
 }
 
 .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ══════════════════════════════════════════════════════════════════
+   Scroll-driven (Startseite)
+
+   useScrollProgress.ts setzt auf [data-scroll]-Elementen --p (0…1) und
+   haengt `scrollfx` an <html>. Alle bewegten Regeln stehen unter .scrollfx;
+   ohne JS oder bei prefers-reduced-motion gelten die statischen
+   Endzustaende darunter - nichts bleibt unsichtbar.
+   ══════════════════════════════════════════════════════════════════ */
+[data-scroll] { --p: 0; }
+
+/* Hero: Headline faehrt langsamer mit als die Seite und blendet aus */
+.scrollfx .hero-fade {
+  transform: translate3d(0, calc(var(--p) * 90px), 0);
+  opacity: calc(1 - var(--p) * 1.4);
+  will-change: transform, opacity;
+}
+.scrollfx .hero-fade-slow {
+  transform: translate3d(0, calc(var(--p) * 40px), 0);
+  opacity: calc(1 - var(--p) * 1.2);
+}
+
+/* Karten steigen gestaffelt auf (--i = Index in der Reihe) */
+.scrollfx .fx-rise {
+  --c: clamp(0, calc(var(--p) * 2.6 - var(--i, 0) * 0.16), 1);
+  opacity: var(--c);
+  transform: translate3d(0, calc((1 - var(--c)) * 40px), 0) scale(calc(0.96 + var(--c) * 0.04));
+  will-change: transform, opacity;
+}
+
+/* Bild-Parallax in den Produktkarten: der innere Rahmen ist etwas groesser
+   und wandert gegen die Scrollrichtung, ohne Raender freizugeben. */
+.fx-media-inner { position: absolute; inset: 0; }
+.scrollfx .fx-media-inner {
+  inset: -8%;
+  transform: translate3d(0, calc((var(--p) - 0.5) * -28px), 0);
+  will-change: transform;
+}
+
+/* Manifest: Woerter hellen sich nacheinander auf */
+.fx-word { display: inline-block; }
+.scrollfx .fx-word {
+  opacity: calc(0.18 + clamp(0, calc((var(--p) * 1.9 - 0.35 - var(--i) / var(--n)) * 5), 1) * 0.82);
+}
+
+/* ── Spotlight: der Tag wird zur Nacht ──────────────────────────── */
+.spot {
+  position: relative;
+  /* --d: Daemmerung 0 (Sand) … 1 (Nachtblau); --t: seitliches Gleiten der Reihe (Handy) */
+  --d: 1;
+  --t: 0;
+}
+.scrollfx .spot {
+  height: 260vh;
+  --d: clamp(0, calc((var(--p) - 0.08) / 0.42), 1);
+  --t: clamp(0, calc((var(--p) - 0.34) / 0.5), 1);
+}
+.spot-sticky {
+  position: relative;
+  padding: 96px 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background: #0A3D52;
+  background: color-mix(in srgb, #F8F3E8 calc((1 - var(--d)) * 100%), #0A3D52);
+}
+.scrollfx .spot-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  padding: 0;
+}
+/* Goldener Schein: die Sonne, die untergeht */
+.spot-glow {
+  position: absolute;
+  inset: -20% -10%;
+  background: radial-gradient(ellipse at 72% 18%, rgba(212,175,55,0.55), rgba(212,175,55,0.18) 30%, transparent 62%);
+  opacity: calc(1 - var(--d));
+  transform: translate3d(0, calc(var(--d) * 22vh), 0) scale(calc(1.05 - var(--d) * 0.25));
+  pointer-events: none;
+}
+.spot-inner {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+}
+.spot-eyebrow {
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #D4AF37;
+  margin: 0 0 14px;
+}
+.spot-title {
+  font-family: var(--font-archivo-black), sans-serif;
+  font-size: clamp(2.2rem, 6vw, 5.5rem);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+  color: #F8F3E8;
+  color: color-mix(in srgb, #1A3040 calc((1 - var(--d)) * 100%), #F8F3E8);
+}
+.spot-title-accent {
+  font-family: var(--font-dm-serif);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  color: #D4AF37;
+}
+.spot-text {
+  max-width: 34ch;
+  font-family: var(--font-syne);
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
+  color: rgba(228,244,247,0.75);
+  color: color-mix(in srgb, rgba(26,48,64,0.7) calc((1 - var(--d)) * 100%), rgba(228,244,247,0.75));
+}
+/* Reihe: auf dem Handy gleitet sie mit dem Scrollen seitlich durch */
+.spot-row {
+  display: flex;
+  gap: 16px;
+  --cw: 62vw;
+  --slide: 1;
+}
+.scrollfx .spot-row {
+  transform: translate3d(calc(var(--slide) * -1 * var(--t) * (var(--n) - 1) * (var(--cw) + 16px)), 0, 0);
+  will-change: transform;
+}
+.spot-card {
+  flex: 0 0 var(--cw);
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  --c: 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(248,243,232,0.06);
+  box-shadow:
+    0 0 0 1px rgba(212,175,55, calc(0.25 + var(--c) * 0.45)),
+    0 30px 60px -30px rgba(0,0,0,0.6);
+}
+.scrollfx .spot-card {
+  --c: clamp(0, calc((var(--p) - 0.22 - var(--i) * 0.14) / 0.16), 1);
+  opacity: var(--c);
+  transform: translate3d(0, calc((1 - var(--c)) * 70px), 0) scale(calc(0.92 + var(--c) * 0.08));
+  will-change: transform, opacity;
+}
+.spot-card-media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: #EDE9E2;
+}
+.spot-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #D4AF37;
+  color: #1A3040;
+  font-family: var(--font-archivo-black), sans-serif;
+  font-weight: 900;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+}
+.spot-card-body {
+  padding: 14px 16px 18px;
+  background: rgba(10,61,82,0.9);
+  background: color-mix(in srgb, #FFFFFF calc((1 - var(--d)) * 100%), rgba(10,61,82,0.9));
+  color: #F8F3E8;
+  color: color-mix(in srgb, #1A3040 calc((1 - var(--d)) * 100%), #F8F3E8);
+}
+.spot-card-name {
+  font-family: var(--font-archivo-black), sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  margin: 0 0 4px;
+}
+.spot-card-price {
+  font-family: var(--font-geist-mono);
+  font-size: 12px;
+  opacity: 0.7;
+  margin: 0 0 10px;
+}
+.spot-card-cta {
+  font-family: var(--font-archivo-black), sans-serif;
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #D4AF37;
+}
+/* Kleine Handys: weniger Hoehe verbrauchen, damit alles ins 100svh passt */
+@media (max-height: 700px) {
+  .spot-card-media { aspect-ratio: 1 / 1; }
+  .spot-text { display: none; }
+}
+/* Ab Tablet: Text links, drei Karten nebeneinander, kein Gleiten */
+@media (min-width: 900px) {
+  .spot-inner { grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr); }
+  .spot-row {
+    --slide: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .scrollfx .spot-row { transform: none; }
+}

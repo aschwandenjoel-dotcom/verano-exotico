@@ -54,3 +54,14 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
   );
   return row ? rowToProduct(row) : null;
 }
+
+/** Feste Auswahl in der angegebenen Reihenfolge (z. B. Spotlight auf der Startseite). */
+export async function fetchProductsBySlugs(slugs: string[]): Promise<Product[]> {
+  if (slugs.length === 0) return [];
+  const rows = await query(
+    "SELECT * FROM products WHERE active = true AND slug IN (?)",
+    [slugs]
+  );
+  const bySlug = new Map(rows.map((row) => [row.slug as string, rowToProduct(row)]));
+  return slugs.map((slug) => bySlug.get(slug)).filter((p): p is Product => Boolean(p));
+}
