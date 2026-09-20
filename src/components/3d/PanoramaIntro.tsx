@@ -26,6 +26,11 @@ export default function PanoramaIntro() {
   const sectionRef = useRef<HTMLElement>(null);
   const viewerRef = useRef<PannellumViewer | null>(null);
   const [loading, setLoading] = useState(true);
+  /* WebGL fehlt (In-App-Browser von Instagram/TikTok, Stromsparmodus, alte
+     Geraete) oder das 1.9-MB-Panorama laedt nicht: Vorher blieb der Hero dann
+     dauerhaft ein schwarzer Kasten mit "LOADING". Jetzt zeigt er nach einem
+     Pannellum-Fehler oder 8 s ohne "load" ein statisches Strandbild. */
+  const [failed, setFailed] = useState(false);
 
   /* Auf dem Handy: seitlich wischen dreht das Panorama, senkrecht wischen
      scrollt die Seite.
@@ -139,7 +144,8 @@ export default function PanoramaIntro() {
       });
 
       viewerRef.current = viewer;
-      viewer.on("load", () => { if (!destroyed) setLoading(false); });
+      viewer.on("load", () => { if (!destroyed) { setLoading(false); clearTimeout(fallbackTimer); } });
+      viewer.on("error", () => { if (!destroyed) { setFailed(true); setLoading(false); clearTimeout(fallbackTimer); } });
 
       /* 4. Drehung bei echter Bedienung stoppen.
          Nur mousedown - NICHT touchstart: auf dem Handy loeste jede
@@ -150,8 +156,14 @@ export default function PanoramaIntro() {
       containerRef.current.addEventListener("mousedown", () => viewer.stopAutoRotate());
     };
 
-    init();
-    return () => { destroyed = true; viewerRef.current?.destroy(); };
+    // Sicherheitsnetz, falls weder "load" noch "error" kommt (Script-CDN
+    // blockiert, Bild haengt): nach 8 s auf das Standbild wechseln.
+    const fallbackTimer = setTimeout(() => {
+      if (!destroyed) { setFailed(true); setLoading(false); }
+    }, 8000);
+
+    init().catch(() => { if (!destroyed) { setFailed(true); setLoading(false); } });
+    return () => { destroyed = true; clearTimeout(fallbackTimer); viewerRef.current?.destroy(); };
   }, []);
 
   return (
@@ -192,8 +204,23 @@ export default function PanoramaIntro() {
       <div
         ref={containerRef}
         id="pano-mount"
-        style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}
+        style={{ width: "100%", height: "100%", position: "absolute", inset: 0, visibility: failed ? "hidden" : "visible" }}
       />
+
+      {/* Statisches Fallback statt Panorama (kein WebGL / Ladefehler) */}
+      {failed && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: "url(/images/shop-hero-1.webp)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            zIndex: 1,
+          }}
+        />
+      )}
 
       {/* Loading spinner — disappears once viewer fires "load" */}
       {loading && (
