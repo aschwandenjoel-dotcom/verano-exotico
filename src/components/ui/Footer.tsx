@@ -35,7 +35,9 @@ export default function Footer() {
         <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
 
           {/* Top row */}
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: "24px" }}>
+          {/* Grosszuegiger Abstand zwischen Markenblock und Linkliste - vorher
+              klebte auf dem Handy die Linkliste direkt am Instagram-Link. */}
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", columnGap: "48px", rowGap: "36px" }}>
             <div>
               <p style={{ fontSize: "13px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", color: "#1A3040" }}>
                 Verano Exotico
@@ -48,7 +50,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                style={{ ...linkStyle, display: "inline-flex", alignItems: "center", gap: "8px", marginTop: "14px" }}
+                style={{ ...linkStyle, display: "inline-flex", alignItems: "center", gap: "10px", marginTop: "22px", fontSize: "12px", color: "#1A3040" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.55)")}
               >
@@ -61,7 +63,7 @@ export default function Footer() {
               </a>
             </div>
 
-            <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", rowGap: "12px" }}>
+            <div style={{ display: "flex", columnGap: "28px", rowGap: "16px", flexWrap: "wrap" }}>
               {links.map((link) => (
                 <a
                   key={link.href}
