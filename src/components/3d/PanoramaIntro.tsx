@@ -7,6 +7,37 @@ interface PannellumViewer {
   on: (event: string, cb: () => void) => PannellumViewer;
   destroy: () => void;
   stopAutoRotate: () => void;
+  startAutoRotate: (speed?: number) => void;
+}
+
+const AUTO_ROTATE_SPEED = -2.0;
+
+/**
+ * Welche Panorama-Datei? Die 8192x4096-Version belegt als GPU-Textur rund
+ * 128 MB (mit Mipmaps ~170 MB) - auf Rechnern mit vielen offenen Tabs oder
+ * knappem Grafikspeicher wartet der Renderer dann auf die GPU, und Chrome
+ * meldet "Seite reagiert nicht". Die 4096er-Version braucht ein Viertel.
+ * Die grosse gibt es nur, wenn der Bildschirm sie ueberhaupt aufloesen kann
+ * und die GPU sie sicher traegt.
+ */
+function pickPanorama(): string {
+  const small = "/images/panorama-360-4k.webp";
+  const large = "/images/panorama-360.webp";
+  try {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl");
+    if (!gl) return small;
+    const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
+    if (maxTex < 8192) return small;
+    const nav = navigator as Navigator & { deviceMemory?: number };
+    if (nav.deviceMemory !== undefined && nav.deviceMemory < 8) return small;
+    // Sichtbare Breite bei 100 Grad Blickwinkel: 8192 lohnt sich erst, wenn der
+    // Ausschnitt mehr als ~1100 physische Pixel breit ist.
+    const physical = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
+    return physical > 1400 ? large : small;
+  } catch {
+    return small;
+  }
 }
 
 declare global {
@@ -25,6 +56,8 @@ export default function PanoramaIntro() {
   const containerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const viewerRef = useRef<PannellumViewer | null>(null);
+  /* Hat die Besucherin die Drehung selbst gestoppt? Dann nicht wieder starten. */
+  const userStopped = useRef(false);
   const [loading, setLoading] = useState(true);
   /* WebGL fehlt (In-App-Browser von Instagram/TikTok, Stromsparmodus, alte
      Geraete) oder das 1.9-MB-Panorama laedt nicht: Vorher blieb der Hero dann
@@ -77,7 +110,10 @@ export default function PanoramaIntro() {
         }
         axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
         // Erst die bewusste waagrechte Geste beendet die Eigendrehung.
-        if (axis === "x") viewerRef.current?.stopAutoRotate();
+        if (axis === "x") {
+          userStopped.current = true;
+          viewerRef.current?.stopAutoRotate();
+        }
       }
       if (axis === "y") e.stopPropagation();
     };
@@ -99,6 +135,7 @@ export default function PanoramaIntro() {
 
   useEffect(() => {
     let destroyed = false;
+    let visibility: IntersectionObserver | null = null;
 
     const init = async () => {
       /* 1. Pannellum CSS */
@@ -129,9 +166,9 @@ export default function PanoramaIntro() {
          Fallback: /images/beach-panorama.jpg (JPG — swap panorama value for Safari < 14 / IE11) */
       const viewer = window.pannellum.viewer(containerRef.current, {
         type: "equirectangular",
-        panorama: "/images/panorama-360.webp",
+        panorama: pickPanorama(),
         autoLoad: true,
-        autoRotate: -2.0,
+        autoRotate: AUTO_ROTATE_SPEED,
         autoRotateInactivityDelay: 1e9,
         showControls: false,
         showFullscreenCtrl: false,
@@ -153,7 +190,31 @@ export default function PanoramaIntro() {
          sollte. Dadurch stand das Panorama dort sofort still, waehrend es auf
          dem Laptop weiterdrehte. Fuer Touch uebernimmt das der Achsen-Handler
          weiter oben, sobald er eine waagrechte Geste erkennt. */
-      containerRef.current.addEventListener("mousedown", () => viewer.stopAutoRotate());
+      containerRef.current.addEventListener("mousedown", () => {
+        userStopped.current = true;
+        viewer.stopAutoRotate();
+      });
+
+      /* 5. Nicht im Bild = nicht rendern. Mit laufender Eigendrehung zeichnet
+         Pannellum 60-mal pro Sekunde das komplette Panorama - auch wenn die
+         Besucherin laengst bei den Produkten ist. Sobald der Hero den Viewport
+         verlaesst, wird die Drehung angehalten (dann rendert Pannellum nur
+         noch bei Aenderungen); kommt er zurueck, laeuft sie weiter - ausser
+         die Besucherin hat sie selbst gestoppt. */
+      if (sectionRef.current && "IntersectionObserver" in window) {
+        visibility = new IntersectionObserver(
+          ([entry]) => {
+            if (destroyed) return;
+            if (entry.isIntersecting) {
+              if (!userStopped.current) viewer.startAutoRotate(AUTO_ROTATE_SPEED);
+            } else {
+              viewer.stopAutoRotate();
+            }
+          },
+          { threshold: 0.05 }
+        );
+        visibility.observe(sectionRef.current);
+      }
     };
 
     // Sicherheitsnetz, falls weder "load" noch "error" kommt (Script-CDN
@@ -163,7 +224,12 @@ export default function PanoramaIntro() {
     }, 8000);
 
     init().catch(() => { if (!destroyed) { setFailed(true); setLoading(false); } });
-    return () => { destroyed = true; clearTimeout(fallbackTimer); viewerRef.current?.destroy(); };
+    return () => {
+      destroyed = true;
+      clearTimeout(fallbackTimer);
+      visibility?.disconnect();
+      viewerRef.current?.destroy();
+    };
   }, []);
 
   return (
