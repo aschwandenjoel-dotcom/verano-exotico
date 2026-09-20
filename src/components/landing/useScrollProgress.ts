@@ -37,27 +37,40 @@ export function useScrollProgress() {
     let ticking = false;
     const clamp = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
+    // Bezugselement pro Eintrag einmal bestimmen (Hero: die umgebende Sektion,
+    // denn der Hero beginnt erst nach dem 100svh-Panorama).
+    const refs = els.map((el) => (el.dataset.scroll === "top" ? (el.closest("section") ?? el) : el));
+    const last = new Array<string>(els.length).fill("");
+
     const update = () => {
       ticking = false;
       const vh = window.innerHeight;
-      for (const el of els) {
-        const rect = el.getBoundingClientRect();
+      // Erst ALLE messen, dann ALLE schreiben. Abwechselnd messen/schreiben
+      // wuerde vor jeder Messung eine neue Style-Berechnung erzwingen
+      // (Layout-Thrashing) - auf einer bildlastigen Seite pro Frame teuer.
+      const values = new Array<string | null>(els.length).fill(null);
+      for (let i = 0; i < els.length; i++) {
+        const rect = refs[i].getBoundingClientRect();
         // Weit ausserhalb: nicht anfassen (spart Style-Recalcs)
         if (rect.bottom < -vh || rect.top > vh * 2) continue;
-        const mode = el.dataset.scroll;
+        const mode = els[i].dataset.scroll;
         let p: number;
         if (mode === "pin") {
           p = clamp(-rect.top / Math.max(1, rect.height - vh));
         } else if (mode === "top") {
-          // Bezug ist die umgebende Sektion, nicht scrollY: Der Hero beginnt
-          // erst nach dem 100svh-Panorama. 0, solange die Sektion noch nicht
-          // oben anliegt; 1 nach 0.7 Viewport-Hoehen darueber hinaus.
-          const ref = el.closest("section") ?? el;
-          p = clamp(-ref.getBoundingClientRect().top / (vh * 0.7));
+          // 0, solange die Sektion noch nicht oben anliegt; 1 nach 0.7 Viewport-Hoehen.
+          p = clamp(-rect.top / (vh * 0.7));
         } else {
           p = clamp((vh - rect.top) / (vh + rect.height));
         }
-        el.style.setProperty("--p", p.toFixed(4));
+        values[i] = p.toFixed(3);
+      }
+      for (let i = 0; i < els.length; i++) {
+        const v = values[i];
+        if (v !== null && v !== last[i]) {
+          last[i] = v;
+          els[i].style.setProperty("--p", v);
+        }
       }
     };
 

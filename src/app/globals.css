@@ -161,19 +161,20 @@ body {
 .scrollfx .hero-fade {
   transform: translate3d(0, calc(var(--p) * 90px), 0);
   opacity: calc(1 - var(--p) * 1.4);
-  will-change: transform, opacity;
 }
 .scrollfx .hero-fade-slow {
   transform: translate3d(0, calc(var(--p) * 40px), 0);
   opacity: calc(1 - var(--p) * 1.2);
 }
 
-/* Karten steigen gestaffelt auf (--i = Index in der Reihe) */
+/* Karten steigen gestaffelt auf (--i = Index in der Reihe).
+   Bewusst OHNE scale(): die Karten sind Snap-Ziele der Reihe, eine
+   Groessenaenderung wuerde Chrome staendig neu einrasten lassen. Und ohne
+   will-change: bei DPR 2 waeren das sechs grosse Compositor-Ebenen. */
 .scrollfx .fx-rise {
   --c: clamp(0, calc(var(--p) * 2.6 - var(--i, 0) * 0.16), 1);
   opacity: var(--c);
-  transform: translate3d(0, calc((1 - var(--c)) * 40px), 0) scale(calc(0.96 + var(--c) * 0.04));
-  will-change: transform, opacity;
+  transform: translate3d(0, calc((1 - var(--c)) * 40px), 0);
 }
 
 /* Bild-Parallax in den Produktkarten: der innere Rahmen ist etwas groesser
@@ -182,7 +183,6 @@ body {
 .scrollfx .fx-media-inner {
   inset: -8%;
   transform: translate3d(0, calc((var(--p) - 0.5) * -28px), 0);
-  will-change: transform;
 }
 
 /* Manifest: Woerter hellen sich nacheinander auf */
@@ -298,7 +298,6 @@ body {
   --c: clamp(0, calc((var(--p) - 0.22 - var(--i) * 0.14) / 0.16), 1);
   opacity: var(--c);
   transform: translate3d(0, calc((1 - var(--c)) * 70px), 0) scale(calc(0.92 + var(--c) * 0.08));
-  will-change: transform, opacity;
 }
 .spot-card-media {
   position: relative;

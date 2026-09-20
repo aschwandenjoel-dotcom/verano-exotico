@@ -196,10 +196,20 @@ export default function VTLanding({ locale, products, highlights }: Props) {
   const scrollShopTo = (index: number) => {
     shopScrollRef.current?.scrollTo({ left: index * cardStep(), behavior: "smooth" });
   };
+  // Per rAF gedrosselt und nur bei tatsaechlicher Aenderung ein State-Update:
+  // die Reihe feuert beim Wischen und beim Einrasten viele Scroll-Events.
+  const shopScrollTick = useRef(false);
   const onShopScroll = () => {
-    const row = shopScrollRef.current;
-    if (!row) return;
-    setShopIndex(Math.round(row.scrollLeft / cardStep()));
+    if (shopScrollTick.current) return;
+    shopScrollTick.current = true;
+    requestAnimationFrame(() => {
+      shopScrollTick.current = false;
+      const row = shopScrollRef.current;
+      if (!row) return;
+      const step = cardStep();
+      const next = step > 0 ? Math.round(row.scrollLeft / step) : 0;
+      setShopIndex((prev) => (prev === next ? prev : next));
+    });
   };
 
   return (
