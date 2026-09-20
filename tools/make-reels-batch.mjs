@@ -58,8 +58,10 @@ const HEADLINES = {
 };
 const NEW_HEADLINE = { de: ["Neu im Shop", "für deine Ferien."], en: ["New in", "for your getaway."] };
 
-const HASHTAGS =
-  "#bikini #bademode #swimwear #bikinis #ferien #winterflucht #malediven #thailand #kanaren #dubai #schweiz #swissbrand #veranoexotico #beachwear #bikinilove #summervibes #goldenhour";
+const HASHTAGS = {
+  de: "#bikini #bademode #swimwear #bikinis #ferien #winterflucht #malediven #thailand #kanaren #dubai #schweiz #swissbrand #veranoexotico #beachwear #bikinilove #summervibes #goldenhour",
+  en: "#bikini #swimwear #bikinis #beachwear #holidaymode #winterescape #maldives #thailand #canaryislands #dubai #switzerland #swissbrand #veranoexotico #bikinilove #summervibes #goldenhour #vacationoutfit",
+};
 
 function caption(product, locale) {
   const name = product.name[locale];
@@ -123,7 +125,7 @@ products.forEach((product, i) => {
   if (MUSIC) args.push("--music", MUSIC);
   execFileSync(process.execPath, args, { stdio: "inherit" });
 
-  const md = `# ${product.name[LOCALE]}\n\n**Video:** ${path.basename(out)}  \n**Clip:** ${path.basename(clip)} (Pexels, siehe .tmp/clips/index.json)  \n**Headline:** ${headline} ${sub}\n\n## Caption DE\n\n${caption(product, "de")}\n\n## Caption EN\n\n${caption(product, "en")}\n\n## Hashtags\n\n${HASHTAGS}\n`;
+  const md = `# ${product.name[LOCALE]}\n\n**Video:** ${path.basename(out)}  \n**Clip:** ${path.basename(clip)} (Pexels, siehe .tmp/clips/index.json)  \n**Headline:** ${headline} ${sub}\n\n## Caption DE\n\n${caption(product, "de")}\n\n${HASHTAGS.de}\n\n## Caption EN\n\n${caption(product, "en")}\n\n${HASHTAGS.en}\n`;
   writeFileSync(out.replace(/\.mp4$/, ".md"), md);
   rows.push(`| ${product.name[LOCALE]} | CHF ${Number(product.price).toFixed(2)} | ${path.basename(out)} | ${headline} ${sub} |`);
 });
