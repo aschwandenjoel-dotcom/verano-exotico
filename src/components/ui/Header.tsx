@@ -82,10 +82,14 @@ export default function Header({ locale }: Props) {
       {/* Wortmarke in der Typografie der Marke: Archivo Black plus DM Serif
           kursiv in Gold, wie im Hero und im Logo. Mit Akzent geschrieben -
           vorher stand hier "EXOTICO", das Logo sagt aber "Exótico". */}
+      {/* Die drei Bereiche bekommen feste Grid-Spalten. Ohne das rutschte die
+          rechte Gruppe auf dem Handy in die mittlere Spalte, sobald die
+          Navigation (hidden md:flex) ausgeblendet war - Warenkorb und Menue
+          hingen dann bei 75 % statt am rechten Rand. */}
       <Link
         href={`/${locale}`}
         className="text-[11px] md:text-[12px] whitespace-nowrap"
-        style={{ color: "#1A3040", textDecoration: "none", lineHeight: 1 }}
+        style={{ color: "#1A3040", textDecoration: "none", lineHeight: 1, gridColumn: 1 }}
         aria-label="Verano Exótico — Startseite"
       >
         <span
@@ -107,7 +111,7 @@ export default function Header({ locale }: Props) {
         </span>
       </Link>
 
-      <nav className="hidden md:flex items-center gap-8" aria-label="Hauptnavigation">
+      <nav className="hidden md:flex items-center gap-8" aria-label="Hauptnavigation" style={{ gridColumn: 2 }}>
         {navLinks.map((link) => (
           <Link
             key={link.href}
@@ -122,7 +126,7 @@ export default function Header({ locale }: Props) {
         ))}
       </nav>
 
-      <div className="flex items-center gap-3" style={{ justifySelf: "end" }}>
+      <div className="flex items-center gap-3" style={{ gridColumn: 3, justifySelf: "end" }}>
         <div className="hidden md:block">
           <LanguageSwitch locale={locale} />
         </div>

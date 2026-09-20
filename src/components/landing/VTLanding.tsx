@@ -58,9 +58,9 @@ function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; 
       href={`/${locale}/product/${product.slug}`}
       style={{
         // Feste 520px passten auf keinem Handy aufs Display (375px Viewport).
-        // 78vw laesst die naechste Karte anschneiden - das zeigt, dass sich
-        // seitlich wischen laesst.
-        flexShrink: 0, width: "min(520px, 78vw)", display: "block", textDecoration: "none",
+        // 70vw laesst rund ein Viertel der naechsten Karte sichtbar - zusammen
+        // mit Pfeilen und Punkten der Hinweis, dass sich seitlich wischen laesst.
+        flexShrink: 0, width: "min(520px, 70vw)", display: "block", textDecoration: "none",
         transform: hovered ? "translateY(-6px)" : "translateY(0)",
         transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
       }}
@@ -69,7 +69,7 @@ function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; 
     >
       <div style={{ position: "relative", aspectRatio: "1/1", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
         {image ? (
-          <Image src={image} alt={name} fill sizes="(max-width: 768px) 78vw, 520px" style={{ objectFit: "contain" }} priority={index < 2} />
+          <Image src={image} alt={name} fill sizes="(max-width: 768px) 70vw, 520px" style={{ objectFit: "contain" }} priority={index < 2} />
         ) : (
           <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
             {product.colors.slice(0, 3).map((c, i) => (
@@ -172,14 +172,27 @@ export default function VTLanding({ locale, products }: Props) {
   const tn = useTranslations("nav");
   const year = new Date().getFullYear();
   const shopScrollRef = useRef<HTMLDivElement>(null);
+  // Welche Karte gerade links anliegt - fuer die Punkte unter der Reihe.
+  const [shopIndex, setShopIndex] = useState(0);
+  const cardStep = () => {
+    const row = shopScrollRef.current;
+    const card = row?.firstElementChild as HTMLElement | null;
+    return card ? card.getBoundingClientRect().width + 20 : 540;
+  };
   // Schrittweite aus der tatsaechlichen Kartenbreite statt fester 540px -
   // sonst springt der Pfeil auf schmalen Displays ueber mehrere Karten.
   const scrollShop = (dir: number) => {
     const row = shopScrollRef.current;
     if (!row) return;
-    const card = row.firstElementChild as HTMLElement | null;
-    const step = card ? card.getBoundingClientRect().width + 20 : 540;
-    row.scrollBy({ left: dir * step, behavior: "smooth" });
+    row.scrollBy({ left: dir * cardStep(), behavior: "smooth" });
+  };
+  const scrollShopTo = (index: number) => {
+    shopScrollRef.current?.scrollTo({ left: index * cardStep(), behavior: "smooth" });
+  };
+  const onShopScroll = () => {
+    const row = shopScrollRef.current;
+    if (!row) return;
+    setShopIndex(Math.round(row.scrollLeft / cardStep()));
   };
 
   return (
@@ -335,7 +348,7 @@ export default function VTLanding({ locale, products }: Props) {
           </div>
           <Link
             href={`/${locale}/collection`}
-            className="hidden md:block text-[10px] tracking-[0.25em] uppercase transition-colors pb-px"
+            className="block text-[10px] tracking-[0.25em] uppercase transition-colors pb-px whitespace-nowrap"
             style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", borderBottom: "1px solid transparent" }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = "#1A3040";
@@ -353,6 +366,7 @@ export default function VTLanding({ locale, products }: Props) {
         <div style={{ position: "relative" }}>
           <div
             ref={shopScrollRef}
+            onScroll={onShopScroll}
             style={{ display: "flex", gap: "20px", overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: "16px", scrollbarWidth: "none", msOverflowStyle: "none" }}
             className="hide-scrollbar"
           >
@@ -362,23 +376,24 @@ export default function VTLanding({ locale, products }: Props) {
               </div>
             ))}
           </div>
-          <div style={{ position: "absolute", right: 0, top: 0, bottom: "16px", width: "80px", background: "linear-gradient(to left, #F8F3E8, transparent)", pointerEvents: "none" }} />
+          {/* Frueher lag hier ein 80px-Farbverlauf ueber der rechten Kante. Er
+              sollte das Wischen andeuten, verdeckte aber genau die angeschnittene
+              naechste Karte - und wirkte wie ein ausgeblichener Rand. Den Hinweis
+              geben jetzt die sichtbare Nachbarkarte, die Pfeile und die Punkte. */}
 
-          {/* Scroll-Pfeile */}
+          {/* Scroll-Pfeile - auch auf dem Handy, dort etwas kleiner */}
           {[-1, 1].map((dir) => (
             <button
               key={dir}
               type="button"
               aria-label={dir < 0 ? t("aria_prev") : t("aria_next")}
               onClick={() => scrollShop(dir)}
-              className="hidden md:flex items-center justify-center"
+              className="flex items-center justify-center w-9 h-9 md:w-11 md:h-11"
               style={{
                 position: "absolute",
                 top: "calc(50% - 30px)",
                 [dir < 0 ? "left" : "right"]: "8px",
                 transform: "translateY(-50%)",
-                width: "44px",
-                height: "44px",
                 borderRadius: "9999px",
                 background: "#F8F3E8",
                 color: "#1A3040",
@@ -395,6 +410,30 @@ export default function VTLanding({ locale, products }: Props) {
               {dir < 0 ? "‹" : "›"}
             </button>
           ))}
+
+          {/* Punkte: Position in der Reihe, antippbar */}
+          <div className="flex justify-center gap-2 mt-2" role="tablist">
+            {products.map((product, i) => (
+              <button
+                key={product.slug}
+                type="button"
+                role="tab"
+                aria-selected={i === shopIndex}
+                aria-label={`${i + 1} / ${products.length}`}
+                onClick={() => scrollShopTo(i)}
+                style={{
+                  width: i === shopIndex ? "22px" : "8px",
+                  height: "8px",
+                  borderRadius: "9999px",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  background: i === shopIndex ? "#D4AF37" : "rgba(26,48,64,0.2)",
+                  transition: "width .25s ease, background .25s ease",
+                }}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
