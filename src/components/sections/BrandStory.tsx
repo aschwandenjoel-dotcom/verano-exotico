@@ -41,13 +41,21 @@ export default function BrandStory() {
     <div style={{ background: "#F8F3E8", color: "#1A3040" }}>
 
       {/* ── HERO ──────────────────────────────────────────────────── */}
+      {/* Auf dem Desktop fuellt der Hero den Bildschirm und der Titel sitzt
+          unten - auf dem Handy liess das ueber "Ueber uns" eine halbe Seite
+          Leere. Dort ist er nur so hoch wie sein Inhalt (about-hero, CSS). */}
+      <style>{`
+        .about-hero { min-height: 100vh; min-height: 100svh; justify-content: flex-end; }
+        @media (max-width: 767px) {
+          .about-hero { min-height: 0; justify-content: flex-start; padding-top: 3.5rem; padding-bottom: 3.5rem; }
+        }
+      `}</style>
       <section
+        className="about-hero"
         style={{
           background: "#243d52",
-          minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "flex-end",
           padding: "clamp(7rem, 12vw, 11rem) clamp(2rem, 6vw, 7rem) clamp(4rem, 7vw, 7rem)",
           position: "relative",
           overflow: "hidden",
