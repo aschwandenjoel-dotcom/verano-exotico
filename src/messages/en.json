@@ -237,5 +237,14 @@
     "footer_tagline": "The endless summer. Timeless quality.",
     "aria_prev": "Back",
     "aria_next": "Next"
+  },
+  "consent": {
+    "aria": "Notice about analytics",
+    "eyebrow": "Privacy",
+    "text": "We measure anonymously how often our pages are viewed, to improve the shop. No cookies, no ad networks, no profiles. Your choice.",
+    "link": "Learn more",
+    "accept": "I agree",
+    "decline": "Essential only",
+    "reset": "Reset your choice"
   }
 }

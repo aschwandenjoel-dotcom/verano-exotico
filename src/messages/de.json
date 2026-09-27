@@ -237,5 +237,14 @@
     "footer_tagline": "Der ewige Sommer. Zeitlose Qualität.",
     "aria_prev": "Zurück",
     "aria_next": "Weiter"
+  },
+  "consent": {
+    "aria": "Hinweis zur Reichweitenmessung",
+    "eyebrow": "Datenschutz",
+    "text": "Wir messen anonym, wie oft unsere Seiten aufgerufen werden, um den Shop zu verbessern. Ohne Cookies, ohne Werbenetzwerke, ohne Profile. Du entscheidest.",
+    "link": "Mehr dazu",
+    "accept": "Einverstanden",
+    "decline": "Nur notwendige",
+    "reset": "Auswahl zurücksetzen"
   }
 }

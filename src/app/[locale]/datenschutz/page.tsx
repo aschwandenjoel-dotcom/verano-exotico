@@ -1,4 +1,5 @@
 import type React from "react";
+import ConsentReset from "@/components/ui/ConsentReset";
 import ShopShell from "@/components/ui/ShopShell";
 import type { Locale } from "@/types";
 
@@ -117,6 +118,7 @@ function PrivacyContent() {
 
       <Section title="10. Analyse & Tracking">
         <p>Zur Reichweitenmessung setzen wir <strong>Vercel Web Analytics</strong> ein (Vercel Inc., siehe Abschnitt 6). Der Dienst arbeitet <strong>ohne Cookies</strong> und ohne geräteübergreifende Kennungen: Erfasst werden Seitenaufrufe, Referrer, Land, Gerätetyp und Browser; die IP-Adresse wird nur zur Bildung eines täglich wechselnden, anonymen Besucher-Hashes verwendet und nicht gespeichert. Eine Identifizierung einzelner Personen ist damit nicht möglich. Rechtsgrundlage ist unser berechtigtes Interesse an der Auswertung und Verbesserung unseres Angebots (Art. 6 Abs. 1 lit. f DSGVO).</p>
+        <p style={{ marginTop: "12px" }}>Beim ersten Besuch fragen wir Sie, ob wir diese Messung durchführen dürfen. Ohne Ihre Zustimmung wird der Dienst nicht geladen. Ihre Entscheidung speichern wir lokal in Ihrem Browser (kein Cookie); Sie können sie jederzeit ändern: <ConsentReset label="Auswahl zurücksetzen" />.</p>
         <p style={{ marginTop: "12px" }}>Wir setzen <strong>keine</strong> Werbe-Tracking-Pixel (wie Meta Pixel, TikTok Pixel o. ä.) ein. Es erfolgt keine Erstellung von Nutzerprofilen und keine Weitergabe Ihrer Daten an Werbenetzwerke.</p>
       </Section>
 
