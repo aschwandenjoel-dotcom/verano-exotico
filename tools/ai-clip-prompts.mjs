@@ -4,15 +4,21 @@
  * oder Flow) — und legt das Ausgangsfoto daneben, damit Joel nur noch
  * hochladen und den Prompt einfügen muss.
  *
+ * NUR Produktfotos ohne Menschen. Veo verweigert das Animieren realer
+ * Personen (getestet am 30.09.2026: "I can't make videos of real people in
+ * situations like that"), und das ist richtig so: Die Models auf den
+ * CJ-Lieferantenfotos haben in ein Foto eingewilligt, nicht in ein KI-Video
+ * ihres Abbilds als Werbung. Ein Bikini am Körper braucht echte Aufnahmen.
+ *
  * Warum Bild-zu-Video und nicht Text-zu-Video: Das Lieferantenfoto zeigt das
- * echte Produkt. Veo animiert es (Wind im Haar, Licht auf dem Wasser, ruhige
- * Kamerafahrt), der Bikini bleibt exakt der, den die Kundin bekommt. Ein frei
- * erfundenes Video würde ein Produkt zeigen, das es so nicht gibt.
+ * echte Produkt. Veo animiert nur Licht, Stoff und Kamera — der Bikini bleibt
+ * exakt der, den die Kundin bekommt.
  *
  * Aufruf:
- *   node tools/ai-clip-prompts.mjs --product safari-blau-fiesta
+ *   node tools/ai-clip-prompts.mjs                      # alle 15 Flatlay-Produkte
+ *   node tools/ai-clip-prompts.mjs --product tanga-leopard
  *   node tools/ai-clip-prompts.mjs --products a,b,c
- *   node tools/ai-clip-prompts.mjs --count 5            # die 5 neuesten Produkte
+ *   node tools/ai-clip-prompts.mjs --count 5
  *
  * Ergebnis je Produkt in .tmp/ai-clips/<slug>/:
  *   ausgangsbild.jpg   das Foto zum Hochladen
@@ -29,42 +35,71 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.resolve(ROOT, arg("out", ".tmp/ai-clips"));
 
 /**
- * Markenlook, den jeder Prompt trägt (aus der Bildsprache der Website:
- * goldene Stunde, Gegenlicht, Atlantik, warme Hauttöne, ruhig, kein Kitsch).
+ * Produkte, deren Hauptbild OHNE Menschen auskommt (Flatlay auf Holz, Sand,
+ * Stoff oder Freisteller). Nur diese lassen sich animieren: Veo verweigert
+ * das Animieren realer Personen — zu Recht, denn die Frauen auf den
+ * Lieferantenfotos haben in ein Foto eingewilligt, nicht in ein KI-Video
+ * ihres Abbilds. Liste per Sichtprüfung des Katalogs erstellt (30.09.2026).
+ */
+export const FLATLAY_SLUGS = [
+  "marea-bikini",
+  "ola-tie-dye-bikini",
+  "brillo-sequin-bikini",
+  "malla-rope-bikini",
+  "fiesta-halter-bikini",
+  "tierra-threepiece-bikini",
+  "rayas-striped-bikini",
+  "selva-floral-bikini",
+  "ondas-ruched-bikini",
+  "cumbre-highwaist-bikini",
+  "tejido-crochet-bikini",
+  "tanga-leopard",
+  "cumbre-blueten-weiss",
+  "costa-beach-dress-set-aquarell",
+  "cumbre-leopard",
+];
+
+/**
+ * Markenlook, den jeder Prompt trägt (Bildsprache der Website: goldene Stunde,
+ * Gegenlicht, warme Töne, ruhig, kein Kitsch).
  */
 const LOOK =
-  "Golden hour light, warm skin tones, soft backlight, natural and unretouched, " +
-  "shot on a phone camera, shallow depth of field, calm and premium editorial mood.";
+  "Golden hour light, warm tones, soft directional sunlight with long gentle shadows, " +
+  "shallow depth of field, calm and premium editorial product film, subtle film grain.";
 
-/** Was Veo NICHT tun soll — verhindert veränderte Muster und Zusatzelemente. */
+/** Was Veo NICHT tun soll — hält das Produkt exakt so, wie es die Kundin bekommt. */
 const KEEP =
-  "Keep the swimwear exactly as in the photo: same cut, same colors, same print, same fit. " +
-  "Do not add text, logos, captions, watermarks or extra people. Keep the face and body natural, no morphing.";
+  "Keep the swimwear exactly as in the photo: same cut, same colors, same print, same proportions. " +
+  "Do not add people, hands, text, logos, captions or watermarks. No morphing of the fabric pattern.";
 
-/** Drei Bewegungsvarianten — Variante 1 ist die sicherste. */
+/**
+ * Drei Bewegungsvarianten für Produktaufnahmen ohne Menschen.
+ * Variante 1 ist die ruhigste und damit die sicherste.
+ */
 function variants(product, locale = "de") {
   const name = product.name[locale];
   return [
     {
-      title: "Variante 1 · Ruhige Kamerafahrt (empfohlen für den ersten Test)",
+      title: "Variante 1 · Langsame Kamerafahrt über das Produkt (empfohlen)",
       prompt:
-        `Animate this photo of a woman wearing the ${name}. Slow, smooth camera push-in toward her, ` +
-        `she shifts her weight slightly and looks toward the sea, hair moves gently in a light breeze. ` +
+        `Animate this product photo of the ${name} swimwear, laid out flat. Very slow, smooth camera ` +
+        `push-in and slight drift across the fabric. The light shifts gently as if the sun is moving, ` +
+        `the fabric breathes almost imperceptibly. Nothing else moves. ` +
         `Vertical 9:16, 8 seconds, photorealistic. ${LOOK} ${KEEP}`,
     },
     {
-      title: "Variante 2 · Wind und Wasser",
+      title: "Variante 2 · Wind und Stoff",
       prompt:
-        `Bring this photo to life: a soft ocean breeze moves her hair and the fabric ties of the ${name}, ` +
-        `sunlight sparkles on the water behind her, she takes one relaxed step and smiles slightly. ` +
-        `Handheld feel, very subtle motion. Vertical 9:16, 8 seconds, photorealistic. ${LOOK} ${KEEP}`,
+        `Bring this flat-lay photo of the ${name} to life: a light breeze lifts the ties and straps, ` +
+        `the fabric ripples softly, a faint shadow moves across the surface. The camera stays almost ` +
+        `still with a barely noticeable drift. Vertical 9:16, 8 seconds, photorealistic. ${LOOK} ${KEEP}`,
     },
     {
-      title: "Variante 3 · Detail zuerst (für Schnitt-Material)",
+      title: "Variante 3 · Makro zuerst (Schnittmaterial für den Einstieg)",
       prompt:
-        `Start close on the fabric and straps of the ${name}, then slowly pull back to reveal her standing ` +
-        `at the beach in the same pose as the photo. Gentle motion only. Vertical 9:16, 8 seconds, ` +
-        `photorealistic. ${LOOK} ${KEEP}`,
+        `Start extremely close on the fabric texture and stitching of the ${name}, then slowly pull back ` +
+        `to reveal the full piece laid out as in the photo. Smooth continuous motion, no cuts. ` +
+        `Vertical 9:16, 8 seconds, photorealistic. ${LOOK} ${KEEP}`,
     },
   ];
 }
@@ -79,10 +114,15 @@ if (slugs.length) {
   picked = slugs.map((s) => {
     const p = products.find((x) => x.slug === s);
     if (!p) throw new Error(`Produkt nicht gefunden: ${s}`);
+    if (!FLATLAY_SLUGS.includes(s)) {
+      console.warn(`⚠️  ${s}: Hauptbild zeigt eine Person — Veo wird das ablehnen. Nur Flatlays animieren.`);
+    }
     return p;
   });
 } else {
-  picked = products.slice().reverse().slice(0, Number(arg("count", "5")));
+  // Standard: alle Produkte mit menschenfreiem Hauptbild
+  const all = FLATLAY_SLUGS.map((s) => products.find((p) => p.slug === s)).filter(Boolean);
+  picked = all.slice(0, Number(arg("count", String(all.length))));
 }
 
 mkdirSync(OUT, { recursive: true });
