@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 /**
  * Strand-Panorama als Intro - ohne WebGL.
  *
@@ -19,8 +21,25 @@
  * In-App-Browsern ohne WebGL.
  */
 export default function PanoramaIntro() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Sobald das Panorama aus dem Bild gescrollt ist, steht die Animation still.
+  // Der Compositor muss dann keine 2 x 4096 px breite Ebene mehr pro Bild
+  // verschieben - entlastet GPU und Akku auf dem Rest der Seite.
+  useEffect(() => {
+    const section = sectionRef.current;
+    const track = section?.querySelector<HTMLElement>(".pano-track");
+    if (!section || !track) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      track.classList.toggle("is-paused", !entry.isIntersecting);
+    });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       className="pano-hero"
       style={{
         position: "relative",
@@ -55,6 +74,7 @@ export default function PanoramaIntro() {
           user-select: none;
           -webkit-user-drag: none;
         }
+        .pano-track.is-paused { animation-play-state: paused; }
         @keyframes pano-pan {
           from { transform: translate3d(0, 0, 0); }
           to   { transform: translate3d(-50%, 0, 0); }

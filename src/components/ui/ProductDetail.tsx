@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import type { Locale, Product } from "@/types";
 import { useCart } from "@/context/CartContext";
 
@@ -107,19 +108,24 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
               const img = product.colorImages?.[i];
               return (
                 <div key={i} className="group relative">
+                  {/* Frueher lag hier das Original-Produktfoto (bis 1 MB pro
+                      Farbe) als background-image auf einem 32-px-Kreis - an
+                      next/image vorbei, also ohne Verkleinerung. Jetzt eine
+                      64-px-Variante aus der Bildoptimierung. */}
                   <div
                     onClick={() => onSelectColor(i)}
-                    className="w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition-transform"
+                    className="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer hover:scale-110 transition-transform"
                     style={{
                       backgroundColor: color,
-                      backgroundImage: img ? `url("${img}")` : undefined,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center 30%",
                       border: `2px solid ${activeColor === i ? "#1A3040" : "rgba(26,48,64,0.15)"}`,
                       outline: activeColor === i ? "2px solid #1A3040" : "none",
                       outlineOffset: "2px",
                     }}
-                  />
+                  >
+                    {img && (
+                      <Image src={img} alt="" fill sizes="32px" style={{ objectFit: "cover", objectPosition: "center 30%" }} />
+                    )}
+                  </div>
                   {name && (
                     <span
                       className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-mono whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"

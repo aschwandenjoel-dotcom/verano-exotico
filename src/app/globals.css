@@ -23,11 +23,11 @@
   box-sizing: border-box;
 }
 
-/* Force system cursor — beats any library stylesheet including Pannellum */
-* { cursor: auto !important; }
-a, button, [role="button"], label, summary,
-[onclick], [tabindex]:not([tabindex="-1"]) { cursor: pointer !important; }
-input, textarea, select { cursor: text !important; }
+/* Zeigehand auf Bedienelementen. Frueher stand hier "* { cursor: auto
+   !important }" gegen den Pannellum-Cursor - Pannellum ist seit 20.09.2026
+   weg, und die !important-Regeln blockierten cursor: zoom-in in der Galerie. */
+button, [role="button"], summary, label { cursor: pointer; }
+button:disabled { cursor: default; }
 
 html {
   scroll-behavior: smooth;
@@ -52,13 +52,17 @@ body {
 }
 
 /* ── Scroll reveal ──────────────────────────────────────────────── */
-.reveal {
+/* Ausgeblendet wird erst, wenn das Skript den Beobachter gesetzt hat
+   (html.reveal-ready, siehe VTLanding). Vorher war opacity:0 der
+   Grundzustand: Blieb JavaScript haengen oder kam es nicht zur Hydration,
+   fehlten Philosophie, Shop-Titel, Manifest und Newsletter komplett. */
+.reveal-ready .reveal {
   opacity: 0;
   transform: translateY(28px);
   transition: opacity 0.75s ease, transform 0.75s ease;
 }
 
-.reveal.visible {
+.reveal-ready .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -141,7 +145,7 @@ body {
 /* ── Respect reduced motion ─────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .hero-word { animation: none; opacity: 1; transform: none; }
-  .reveal, .reveal.visible { transition: none; opacity: 1; transform: none; }
+  .reveal-ready .reveal, .reveal-ready .reveal.visible { transition: none; opacity: 1; transform: none; }
   .btn-shimmer::after, .btn-ripple::before { animation: none !important; }
 }
 

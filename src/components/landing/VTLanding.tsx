@@ -27,7 +27,7 @@ function tickerItems(categories: string) {
 /* ─── Scroll reveal hook ─────────────────────────────────────────── */
 function useScrollReveal() {
   useEffect(() => {
-    const els = document.querySelectorAll(".reveal");
+    const els = Array.from(document.querySelectorAll(".reveal"));
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -39,8 +39,22 @@ function useScrollReveal() {
       },
       { threshold: 0.12 }
     );
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const vh = window.innerHeight;
+    els.forEach((el) => {
+      // Was beim Start schon im Bild ist, bleibt sichtbar - sonst wuerde es
+      // beim Einschalten der Ausblendung kurz verschwinden.
+      const r = el.getBoundingClientRect();
+      if (r.top < vh && r.bottom > 0) el.classList.add("visible");
+      else observer.observe(el);
+    });
+    // Erst ab hier blendet globals.css die .reveal-Elemente aus. Ohne diese
+    // Klasse (kein JavaScript, Skript haengt) bleibt alles sichtbar.
+    const root = document.documentElement;
+    root.classList.add("reveal-ready");
+    return () => {
+      observer.disconnect();
+      root.classList.remove("reveal-ready");
+    };
   }, []);
 }
 

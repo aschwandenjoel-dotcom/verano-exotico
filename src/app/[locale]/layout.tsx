@@ -6,7 +6,6 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Locale } from "@/types";
-import CursorGuard from "@/components/ui/CursorGuard";
 import ClientProviders from "@/components/ui/ClientProviders";
 import CookieConsent from "@/components/ui/CookieConsent";
 import "../globals.css";
@@ -101,7 +100,6 @@ export default async function LocaleLayout({
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
-          <CursorGuard />
           <ClientProviders>
             {children}
           </ClientProviders>
