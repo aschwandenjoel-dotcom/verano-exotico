@@ -60,48 +60,54 @@ export const FLATLAY_SLUGS = [
 ];
 
 /**
- * Markenlook, den jeder Prompt trägt (Bildsprache der Website: goldene Stunde,
- * Gegenlicht, warme Töne, ruhig, kein Kitsch).
+ * Negativ-Prompt für Kling. Bewusst kurz (Kling empfiehlt 3–7 Punkte; mehr
+ * verwirrt das Modell). Deckt die Fehler ab, die bei Flatlays auftreten:
+ * auftauchende Hände, verzerrte Muster, Flackern, eingeblendeter Text.
  */
-const LOOK =
-  "Golden hour light, warm tones, soft directional sunlight with long gentle shadows, " +
-  "shallow depth of field, calm and premium editorial product film, subtle film grain.";
-
-/** Was Veo NICHT tun soll — hält das Produkt exakt so, wie es die Kundin bekommt. */
-const KEEP =
-  "Keep the swimwear exactly as in the photo: same cut, same colors, same print, same proportions. " +
-  "Do not add people, hands, text, logos, captions or watermarks. No morphing of the fabric pattern.";
+const NEGATIVE = "people, hands, text, logo, watermark, distorted pattern, flicker, morphing";
 
 /**
- * Drei Bewegungsvarianten für Produktaufnahmen ohne Menschen.
- * Variante 1 ist die ruhigste und damit die sicherste.
+ * Kling-Prompts für Produktaufnahmen ohne Menschen.
+ *
+ * Bei Bild-zu-Video legt das Foto das Aussehen fest — der Prompt steuert nur
+ * die BEWEGUNG. Deshalb kurz (20–40 Wörter) und mit ausdrücklicher
+ * Kameraanweisung; lange Beschreibungen des Motivs schaden hier eher.
  */
 function variants(product, locale = "de") {
   const name = product.name[locale];
   return [
     {
-      title: "Variante 1 · Langsame Kamerafahrt über das Produkt (empfohlen)",
+      title: "Variante 1 · Langsame Kamerafahrt (empfohlen für den ersten Test)",
       prompt:
-        `Animate this product photo of the ${name} swimwear, laid out flat. Very slow, smooth camera ` +
-        `push-in and slight drift across the fabric. The light shifts gently as if the sun is moving, ` +
-        `the fabric breathes almost imperceptibly. Nothing else moves. ` +
-        `Vertical 9:16, 8 seconds, photorealistic. ${LOOK} ${KEEP}`,
+        "Camera slowly pushes in on the swimwear, smooth and steady. Sunlight shifts gently across " +
+        "the fabric, soft shadows move. The fabric breathes almost imperceptibly. Nothing else moves.",
     },
     {
-      title: "Variante 2 · Wind und Stoff",
+      title: "Variante 2 · Wind im Stoff",
       prompt:
-        `Bring this flat-lay photo of the ${name} to life: a light breeze lifts the ties and straps, ` +
-        `the fabric ripples softly, a faint shadow moves across the surface. The camera stays almost ` +
-        `still with a barely noticeable drift. Vertical 9:16, 8 seconds, photorealistic. ${LOOK} ${KEEP}`,
+        "A light breeze lifts the ties and straps, the fabric ripples softly. Camera holds almost " +
+        "still with a barely noticeable drift. Warm golden hour light, soft moving shadows.",
     },
     {
-      title: "Variante 3 · Makro zuerst (Schnittmaterial für den Einstieg)",
+      title: "Variante 3 · Makro zuerst (Einstiegsmaterial)",
       prompt:
-        `Start extremely close on the fabric texture and stitching of the ${name}, then slowly pull back ` +
-        `to reveal the full piece laid out as in the photo. Smooth continuous motion, no cuts. ` +
-        `Vertical 9:16, 8 seconds, photorealistic. ${LOOK} ${KEEP}`,
+        "Camera starts extremely close on the fabric texture and stitching, then slowly pulls back " +
+        "to reveal the whole piece. One continuous smooth move, no cuts.",
     },
   ];
+}
+
+/** Längere Fassung für Veo (Gemini/Flow), falls dort gearbeitet wird. */
+function veoPrompt(product, locale = "de") {
+  const name = product.name[locale];
+  return (
+    `Animate this product photo of the ${name} swimwear, laid out flat. Very slow, smooth camera ` +
+    `push-in and slight drift across the fabric. The light shifts gently as if the sun is moving, ` +
+    `the fabric breathes almost imperceptibly. Nothing else moves. Vertical 9:16, 8 seconds, ` +
+    `photorealistic. Golden hour light, warm tones, soft directional sunlight, shallow depth of field, ` +
+    `calm premium product film. Keep the swimwear exactly as in the photo: same cut, colors, print. ` +
+    `Do not add people, hands, text, logos or watermarks.`
+  );
 }
 
 const slugs = arg("product")
@@ -128,10 +134,17 @@ if (slugs.length) {
 mkdirSync(OUT, { recursive: true });
 writeFileSync(
   path.join(OUT, "README.md"),
-  `# KI-Clips\n\nJe Produkt ein Ordner. Darin \`ausgangsbild.jpg\` (in Gemini/Flow hochladen) und \`PROMPT.md\`.\n` +
-    `Fertige Clips als \`clip-1.mp4\`, \`clip-2.mp4\` … in den Produktordner legen — die Reel-Pipeline\n` +
-    `(tools/make-ai-reel.mjs) holt sie von dort.\n\nGemini-App: Werkzeug „Videos" → Foto hochladen → Prompt einfügen.\n` +
-    `Flow: Neues Projekt → „Frames to Video" → Foto als Startbild → Prompt.\n`
+  `# KI-Clips\n\nJe Produkt ein Ordner mit \`ausgangsbild.jpg\` (hochladen) und \`PROMPT.md\`.\n` +
+    `Fertige Clips als \`clip-1.mp4\`, \`clip-2.mp4\` … in denselben Ordner legen.\n\n` +
+    `## Kling (klingai.com)\n\n` +
+    `1. **AI Video → Image to Video**\n2. Bild hochladen\n3. Prompt aus \`PROMPT.md\` einfügen\n` +
+    `4. **Negative Prompt** ausklappen und den Negativ-Prompt einfügen\n` +
+    `5. Dauer **5 s**, Seitenverhältnis **9:16** → Generate\n\n` +
+    `Gratis: 66 Credits pro Tag, jeden Tag neu. Ein 5-Sekunden-Clip im Standardmodus kostet wenige\n` +
+    `Credits — es reicht für mehrere Versuche pro Produkt.\n\n` +
+    `## Veo (Gemini-App oder Flow)\n\n` +
+    `Werkzeug „Videos" → Foto hochladen → den längeren Veo-Prompt aus \`PROMPT.md\`.\n` +
+    `Achtung: Veo animiert keine realen Personen — nur die Flatlay-Fotos hier funktionieren.\n`
 );
 
 for (const product of picked) {
@@ -143,10 +156,19 @@ for (const product of picked) {
 
   const vs = variants(product);
   const md =
-    `# ${product.name.de} — Veo-Prompts\n\n` +
-    `**Hochladen:** \`${path.relative(ROOT, img)}\`  \n` +
-    `**Einstellungen:** Hochformat 9:16, 8 Sekunden, höchste Qualität. Ton egal (wird durch den Instagram-Sound ersetzt).\n\n` +
+    `# ${product.name.de} — Clip-Prompts\n\n` +
+    `**Bild hochladen:** \`${path.relative(ROOT, img)}\`\n\n` +
+    `## Einstellungen in Kling\n\n` +
+    `| Feld | Wert |\n|---|---|\n` +
+    `| Modus | **Image to Video** (Bild zuerst hochladen) |\n` +
+    `| Dauer | **5 s** (reicht fürs Reel, spart Credits) |\n` +
+    `| Seitenverhältnis | **9:16** |\n` +
+    `| Qualität | Professional, wenn Credits reichen — sonst Standard |\n` +
+    `| Ton | egal, wird durch den Instagram-Sound ersetzt |\n\n` +
+    `**Negativ-Prompt** (ins eigene Feld, gilt für alle Varianten):\n\n\`\`\`\n${NEGATIVE}\n\`\`\`\n\n` +
     vs.map((v) => `## ${v.title}\n\n\`\`\`\n${v.prompt}\n\`\`\`\n`).join("\n") +
+    `\n## Falls du es in Veo (Gemini/Flow) versuchst\n\nDort gehören Aussehen und Bewegung in einen Prompt:\n\n` +
+    `\`\`\`\n${veoPrompt(product)}\n\`\`\`\n` +
     `\n## Danach\n\nClip als \`clip-1.mp4\` (bzw. clip-2, clip-3) in diesen Ordner speichern.\n` +
     `Beim Posten wird „KI-generiert" markiert — das Produkt ist echt, nur die Bewegung ist erzeugt.\n`;
   writeFileSync(path.join(dir, "PROMPT.md"), md);
@@ -156,5 +178,6 @@ for (const product of picked) {
 // Den ersten Prompt gleich zum Kopieren ausgeben
 if (picked.length === 1) {
   const v = variants(picked[0])[0];
-  console.log(`\n--- Zum Kopieren (${v.title}) ---\n${v.prompt}\n`);
+  console.log(`\n--- Kling · ${v.title} ---\n${v.prompt}`);
+  console.log(`\n--- Kling · Negativ-Prompt ---\n${NEGATIVE}\n`);
 }
