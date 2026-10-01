@@ -137,7 +137,9 @@ erzeugten Reels sind ohnehin stumm.
 ## Grenzen der Schnittstelle
 
 - **25 Beiträge pro 24 Stunden** (Meta-Limit). Bei 3 Posts pro Woche irrelevant.
-- **Keine Stories** über die API.
+- **Stories** gehen über die API (`--story`), aber nur für **Business**-Konten
+  (nicht Creator), 3–60 s, ohne Caption und ohne Instagram-Sound. Reels
+  erreichen auch Nicht-Follower — bei kleinem Konto zuerst als Reel posten.
 - **Keine Karussells aus Videos** (nur Bilder).
 - **Videoformat:** MP4, H.264, AAC, max. 100 MB, 3 Sekunden bis 15 Minuten,
   Seitenverhältnis 9:16. Die erzeugten Reels erfüllen das.

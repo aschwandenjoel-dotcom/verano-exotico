@@ -171,16 +171,24 @@ async function uploadVideo(file) {
   return { url: blob.url, cleanup: () => del(blob.url, { token: blobToken }).catch(() => {}) };
 }
 
-// ---------- Reel veröffentlichen ----------
-async function publishReel({ video, caption }) {
+// ---------- Reel oder Story veröffentlichen ----------
+/**
+ * story=true veröffentlicht als Story (media_type=STORIES): nur für
+ * Business-Konten, 3–60 s, keine Caption (Stories haben keine), kein
+ * Instagram-Sound. Reels erreichen auch Nicht-Follower, Stories nur Follower.
+ */
+async function publishReel({ video, caption, story = false }) {
   const abs = path.resolve(ROOT, video);
   if (!existsSync(abs)) throw new Error(`Video nicht gefunden: ${video}`);
   const sizeMb = statSync(abs).size / 1048576;
   if (sizeMb > 100) throw new Error(`Video ist ${sizeMb.toFixed(1)} MB — Instagram erlaubt maximal 100 MB.`);
   if (caption.length > 2200) throw new Error(`Caption ist ${caption.length} Zeichen lang — Instagram erlaubt 2200.`);
+  if (story && (arg("audio") || arg("audio-id"))) {
+    throw new Error("Stories unterstützen über die API keinen Instagram-Sound — die Tonspur des Videos wird verwendet.");
+  }
 
-  console.log(`📹 ${path.relative(ROOT, abs)} (${sizeMb.toFixed(1)} MB)`);
-  console.log(`📝 ${caption.split("\n")[0].slice(0, 70)}…  (${caption.length} Zeichen)`);
+  console.log(`📹 ${path.relative(ROOT, abs)} (${sizeMb.toFixed(1)} MB) → ${story ? "STORY" : "REEL"}`);
+  if (!story) console.log(`📝 ${caption.split("\n")[0].slice(0, 70)}…  (${caption.length} Zeichen)`);
 
   const audioWish = arg("audio") ?? (arg("audio-id") ? `ID ${arg("audio-id")}` : null);
   if (DRY) {
@@ -200,8 +208,10 @@ async function publishReel({ video, caption }) {
 
   try {
     process.stdout.write("📦 Media-Container anlegen … ");
-    const params = { media_type: "REELS", video_url: url, caption, share_to_feed: true };
-    if (audio) {
+    const params = story
+      ? { media_type: "STORIES", video_url: url }
+      : { media_type: "REELS", video_url: url, caption, share_to_feed: true };
+    if (audio && !story) {
       params.audio_configuration = JSON.stringify({
         audio_id: audio.id,
         audio_volume: Number(arg("audio-volume", "100")),
@@ -324,13 +334,15 @@ try {
     const video = arg("video");
     const captionFile = arg("caption-file");
     const captionArg = arg("caption");
-    if (!video || (!captionFile && !captionArg)) {
+    const story = has("story");
+    if (!video || (!story && !captionFile && !captionArg)) {
       console.error('Nutzung: --video <mp4> (--caption-file <md> | --caption "Text") [--audio trending|"<suche>" | --audio-id <id>] [--dry-run]');
+      console.error("         --video <mp4> --story [--dry-run]          (Story: ohne Caption, ohne Instagram-Sound)");
       console.error("         --list-audio [--query …] | --insights [--limit 10] | --profile | --whoami | --exchange-token <token>");
       process.exit(1);
     }
-    const caption = captionArg ?? captionFromFile(path.resolve(ROOT, captionFile));
-    await publishReel({ video, caption });
+    const caption = story ? "" : (captionArg ?? captionFromFile(path.resolve(ROOT, captionFile)));
+    await publishReel({ video, caption, story });
   }
 } catch (err) {
   console.error(`\n❌ ${err.message}`);
