@@ -158,6 +158,13 @@
     "verified_hint": "Du hast dieses Stück bestellt — deine Bewertung wird als verifizierter Kauf angezeigt.",
     "rating_stars": "von 5 Sternen"
   },
+  "voices": {
+    "label": "Echte Kommentare",
+    "title": "Was Käuferinnen sagen",
+    "aria_prev": "Vorheriger Kommentar",
+    "aria_next": "Nächster Kommentar",
+    "source_note": "Kommentare von Käuferinnen dieser Modelle, gesammelt über unseren Produktionspartner und aus dem Original übersetzt."
+  },
   "newsletter": {
     "placeholder": "deine@email.ch",
     "submit": "Anmelden",

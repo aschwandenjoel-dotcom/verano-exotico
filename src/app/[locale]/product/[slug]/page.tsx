@@ -5,6 +5,7 @@ import ShopShell from "@/components/ui/ShopShell";
 import BackButton from "@/components/ui/BackButton";
 import ProductView from "@/components/ui/ProductView";
 import ReviewSection from "@/components/ui/ReviewSection";
+import CustomerVoices from "@/components/ui/CustomerVoices";
 import { fetchProductBySlug, fetchProducts } from "@/lib/api";
 import type { Locale } from "@/types";
 
@@ -107,6 +108,10 @@ export default async function ProductPage({
           }}
         />
       </div>
+
+      {/* Käuferstimmen zu genau diesem Modell (CJ). Rendert nichts, solange es
+          für den Slug keine Kommentare gibt — Import: node tools/cj-reviews.mjs */}
+      <CustomerVoices locale={loc} slug={product.slug} />
 
       {/* Suspense: ReviewSection liest den Bewertungs-Token aus ?r= — ohne die
           Grenze müsste Next.js die ganze Produktseite dynamisch rendern. */}

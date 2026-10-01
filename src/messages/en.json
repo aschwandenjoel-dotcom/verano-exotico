@@ -158,6 +158,13 @@
     "verified_hint": "You ordered this piece — your review will be shown as a verified purchase.",
     "rating_stars": "out of 5 stars"
   },
+  "voices": {
+    "label": "Real comments",
+    "title": "What buyers say",
+    "aria_prev": "Previous comment",
+    "aria_next": "Next comment",
+    "source_note": "Comments from buyers of these styles, collected via our production partner and translated from the original."
+  },
   "newsletter": {
     "placeholder": "your@email.com",
     "submit": "Subscribe",

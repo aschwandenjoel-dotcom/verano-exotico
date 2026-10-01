@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Locale, Product as ShopProduct } from "@/types";
 import Header from "@/components/ui/Header";
+import CustomerVoices from "@/components/ui/CustomerVoices";
 // Frueher dynamisch ohne SSR geladen (WebGL). Jetzt reines Markup + CSS,
 // darf serverseitig gerendert werden - das Bild ist dann Teil des ersten HTML.
 import PanoramaIntro from "@/components/3d/PanoramaIntro";
@@ -447,6 +448,11 @@ export default function VTLanding({ locale, products }: Props) {
           </div>
         </div>
       </section>
+
+      {/* ── KUNDENSTIMMEN ───────────────────────────────────────── */}
+      {/* Laufende Kommentarboxen. Rendert nichts, solange
+          src/data/customer-voices.json leer ist (node tools/cj-reviews.mjs). */}
+      <CustomerVoices locale={locale} variant="marquee" />
 
       {/* ── EDITORIAL STATEMENT ─────────────────────────────────── */}
       <section

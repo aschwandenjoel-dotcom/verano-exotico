@@ -142,11 +142,101 @@ body {
   animation: ripple-out 0.65s ease forwards;
 }
 
+/* ── Kundenstimmen als Laufband (Startseite) ────────────────────── */
+/* Die Spur enthält die Karten zweimal hintereinander und wandert um die
+   halbe Breite — am Ende sitzt Kopie 2 exakt dort, wo Kopie 1 begann, der
+   Sprung ist unsichtbar. Richtung: von links nach rechts. */
+@keyframes voiceMarquee {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+.voice-marquee {
+  overflow: hidden;
+  /* Platz für den Sprechblasen-Zipfel und den Schatten — ohne das schneidet
+     overflow:hidden beides ab. */
+  padding: 6px 0 18px;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+          mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+/* Kein gap: Bei N Karten gibt es N-1 Abstände, die beiden Hälften wären
+   dadurch um einen halben Abstand verschieden breit und das Band würde bei
+   jedem Durchlauf sichtbar springen. Der Abstand sitzt deshalb als
+   margin-right auf der Karte — dann ist jede Hälfte exakt N × (Breite +
+   Abstand) und translateX(-50%) trifft genau. */
+.voice-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: voiceMarquee linear infinite;
+  will-change: transform;
+}
+
+/* Auf dem Handy wächst die längste Karte über den halben Bildschirm — würden
+   alle auf diese Höhe gestreckt, stünde in den kurzen fast nur Leere. Dort
+   also natürliche Höhe, erst ab Tablet gleich hoch. */
+@media (max-width: 767px) {
+  .voice-marquee-track { align-items: flex-start; }
+}
+
+/* Zum Lesen anhalten — mit der Maus und für die Tastatur. */
+.voice-marquee:hover .voice-marquee-track,
+.voice-marquee:focus-within .voice-marquee-track {
+  animation-play-state: paused;
+}
+
+.voice-card {
+  position: relative;
+  flex: 0 0 auto;
+  /* Spalte, damit die Namenszeile unten sitzt: Alle Karten sind gleich hoch
+     (Flex streckt sie auf die längste), sonst klebte die Zeile am Zitat und
+     darunter stünde Leere. */
+  display: flex;
+  flex-direction: column;
+  width: clamp(280px, 80vw, 400px);
+  margin-right: 24px;
+  background: #FFFFFF;
+  border: 1px solid rgba(26, 48, 64, 0.08);
+  border-radius: 18px;
+  padding: 28px 28px 30px;
+  box-shadow: 0 2px 16px rgba(26, 48, 64, 0.06);
+}
+
+/* Sprechblasen-Zipfel unten links */
+.voice-card::after {
+  content: "";
+  position: absolute;
+  left: 34px;
+  bottom: -9px;
+  width: 18px;
+  height: 18px;
+  background: #FFFFFF;
+  border-right: 1px solid rgba(26, 48, 64, 0.08);
+  border-bottom: 1px solid rgba(26, 48, 64, 0.08);
+  transform: rotate(45deg);
+  border-bottom-right-radius: 3px;
+}
+
+/* ── Kundenstimmen: eine Stimme blendet ein, dann die nächste ───── */
+@keyframes voiceIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.voice-in {
+  animation: voiceIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* ── Respect reduced motion ─────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .hero-word { animation: none; opacity: 1; transform: none; }
   .reveal-ready .reveal, .reveal-ready .reveal.visible { transition: none; opacity: 1; transform: none; }
   .btn-shimmer::after, .btn-ripple::before { animation: none !important; }
+  .voice-in { animation: none; opacity: 1; transform: none; }
+  /* Laufband steht still und wird von Hand wischbar — sonst wäre nur die
+     erste Karte erreichbar. */
+  .voice-marquee { overflow-x: auto; }
+  .voice-marquee-track { animation: none; transform: none; }
 }
 
 .hide-scrollbar::-webkit-scrollbar { display: none; }

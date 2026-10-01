@@ -1,0 +1,244 @@
+{
+  "generatedAt": "2026-10-01T07:09:55.658Z",
+  "source": "cjdropshipping",
+  "note": "Originalkommentare von Kaeufern derselben Modelle ueber CJdropshipping. Von Hand ausgewaehlt und ins Englische uebersetzt bzw. sprachlich geglaettet; der CJ-Rohtext steht je Eintrag in 'original'. Weggelassen: widerspruechliche, unverstaendliche und solche, die den Verkaeuferservice loben.",
+  "filter": {
+    "langs": [
+      "all"
+    ],
+    "minScore": 4,
+    "perProduct": 10,
+    "max": 300
+  },
+  "pids": {
+    "marea-bikini": "1796048609763405824",
+    "palma-print-bikini": "1798164136682074112",
+    "costa-strap-bikini": "D75EFC11-7D5F-4AF2-959B-E6054E0BC50A",
+    "ola-tie-dye-bikini": "2406100641361611000",
+    "brillo-sequin-bikini": "2508280732151603400",
+    "lucia-halter-bikini": "2508130612491604000",
+    "volante-ruffle-bikini": "1798552650494128128",
+    "brisa-strappy-bikini": "1661230408471683072",
+    "duna-fission-bikini": "1779781821690032128",
+    "riviera-stripe-bikini": "2406080849451613900",
+    "malla-rope-bikini": "2406080821071623700",
+    "fiesta-halter-bikini": "2406270130061617000",
+    "sol-solid-bikini": "45BB2930-DEB2-41DA-A978-2241457DD481",
+    "sirena-cross-string-bikini": "1541007545253507072",
+    "bahia-bandeau-bikini": "1386300240277147648",
+    "costa-alta-highwaist-bikini": "1417378143416750080",
+    "playa-cross-strap-bikini": "1767114144253227008",
+    "coral-lace-up-bikini": "1761693212298719232",
+    "flora-floral-bikini": "1644513357027872768",
+    "jardin-onepiece-swimsuit": "2508151259271606900",
+    "elastica-fission-bikini": "1742169857124216832",
+    "tanga-lace-up-bikini": "1775493262573309952",
+    "verona-onepiece-swimsuit": "1777696236486152192",
+    "totem-triangle-bikini": "1418114094589939712",
+    "nudo-cross-bikini": "1648157262651215872",
+    "costa-beach-dress-set": "1745812500064505856",
+    "duo-halter-bikini": "2410010903531609000",
+    "lazo-knot-bikini": "2406230612561606100",
+    "aurora-gradient-bikini": "2406080649241622300",
+    "roma-onepiece-swimsuit": "2508281054591622500",
+    "tierra-threepiece-bikini": "2406240111011602500",
+    "boxer-onepiece-swimsuit": "2407030854561621100",
+    "rayas-striped-bikini": "1798553861909782528",
+    "esmeralda-threepiece-bikini": "2406120347291607400",
+    "tres-puntos-bikini": "EA580C4E-829D-4963-94A5-C5143E0CEC12",
+    "selva-floral-bikini": "AC995192-904E-42AD-B48D-D5819B17931C",
+    "ondas-ruched-bikini": "2601270827471630100",
+    "cumbre-highwaist-bikini": "1788836031215702016",
+    "tejido-crochet-bikini": "A90FF17B-80F8-4D7C-A060-6BC87483CF3D",
+    "hombro-oneshoulder-bikini": "1409741588804014080",
+    "safari-pushup-bikini": "1558338121501257728",
+    "micro-pushup-golden-python": "1368157547449683968",
+    "micro-pushup-ocean-python": "1368157547449683968",
+    "micro-pushup-white-dots": "1368157547449683968",
+    "micro-pushup-pink-dots": "1368157547449683968",
+    "micro-pushup-sand-leopard": "1368157547449683968",
+    "safari-leopard": "1558338121501257728",
+    "safari-pink-fiesta": "1558338121501257728",
+    "safari-blau-fiesta": "1558338121501257728",
+    "safari-tuerkis-bluete": "1558338121501257728",
+    "totem-mediterran-blau": "1418114094589939712",
+    "totem-mandala-petrol": "1418114094589939712",
+    "totem-mandala-azur": "1418114094589939712",
+    "tanga-leopard": "1775493262573309952",
+    "cumbre-blueten-weiss": "1788836031215702016",
+    "cumbre-leopard": "1788836031215702016",
+    "costa-beach-dress-set-aquarell": "1745812500064505856"
+  },
+  "voices": [
+    {
+      "id": "cd178395d82a",
+      "slug": "sol-solid-bikini",
+      "product": {
+        "de": "Sol Solid Bikini",
+        "en": "Sol Solid Bikini"
+      },
+      "rating": 5,
+      "comment": "DHL delivery was quite fast, and the products are good quality. I highly recommend them.",
+      "lang": "fr",
+      "author": "M***i",
+      "country": "FR",
+      "date": "2020-08-15",
+      "original": "Livraison DHL assez rapide mais les produits sont de qualité je recommande fortement",
+      "translated": true,
+      "cjCommentId": "1994805"
+    },
+    {
+      "id": "cf04653ed02d",
+      "slug": "costa-alta-highwaist-bikini",
+      "product": {
+        "de": "Costa Alta High-Waist Bikini",
+        "en": "Costa Alta High-Waist Bikini"
+      },
+      "rating": 5,
+      "comment": "The swimsuit is stunning! For measurements 84/63/90, size S fitted perfectly.",
+      "lang": "other",
+      "author": "V***l",
+      "country": "RU",
+      "date": "2023-06-06",
+      "original": "купальник потрясающий! на параметры 84/63/90 размер s сел идеально!",
+      "translated": true,
+      "cjCommentId": "1666381276967874600"
+    },
+    {
+      "id": "b797e1210e7b",
+      "slug": "selva-floral-bikini",
+      "product": {
+        "de": "Selva Floral Bikini",
+        "en": "Selva Floral Bikini"
+      },
+      "rating": 5,
+      "comment": "Excellent swimsuit, it fits perfectly. I recommend it.",
+      "lang": "en",
+      "author": "R***r",
+      "country": "RU",
+      "date": "2020-11-11",
+      "original": "Excellent swimsuit, sat perfectly, I recommend",
+      "translated": true,
+      "cjCommentId": "4613958"
+    },
+    {
+      "id": "8ae5fe021331",
+      "slug": "tres-puntos-bikini",
+      "product": {
+        "de": "Tres Puntos Bikini",
+        "en": "Tres Puntos Bikini"
+      },
+      "rating": 5,
+      "comment": "Good quality, and the size was right for me. I wear 75 B, 36–38.",
+      "lang": "en",
+      "author": "G***a",
+      "country": "LT",
+      "date": "2020-10-16",
+      "original": "Good quality, the size approached. I wear 75 V, 36-38",
+      "translated": true,
+      "cjCommentId": "3863528"
+    },
+    {
+      "id": "2aa229b5e097",
+      "slug": "costa-alta-highwaist-bikini",
+      "product": {
+        "de": "Costa Alta High-Waist Bikini",
+        "en": "Costa Alta High-Waist Bikini"
+      },
+      "rating": 5,
+      "comment": "Very good quality. Thick fabric, and no loose threads.",
+      "lang": "other",
+      "author": "W***o",
+      "country": "RU",
+      "date": "2023-05-18",
+      "original": "Очень хорошего качества. Плотный , нитки не торчат.",
+      "translated": true,
+      "cjCommentId": "1666381276967874600"
+    },
+    {
+      "id": "80305dc2ceaf",
+      "slug": "nudo-cross-bikini",
+      "product": {
+        "de": "Nudo Cross Bikini",
+        "en": "Nudo Cross Bikini"
+      },
+      "rating": 5,
+      "comment": "The swimsuit is great! Very nice, correct size, beautiful colour.",
+      "lang": "en",
+      "author": "Q***d",
+      "country": "US",
+      "date": "2023-06-04",
+      "original": "The swimsuit is great! Very nice, correct size, Beautiful color",
+      "translated": true,
+      "cjCommentId": "1669235431491248000"
+    },
+    {
+      "id": "47c77a64cfb3",
+      "slug": "selva-floral-bikini",
+      "product": {
+        "de": "Selva Floral Bikini",
+        "en": "Selva Floral Bikini"
+      },
+      "rating": 5,
+      "comment": "Cool swimsuit — it reached the Rostov region in 10 days! The quality is good; for measurements 88/68/89 I took size S.",
+      "lang": "en",
+      "author": "V***v",
+      "country": "RU",
+      "date": "2020-11-22",
+      "original": "Cool swimsuit, to the Rostov region reached in 10 days! Quality is good, on parameters 88/68/89 took S",
+      "translated": true,
+      "cjCommentId": "4613956"
+    },
+    {
+      "id": "ded2ffc30dae",
+      "slug": "costa-alta-highwaist-bikini",
+      "product": {
+        "de": "Costa Alta High-Waist Bikini",
+        "en": "Costa Alta High-Waist Bikini"
+      },
+      "rating": 5,
+      "comment": "Excellent swimsuit. The sizing runs true to Russian sizes. The bottoms are high-waisted — they look even better if you have a defined waist.",
+      "lang": "other",
+      "author": "Q***u",
+      "country": "RU",
+      "date": "2023-05-28",
+      "original": "Отличный купальник. Размер соответствует российскому. Трусики высокие, если талия выраженная, то сидят красивее.",
+      "translated": true,
+      "cjCommentId": "1666381276967874600"
+    },
+    {
+      "id": "ca42d88a2992",
+      "slug": "tres-puntos-bikini",
+      "product": {
+        "de": "Tres Puntos Bikini",
+        "en": "Tres Puntos Bikini"
+      },
+      "rating": 5,
+      "comment": "Excellent, I loved it.",
+      "lang": "en",
+      "author": "C***r",
+      "country": "CL",
+      "date": "2020-11-04",
+      "original": "Exelente, I loved it.",
+      "translated": true,
+      "cjCommentId": "3863527"
+    },
+    {
+      "id": "168bfeddc0e4",
+      "slug": "selva-floral-bikini",
+      "product": {
+        "de": "Selva Floral Bikini",
+        "en": "Selva Floral Bikini"
+      },
+      "rating": 5,
+      "comment": "I liked everything about it. I recommend it.",
+      "lang": "en",
+      "author": "A***a",
+      "country": "RU",
+      "date": "2020-11-05",
+      "original": "I liked everything, I recommend",
+      "translated": true,
+      "cjCommentId": "4613965"
+    }
+  ]
+}
