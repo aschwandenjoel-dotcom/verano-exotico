@@ -32,7 +32,7 @@
  *   BLOB_READ_WRITE_TOKEN    Vercel Blob (Zwischenspeicher fürs Video)
  *   FB_APP_ID / FB_APP_SECRET  nur für --exchange-token
  */
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -309,18 +309,52 @@ async function whoami(token = TOKEN) {
  * langlebiges tauschen und daraus die Seiten-Tokens holen. Seiten-Tokens aus
  * einem langlebigen Nutzer-Token laufen nicht ab — kein Kalendereintrag nötig.
  */
-async function exchangeToken(shortToken) {
+/** Ersetzt oder ergänzt KEY=wert in .env.local, ohne andere Zeilen anzufassen. */
+function setEnv(key, value) {
+  const text = existsSync(envPath) ? readFileSync(envPath, "utf8") : "";
+  const line = `${key}=${value}`;
+  const re = new RegExp(`^${key}=.*$`, "m");
+  const next = re.test(text) ? text.replace(re, line) : `${text.replace(/\n*$/, "\n")}${line}\n`;
+  writeFileSync(envPath, next);
+}
+
+const mask = (s) => (s ? `${s.slice(0, 6)}…${s.slice(-4)} (${s.length} Zeichen)` : "—");
+
+/**
+ * Tauscht das kurzlebige Token in ein dauerhaftes und trägt INSTAGRAM_USER_ID
+ * und INSTAGRAM_ACCESS_TOKEN selbst in .env.local ein. Das kurzlebige Token
+ * kommt aus FB_SHORT_TOKEN in .env.local (oder als Argument) und wird danach
+ * gelöscht — so muss kein Token durch Chat oder Terminal-Verlauf.
+ */
+async function exchangeToken(shortArg) {
   const appId = process.env.FB_APP_ID;
   const appSecret = process.env.FB_APP_SECRET;
   if (!appId || !appSecret) throw new Error("FB_APP_ID und FB_APP_SECRET fehlen in .env.local (Meta-App → Einstellungen → Allgemein).");
+  const shortToken = shortArg ?? process.env.FB_SHORT_TOKEN;
+  if (!shortToken || !shortToken.startsWith("EAA")) {
+    throw new Error("Kein Token gefunden. In .env.local die Zeile FB_SHORT_TOKEN=EAA… mit dem Token aus dem Graph API Explorer füllen.");
+  }
   const res = await fetch(
     `${API}/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${shortToken}`
   );
   const data = await res.json();
-  if (data.error) throw new Error(data.error.message);
-  console.log(`✅ Langlebiges Nutzer-Token erhalten (${Math.round((data.expires_in ?? 5184000) / 86400)} Tage). Verknüpfte Seiten:`);
-  await whoami(data.access_token);
-  console.log("\nDie beiden Zeilen mit INSTAGRAM_USER_ID und INSTAGRAM_ACCESS_TOKEN in .env.local eintragen.");
+  if (data.error) throw new Error(`Tausch fehlgeschlagen: ${data.error.message}`);
+  console.log("✅ Dauerhaftes Nutzer-Token erhalten.");
+
+  const pages = await graph("/me/accounts", { fields: "id,name,access_token,instagram_business_account{id,username}" }, "GET", data.access_token);
+  const withIg = (pages.data ?? []).filter((p) => p.instagram_business_account);
+  if (withIg.length === 0) {
+    console.log("Seiten gefunden:", (pages.data ?? []).map((p) => p.name).join(", ") || "keine");
+    throw new Error("Keine Facebook-Seite mit verknüpftem Instagram-Business-Konto im Token. Im Explorer-Dialog Seite UND Instagram-Konto anhaken.");
+  }
+  const page = withIg.find((p) => /verano/i.test(p.instagram_business_account.username)) ?? withIg[0];
+  setEnv("INSTAGRAM_USER_ID", page.instagram_business_account.id);
+  setEnv("INSTAGRAM_ACCESS_TOKEN", page.access_token);
+  setEnv("FB_SHORT_TOKEN", "");
+  console.log(`   Seite:      ${page.name}`);
+  console.log(`   Instagram:  @${page.instagram_business_account.username} (${page.instagram_business_account.id})`);
+  console.log(`   Seiten-Token ${mask(page.access_token)} → in .env.local eingetragen (läuft nicht ab)`);
+  console.log("   FB_SHORT_TOKEN wieder geleert.");
 }
 
 // ---------- Einstieg ----------
@@ -330,6 +364,7 @@ try {
   else if (has("profile")) await showProfile();
   else if (has("whoami")) await whoami();
   else if (has("exchange-token")) await exchangeToken(arg("exchange-token"));
+  else if (has("setup")) await exchangeToken();
   else {
     const video = arg("video");
     const captionFile = arg("caption-file");
