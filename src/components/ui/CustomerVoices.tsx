@@ -170,7 +170,7 @@ export default function CustomerVoices({
     // Die Spur enthält die Karten zweimal — die zweite Hälfte ist nur die
     // optische Fortsetzung und für Screenreader unsichtbar. Tempo nach Anzahl,
     // damit zehn Karten nicht schneller durchrauschen als drei.
-    const seconds = Math.max(28, voices.length * 7);
+    const seconds = Math.max(20, voices.length * 5);
     return (
       <section
         className="py-20"

@@ -179,8 +179,9 @@ body {
   .voice-marquee-track { align-items: flex-start; }
 }
 
-/* Zum Lesen anhalten — mit der Maus und für die Tastatur. */
-.voice-marquee:hover .voice-marquee-track,
+/* Mit der Maus wird NICHT angehalten — das Band läuft einfach weiter.
+   Nur beim Tastaturfokus: Sonst wandert der angesprungene Produktlink unter
+   dem Finger weg und ist nicht mehr anklickbar. Für Mausnutzer unsichtbar. */
 .voice-marquee:focus-within .voice-marquee-track {
   animation-play-state: paused;
 }
