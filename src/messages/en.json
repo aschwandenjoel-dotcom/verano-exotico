@@ -50,8 +50,8 @@
     "sourced": "Carefully curated and shipped worldwide",
     "shipping": "Delivery in 5–14 business days",
     "trust_shipping": "Shipping from CHF 4.90",
-    "trust_returns": "14-day returns",
-    "trust_payment": "No card details needed"
+    "trust_returns": "14 days to report defects",
+    "trust_payment": "Secure payment by card & TWINT"
   },
   "cart": {
     "title": "Cart",
