@@ -108,30 +108,49 @@ function captionFromFile(file) {
  * Trending-Sounds. Die genaue Feldliste ist in Metas Doku nicht abschliessend
  * genannt; deshalb erst mit ausführlichen Feldern, bei Ablehnung ohne.
  */
+/**
+ * audio_type ist Pflicht:
+ *   music           Metas "Sound Collection" (lizenzfreie Musik)
+ *   original_sound  Original-Sounds von Creatorn — hier liegen die Sounds,
+ *                   die auf Reels gerade die Runde machen
+ * Ohne Angabe werden beide abgefragt und zusammengeführt.
+ */
+async function listAudioOfType(type, query, limit) {
+  // ig_user_id ist Pflicht: Meta liefert nur Sounds, die für genau dieses
+  // Konto (Region, Kontotyp) freigegeben sind.
+  const params = { limit, ig_user_id: USER_ID, audio_type: type };
+  if (query) params.search_query = query;
+  const data = await graph("/ig_audio", params);
+  // Die Antwort weicht vom Graph-Standard ab: Liste unter "audio" (nicht
+  // "data"), ID als "audio_id", Dauer als "duration_in_ms", Künstler bei Musik
+  // als "display_artist", bei Original Sounds als "ig_username". Hier auf
+  // ein einheitliches Format bringen.
+  return (data.audio ?? data.data ?? []).map((a) => ({
+    id: a.audio_id ?? a.id,
+    title: a.title,
+    artist: a.display_artist ?? (a.ig_username ? `@${a.ig_username}` : undefined),
+    duration_ms: a.duration_in_ms ?? a.duration_ms,
+    audio_type: a.audio_type ?? type,
+    preview: a.on_platform_audio_preview_link,
+  }));
+}
+
 async function listAudio(query, limit) {
-  const base = { limit };
-  if (query) base.search_query = query;
-  const attempts = [
-    { ...base, fields: "id,title,artist,duration_ms,music_type,is_explicit" },
-    { ...base, fields: "id,title" },
-    base,
-  ];
-  let lastErr;
-  for (const params of attempts) {
-    try {
-      const data = await graph("/ig_audio", params);
-      return data.data ?? [];
-    } catch (err) {
-      lastErr = err;
-      if (!/field|nonexisting|Unsupported/i.test(err.message)) throw err;
-    }
+  const wanted = arg("audio-type");
+  const types = wanted ? [wanted] : ["original_sound", "music"];
+  const lists = await Promise.all(types.map((t) => listAudioOfType(t, query, limit).catch((e) => ({ error: e, type: t }))));
+  const out = [];
+  for (const l of lists) {
+    if (Array.isArray(l)) out.push(...l);
+    else console.warn(`⚠️  ${l.type}: ${l.error.message}`);
   }
-  throw lastErr;
+  return out;
 }
 
 function describeAudio(a) {
   const dur = a.duration_ms ? ` · ${Math.round(a.duration_ms / 1000)} s` : "";
-  return `${a.title ?? "(ohne Titel)"}${a.artist ? ` — ${a.artist}` : ""}${dur}${a.is_explicit ? " · explicit" : ""}`;
+  const kind = a.audio_type === "music" ? "[Musik]   " : a.audio_type === "original_sound" ? "[Original]" : "";
+  return `${kind} ${a.title ?? "(ohne Titel)"}${a.artist ? ` — ${a.artist}` : ""}${dur}${a.is_explicit ? " · explicit" : ""}`.trim();
 }
 
 /** Aus --audio / --audio-id die audio_id ermitteln. */
@@ -191,7 +210,7 @@ async function publishReel({ video, caption, story = false }) {
   if (!story) console.log(`📝 ${caption.split("\n")[0].slice(0, 70)}…  (${caption.length} Zeichen)`);
 
   const audioWish = arg("audio") ?? (arg("audio-id") ? `ID ${arg("audio-id")}` : null);
-  if (DRY) {
+  if (DRY && !has("prepare-only")) {
     console.log(`🎵 Sound: ${audioWish ?? "keiner (Video-Tonspur)"}`);
     console.log("\n🔍 Probelauf — es wurde nichts hochgeladen und nichts veröffentlicht.");
     console.log("\n--- Caption ---\n" + caption);
@@ -202,15 +221,22 @@ async function publishReel({ video, caption, story = false }) {
   const audio = await resolveAudio();
   console.log(`🎵 Sound: ${audio ? audio.label : "keiner (Video-Tonspur)"}`);
 
-  process.stdout.write("⬆️  Video hochladen … ");
-  const { url, cleanup } = await uploadVideo(abs);
-  console.log("ok");
+  // Standard: Video direkt bei Meta hochladen (upload_type=resumable) — keine
+  // öffentliche URL, kein Zwischenspeicher nötig. Nur mit --via-blob über
+  // Vercel Blob (Fallback, falls Meta den Direkt-Upload einmal ablehnt).
+  const viaBlob = has("via-blob");
+  let cleanup = async () => {};
 
   try {
     process.stdout.write("📦 Media-Container anlegen … ");
-    const params = story
-      ? { media_type: "STORIES", video_url: url }
-      : { media_type: "REELS", video_url: url, caption, share_to_feed: true };
+    const params = story ? { media_type: "STORIES" } : { media_type: "REELS", caption, share_to_feed: true };
+    if (viaBlob) {
+      const up = await uploadVideo(abs);
+      cleanup = up.cleanup;
+      params.video_url = up.url;
+    } else {
+      params.upload_type = "resumable";
+    }
     if (audio && !story) {
       params.audio_configuration = JSON.stringify({
         audio_id: audio.id,
@@ -220,6 +246,40 @@ async function publishReel({ video, caption, story = false }) {
     }
     const container = await graph(`/${USER_ID}/media`, params, "POST");
     console.log(container.id);
+
+    if (!viaBlob) {
+      process.stdout.write("⬆️  Video direkt zu Meta hochladen … ");
+      const bytes = readFileSync(abs);
+      const uploadUrl = container.uri ?? `https://rupload.facebook.com/ig-api-upload/v23.0/${container.id}`;
+      const res = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { Authorization: `OAuth ${TOKEN}`, offset: "0", file_size: String(bytes.length) },
+        body: bytes,
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || body.success === false || body.error) {
+        throw new Error(`Upload fehlgeschlagen (HTTP ${res.status}): ${body.error?.message ?? body.debug_info?.message ?? JSON.stringify(body).slice(0, 200)}`);
+      }
+      console.log("ok");
+    }
+
+    if (has("prepare-only")) {
+      // Test des kompletten Wegs ohne Veröffentlichung: der Container verfällt
+      // nach 24 Stunden von selbst.
+      process.stdout.write("⏳ Instagram verarbeitet das Video ");
+      const deadline = Date.now() + 10 * 60 * 1000;
+      let s;
+      while (Date.now() < deadline) {
+        await new Promise((r) => setTimeout(r, 5000));
+        s = await graph(`/${container.id}`, { fields: "status_code,status" });
+        if (s.status_code !== "IN_PROGRESS") break;
+        process.stdout.write(".");
+      }
+      console.log(` ${s?.status_code}`);
+      if (s?.status_code !== "FINISHED") throw new Error(`Verarbeitung: ${s?.status ?? s?.status_code}`);
+      console.log("\n🧪 Bereit zum Veröffentlichen — NICHT veröffentlicht (--prepare-only). Container verfällt in 24 h.");
+      return;
+    }
 
     // Status abfragen statt blind warten — Reels brauchen 20 s bis mehrere Minuten
     process.stdout.write("⏳ Instagram verarbeitet das Video ");
@@ -254,7 +314,10 @@ async function showAudio() {
   const list = await listAudio(query, Number(arg("limit", "10")));
   console.log(query ? `Sounds für "${query}":` : "Trending-Sounds (für Drittanbieter freigegeben):");
   if (list.length === 0) console.log("  keine");
-  for (const a of list) console.log(`  ${a.id}  ${describeAudio(a)}`);
+  for (const a of list) {
+    console.log(`  ${a.id}  ${describeAudio(a)}`);
+    if (a.preview) console.log(`  ${" ".repeat(String(a.id).length)}  ▶ ${a.preview}`);
+  }
   console.log('\nVerwenden mit: --audio-id <id>   oder   --audio "suchbegriff"   oder   --audio trending');
 }
 
@@ -341,11 +404,32 @@ async function exchangeToken(shortArg) {
   if (data.error) throw new Error(`Tausch fehlgeschlagen: ${data.error.message}`);
   console.log("✅ Dauerhaftes Nutzer-Token erhalten.");
 
-  const pages = await graph("/me/accounts", { fields: "id,name,access_token,instagram_business_account{id,username}" }, "GET", data.access_token);
-  const withIg = (pages.data ?? []).filter((p) => p.instagram_business_account);
+  const fields = "id,name,access_token,instagram_business_account{id,username}";
+  const pages = await graph("/me/accounts", { fields }, "GET", data.access_token);
+  let candidates = pages.data ?? [];
+
+  // Seiten in einem Business-Portfolio fehlen in /me/accounts, obwohl sie
+  // freigegeben sind. Die Seiten-IDs stehen dann in den granular_scopes des
+  // Tokens — von dort direkt abfragen.
+  if (!candidates.some((p) => p.instagram_business_account)) {
+    const dbg = await graph("/debug_token", { input_token: data.access_token }, "GET", `${appId}|${appSecret}`);
+    const pageIds = [
+      ...new Set((dbg.data?.granular_scopes ?? []).filter((g) => g.scope.startsWith("pages_")).flatMap((g) => g.target_ids ?? [])),
+    ];
+    candidates = [];
+    for (const id of pageIds) {
+      const p = await graph(`/${id}`, { fields }, "GET", data.access_token).catch(() => null);
+      if (p) candidates.push(p);
+    }
+  }
+
+  const withIg = candidates.filter((p) => p.instagram_business_account && p.access_token);
   if (withIg.length === 0) {
-    console.log("Seiten gefunden:", (pages.data ?? []).map((p) => p.name).join(", ") || "keine");
-    throw new Error("Keine Facebook-Seite mit verknüpftem Instagram-Business-Konto im Token. Im Explorer-Dialog Seite UND Instagram-Konto anhaken.");
+    console.log("Seiten gefunden:", candidates.map((p) => p.name).join(", ") || "keine");
+    throw new Error(
+      "Keine Facebook-Seite mit verknüpftem Instagram-Business-Konto im Token.\n" +
+        "   Instagram → Einstellungen → Professionelles Konto → Facebook „Verknüpfen\", dann Token neu erzeugen."
+    );
   }
   const page = withIg.find((p) => /verano/i.test(p.instagram_business_account.username)) ?? withIg[0];
   setEnv("INSTAGRAM_USER_ID", page.instagram_business_account.id);

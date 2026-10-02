@@ -41,7 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 # Claude Code
-.claude/
+.claude/*
+# Projekt-Skills (Instagram-Autopilot + Text-Skills) gehoeren ins Repo;
+# lokale Einstellungen (settings.local.json usw.) bleiben draussen.
+!.claude/skills/
 
 # temporary processing files
 .tmp/

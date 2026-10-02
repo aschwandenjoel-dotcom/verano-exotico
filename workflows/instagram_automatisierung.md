@@ -19,6 +19,15 @@ Suchbegriff die Trending-Sounds, mit Suchbegriff Musik und Original Sounds;
 beim Reel-Container hängt `audio_configuration={"audio_id":…}` den Sound an.
 Das Tool nutzt genau das.
 
+Was der Katalog tatsächlich enthält (getestet 02.10.2026):
+
+- `audio_type=original_sound` — Sounds, die auf Reels gerade laufen
+  (Creator-Audios, teils Remixe bekannter Songs)
+- `audio_type=music` — Metas **lizenzfreie Sound Collection**
+
+`audio_type` und `ig_user_id` sind Pflicht; die Antwort steht unter `audio`
+(nicht `data`), die ID heisst `audio_id`. Das Tool fragt beide Typen ab.
+
 Drei Einschränkungen, die man kennen muss:
 
 - **Kleinerer Katalog als in der App.** Es kommt nur, was Meta für
@@ -53,6 +62,12 @@ Konten hinzufügen → Facebook → die Seite verbinden.
    in `.env.local` als `FB_APP_ID` und `FB_APP_SECRET`
 
 ### 4. Token erzeugen
+
+**Stolperstein (30.09.2026):** Im Graph API Explorer meldete der Dialog
+zuerst „kein Instagram-Konto". Ursache: Instagram war nur übers Konten-Center
+mit Facebook verknüpft, nicht mit der **Seite**. Lösung: Instagram (Web) →
+Einstellungen → **Professionelles Konto** → Facebook **„Verknüpfen"** → Seite
+wählen. Das Konten-Center allein genügt der Schnittstelle nicht.
 1. https://developers.facebook.com/tools/explorer → oben rechts die App
    `verano-exotico` wählen
 2. **Berechtigungen hinzufügen:** `instagram_basic`,
@@ -60,29 +75,24 @@ Konten hinzufügen → Facebook → die Seite verbinden.
    `pages_show_list`, `pages_read_engagement`
 3. **Generate Access Token** → im Dialog Facebook-Konto, die Seite und das
    Instagram-Konto freigeben
-4. Das angezeigte (kurzlebige) Token kopieren und im Projekt tauschen:
+4. Das angezeigte (kurzlebige) Token kopieren und in `.env.local` hinter
+   `FB_SHORT_TOKEN=` einfügen (nicht in einen Chat), dann:
 
 ```bash
-node tools/instagram-publish.mjs --exchange-token <kurzlebiges-Token>
+node tools/instagram-publish.mjs --setup
 ```
 
-Das Tool tauscht es in ein langlebiges, liest die Seite und das verknüpfte
-Instagram-Konto aus und gibt die zwei Zeilen für `.env.local` aus. Das
+Das Tool tauscht es in ein dauerhaftes, sucht Seite und Instagram-Konto,
+trägt `INSTAGRAM_USER_ID` und `INSTAGRAM_ACCESS_TOKEN` selbst ein und leert
+`FB_SHORT_TOKEN`. Liegt die Seite in einem Business-Portfolio, fehlt sie in
+`/me/accounts` — das Tool liest sie dann aus den `granular_scopes` des Tokens. Das
 Seiten-Token **läuft nicht ab** — kein Kalendereintrag nötig.
 
-### 5. Vercel Blob anlegen (Video-Zwischenspeicher)
-Instagram lädt Videos nur von einer öffentlich erreichbaren HTTPS-Adresse.
-Statt die Dateien ins Git-Repository zu legen (150 Videos pro Jahr × 8 MB
-blieben dort für immer), landen sie kurz im Blob-Speicher und werden nach dem
-Posten gelöscht.
-
-1. Vercel → Projekt `verano-exotico` → **Storage → Create Database → Blob**
-2. Name `verano-media` → Create
-3. Reiter **`.env.local`** → `BLOB_READ_WRITE_TOKEN` kopieren
-
-```bash
-npm i @vercel/blob
-```
+### 5. ~~Vercel Blob~~ — entfällt
+Das Tool lädt das Video direkt zu Meta hoch (`upload_type=resumable`). Eine
+öffentliche Video-URL oder ein Zwischenspeicher ist nicht nötig. Vercel Blob
+bleibt nur als Notlösung (`--via-blob`), falls Meta den Direkt-Upload einmal
+ablehnt.
 
 ### 6. Werte eintragen
 In `.env.local` (gitignored, verlässt den Rechner nie):
@@ -92,7 +102,6 @@ FB_APP_ID=…
 FB_APP_SECRET=…
 INSTAGRAM_ACCESS_TOKEN=EAA…        # Seiten-Token aus Schritt 4
 INSTAGRAM_USER_ID=17841…           # aus Schritt 4
-BLOB_READ_WRITE_TOKEN=vercel_blob_rw_…
 ```
 
 ### 7. Prüfen
