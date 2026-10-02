@@ -33,6 +33,10 @@
  *   FB_APP_ID / FB_APP_SECRET  nur für --exchange-token
  */
 import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -165,6 +169,24 @@ async function resolveAudio() {
   return { id: pick.id, label: describeAudio(pick) };
 }
 
+/**
+ * Maximale Lautstärke der Tonspur in dB (0 = Vollaussteuerung, -91 = digitale
+ * Stille), oder null ohne Tonspur. Gemessen mit ffmpeg volumedetect.
+ */
+function videoLoudness(file) {
+  let ffmpeg;
+  try {
+    ffmpeg = require("ffmpeg-static");
+  } catch {
+    return 0; // ohne ffmpeg nicht prüfbar — nicht blockieren
+  }
+  const r = spawnSync(ffmpeg, ["-hide_banner", "-i", file, "-map", "0:a:0", "-af", "volumedetect", "-f", "null", "-"], { encoding: "utf8" });
+  const out = `${r.stderr ?? ""}`;
+  if (/does not contain any stream|matches no streams/i.test(out)) return null;
+  const m = out.match(/max_volume:\s*(-?[\d.]+) dB/);
+  return m ? Number(m[1]) : null;
+}
+
 // ---------- Video öffentlich bereitstellen ----------
 async function uploadVideo(file) {
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
@@ -220,6 +242,21 @@ async function publishReel({ video, caption, story = false }) {
   requireAuth();
   const audio = await resolveAudio();
   console.log(`🎵 Sound: ${audio ? audio.label : "keiner (Video-Tonspur)"}`);
+
+  // Sperre gegen stumme Posts (02.10.2026: ein Reel ging mit leerer
+  // Platzhalter-Tonspur raus). Ohne Instagram-Sound muss das Video selbst
+  // hörbaren Ton haben — sonst abbrechen, ausser es ist ausdrücklich gewollt.
+  if (!audio && !has("allow-silent")) {
+    const level = videoLoudness(abs);
+    if (level === null || level < -60) {
+      throw new Error(
+        `Das Video ist stumm (${level === null ? "keine Tonspur" : `${level.toFixed(0)} dB`}) und es ist kein Sound gewählt.\n` +
+          '   Sound anhängen: --list-audio --query "summer" → --audio-id <id>\n' +
+          "   Oder bewusst stumm posten: --allow-silent"
+      );
+    }
+    console.log(`🔊 Video-Tonspur hörbar (${level.toFixed(0)} dB)`);
+  }
 
   // Standard: Video direkt bei Meta hochladen (upload_type=resumable) — keine
   // öffentliche URL, kein Zwischenspeicher nötig. Nur mit --via-blob über
