@@ -6,11 +6,20 @@ import { calcShipping, isShippingCountry } from "@/lib/shipping";
 import { CURRENCIES, convert } from "@/lib/currency";
 import { sendOrderConfirmation, sendAdminNewOrderNotification } from "@/lib/email";
 import { paymentMode, stripe, toMinorUnits } from "@/lib/stripe";
+import { subscribeViaCheckout } from "@/lib/newsletter";
 
 /** Label des Shop-Checkouts in Stripe (Dashboard → Checkout-Analysen). */
 const STRIPE_INTEGRATION_ID = "verano-shop-checkout-kqzmvtwe";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/**
+ * Lebensdauer der Stripe-Bezahlseite. Danach meldet Stripe den Abbruch
+ * (checkout.session.expired) und der Webhook verschickt — nur mit Einwilligung —
+ * die Erinnerung. Stripe-Standard wären 24 h; Erinnerungen wirken aber am
+ * besten innerhalb weniger Stunden. Minimum laut Stripe: 30 Minuten.
+ */
+const CHECKOUT_SESSION_HOURS = 3;
 
 interface CheckoutItem {
   productSlug: string;
@@ -81,6 +90,8 @@ export async function POST(req: Request) {
     country: String(body.address?.country ?? "").trim().toUpperCase(),
   };
   const rawItems: CheckoutItem[] = Array.isArray(body.items) ? body.items : [];
+  // Häkchen "Newsletter & Erinnerung" — muss aktiv gesetzt sein, nie vorausgefüllt.
+  const marketingConsent = body.newsletter === true;
 
   if (name.length < 2) return NextResponse.json({ error: "name" }, { status: 400 });
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "email" }, { status: 400 });
@@ -180,24 +191,19 @@ export async function POST(req: Request) {
               },
             },
           })),
-          ...(shippingCost > 0
-            ? [
-                {
-                  quantity: 1,
-                  price_data: {
-                    currency: currency.toLowerCase(),
-                    unit_amount: toMinorUnits(convert(shippingCost, currency)),
-                    product_data: { name: shippingLabel },
-                  },
-                },
-              ]
-            : []),
         ]
       : [];
 
+  // Versand geht als Versandoption an Stripe, nicht als Artikelposition:
+  // Gutscheincodes wirken in Stripe nur auf die Artikel, der Versand bleibt
+  // dadurch immer voll bezahlt.
+  const shippingMinor = toMinorUnits(convert(shippingCost, currency));
+
   const paymentAmount =
     mode === "stripe"
-      ? lineItems.reduce((sum, li) => sum + (li.price_data?.unit_amount ?? 0) * (li.quantity ?? 1), 0) / 100
+      ? (lineItems.reduce((sum, li) => sum + (li.price_data?.unit_amount ?? 0) * (li.quantity ?? 1), 0) +
+          shippingMinor) /
+        100
       : Math.round(convert(total, currency) * 100) / 100;
 
   // Bestellung anlegen — Telefon wandert mit in die Lieferadresse (für CJ nötig)
@@ -215,6 +221,17 @@ export async function POST(req: Request) {
   const order = await queryOne<OrderRow>("SELECT id, order_number FROM orders WHERE id = ?", [orderId]);
   if (!order) {
     return NextResponse.json({ error: "Bestellung fehlgeschlagen" }, { status: 500 });
+  }
+
+  // Einwilligung separat speichern — eine noch fehlende Migration
+  // (hostpoint-migration-newsletter.sql) darf keine Bestellung verhindern.
+  if (marketingConsent) {
+    await query("UPDATE orders SET marketing_consent = true WHERE id = ?", [order.id]).catch((err) =>
+      console.error("[checkout] marketing_consent:", err instanceof Error ? err.message : err)
+    );
+    await subscribeViaCheckout(email, locale).catch((err) =>
+      console.error("[checkout] Newsletter-Eintrag:", err instanceof Error ? err.message : err)
+    );
   }
 
   try {
@@ -255,6 +272,15 @@ export async function POST(req: Request) {
         {
           mode: "payment",
           line_items: lineItems,
+          shipping_options: [
+            {
+              shipping_rate_data: {
+                type: "fixed_amount",
+                display_name: shippingLabel,
+                fixed_amount: { amount: shippingMinor, currency: currency.toLowerCase() },
+              },
+            },
+          ],
           customer_email: email,
           client_reference_id: order.id,
           // Der Webhook findet die Bestellung ausschliesslich hierüber — nicht
@@ -281,6 +307,13 @@ export async function POST(req: Request) {
           // pro Integration). Fester Wert, der Suffix ist Stripe-Konvention.
           integration_identifier: STRIPE_INTEGRATION_ID,
           locale: locale === "en" ? "en" : "de",
+          // Feld "Gutscheincode hinzufügen" — für den Code aus der Willkommensmail
+          // (gilt nur auf Artikel, siehe shipping_options).
+          allow_promotion_codes: true,
+          expires_at: Math.floor(Date.now() / 1000) + CHECKOUT_SESSION_HOURS * 60 * 60,
+          // Bei Abbruch erzeugt Stripe einen 30 Tage gültigen Link auf eine
+          // Kopie dieser Bezahlseite — den verschickt der Webhook (nur mit Einwilligung).
+          after_expiration: { recovery: { enabled: true, allow_promotion_codes: true } },
           success_url: `${base}/${locale}/order-confirmation?id=${order.id}`,
           cancel_url: `${base}/${locale}/checkout?canceled=1`,
         },

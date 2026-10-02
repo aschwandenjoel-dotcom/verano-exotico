@@ -35,7 +35,7 @@ function PrivacyContent() {
         Datenschutz&shy;erklärung
       </h1>
       <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", marginBottom: "48px" }}>
-        Stand: September 2026
+        Stand: Oktober 2026
       </p>
 
       <Section title="1. Allgemeines">
@@ -87,7 +87,7 @@ function PrivacyContent() {
       </Section>
 
       <Section title="5. E-Mail-Versand (Bestellbestätigung)">
-        <p>Zur Versendung von Bestellbestätigungen nutzen wir den Dienst Resend, angeboten von Resend Inc., 2261 Market Street #5039, San Francisco, CA 94114, USA. Ihre E-Mail-Adresse wird ausschliesslich für den transaktionalen Versand der Bestellbestätigung verwendet und nicht für Werbezwecke genutzt.</p>
+        <p>Zur Versendung von Bestellbestätigungen nutzen wir den Dienst Resend, angeboten von Resend Inc., 2261 Market Street #5039, San Francisco, CA 94114, USA. Ihre E-Mail-Adresse wird für Bestellbestätigungen, Versandinformationen und die Bitte um eine Produktbewertung verwendet. Für Newsletter und Erinnerungen nutzen wir sie nur mit Ihrer Einwilligung (siehe Abschnitt 9).</p>
         <p style={{ marginTop: "12px" }}>Mit Resend besteht ein Datenverarbeitungsvertrag (DPA) gemäss Art. 28 DSGVO. Die Übertragung in die USA erfolgt auf Basis der Standardvertragsklauseln (SCCs) der EU-Kommission.</p>
       </Section>
 
@@ -112,7 +112,9 @@ function PrivacyContent() {
       </Section>
 
       <Section title="9. Newsletter & Produktbewertungen">
-        <p><strong>Newsletter:</strong> Wenn Sie sich für unseren Newsletter anmelden, speichern wir Ihre E-Mail-Adresse in unserer Datenbank (Hostpoint), bis Sie sich abmelden. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO); Sie können diese jederzeit per E-Mail an uns widerrufen.</p>
+        <p><strong>Newsletter:</strong> Wenn Sie sich über das Formular auf unserer Website anmelden, senden wir Ihnen zuerst eine E-Mail mit einem Bestätigungslink (Double-Opt-in). Erst nach Ihrer Bestätigung erhalten Sie Newsletter. Wir speichern Ihre E-Mail-Adresse, die gewählte Sprache sowie den Zeitpunkt von Anmeldung und Bestätigung in unserer Datenbank (Hostpoint), bis Sie sich abmelden. Nach der Bestätigung erhalten Sie einmalig einen persönlichen Rabattcode, den wir dafür bei Stripe (siehe Abschnitt 4) anlegen.</p>
+        <p style={{ marginTop: "12px" }}><strong>Einwilligung beim Bestellen:</strong> Im Bestellformular können Sie freiwillig ein Häkchen setzen, um Newsletter zu erhalten. In diesem Fall schicken wir Ihnen zusätzlich einmalig eine Erinnerung per E-Mail, wenn Sie die Bezahlung nicht abschliessen; sie enthält einen Link, mit dem Sie die Bestellung fortsetzen können. Ohne Häkchen erhalten Sie weder Newsletter noch Erinnerungen.</p>
+        <p style={{ marginTop: "12px" }}>Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können sie jederzeit widerrufen — über den Abmeldelink in jeder dieser E-Mails oder per E-Mail an uns. Bestellbestätigungen und Versandinformationen erhalten Sie weiterhin.</p>
         <p style={{ marginTop: "12px" }}><strong>Produktbewertungen:</strong> Wenn Sie eine Bewertung hinterlassen, speichern wir den von Ihnen angegebenen Namen (freiwillig, auch Pseudonym möglich), die Bewertung und den Kommentartext. Die Bewertung wird öffentlich auf der jeweiligen Produktseite angezeigt. Sie können die Löschung jederzeit per E-Mail verlangen.</p>
       </Section>
 

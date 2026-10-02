@@ -103,7 +103,8 @@
     "amount_to_pay": "Zu bezahlen",
     "pay_currency_note_card": "Umgerechnet zum aktuellen Kurs, entspricht CHF {chf}. Belastet wird genau der oben angezeigte Betrag.",
     "payment_unavailable": "Die Zahlung ist gerade nicht verfügbar. Bitte versuche es in ein paar Minuten erneut oder melde dich kurz bei uns.",
-    "canceled": "Die Zahlung wurde abgebrochen — es wurde nichts belastet. Dein Warenkorb ist noch da, du kannst es jederzeit erneut versuchen."
+    "canceled": "Die Zahlung wurde abgebrochen — es wurde nichts belastet. Dein Warenkorb ist noch da, du kannst es jederzeit erneut versuchen.",
+    "newsletter_optin": "Ja, schickt mir Neuigkeiten und Angebote per E-Mail — und eine kurze Erinnerung, falls ich die Zahlung nicht abschliesse. Abmelden jederzeit mit einem Klick."
   },
   "order": {
     "received_label": "Bestellung eingegangen",
@@ -168,8 +169,9 @@
   "newsletter": {
     "placeholder": "deine@email.ch",
     "submit": "Anmelden",
-    "success": "Du bist dabei — bis bald im Posteingang!",
-    "error": "Anmeldung fehlgeschlagen — bitte versuche es später erneut."
+    "success": "Fast geschafft — bitte bestätige deine Anmeldung über den Link in der Mail, die wir dir gerade geschickt haben.",
+    "error": "Anmeldung fehlgeschlagen — bitte versuche es später erneut.",
+    "offer": "{percent} % Rabatt auf deine nächste Bestellung — dein persönlicher Code kommt nach der Bestätigung per Mail."
   },
   "about": {
     "eyebrow": "Über uns",

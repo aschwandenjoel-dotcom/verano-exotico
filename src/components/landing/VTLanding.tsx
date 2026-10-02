@@ -7,6 +7,7 @@ import Image from "next/image";
 import type { Locale, Product as ShopProduct } from "@/types";
 import Header from "@/components/ui/Header";
 import CustomerVoices from "@/components/ui/CustomerVoices";
+import { WELCOME_DISCOUNT_PERCENT } from "@/lib/newsletterOffer";
 // Frueher dynamisch ohne SSR geladen (WebGL). Jetzt reines Markup + CSS,
 // darf serverseitig gerendert werden - das Bild ist dann Teil des ersten HTML.
 import PanoramaIntro from "@/components/3d/PanoramaIntro";
@@ -182,6 +183,7 @@ export default function VTLanding({ locale, products }: Props) {
   const t = useTranslations("landing");
   const tf = useTranslations("footer");
   const tn = useTranslations("nav");
+  const tNews = useTranslations("newsletter");
   const year = new Date().getFullYear();
   const shopScrollRef = useRef<HTMLDivElement>(null);
   // Welche Karte gerade links anliegt - fuer die Punkte unter der Reihe.
@@ -510,6 +512,14 @@ export default function VTLanding({ locale, products }: Props) {
               {t("newsletter_title_1")}<br />
               <span style={{ color: "#D4AF37" }}>{t("newsletter_title_2")}</span>
             </h2>
+            {WELCOME_DISCOUNT_PERCENT > 0 && (
+              <p
+                className="text-sm mb-6 -mt-4"
+                style={{ color: "rgba(248,243,232,0.75)", fontFamily: "var(--font-geist-mono)" }}
+              >
+                {tNews("offer", { percent: WELCOME_DISCOUNT_PERCENT })}
+              </p>
+            )}
             <NewsletterInput />
           </div>
         </div>

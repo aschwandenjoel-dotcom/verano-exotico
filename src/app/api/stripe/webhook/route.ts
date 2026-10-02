@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { query, queryOne, execute, parseJson } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
-import { sendOrderConfirmation, sendAdminNewOrderNotification } from "@/lib/email";
+import { sendOrderConfirmation, sendAdminNewOrderNotification, sendCartRecovery } from "@/lib/email";
 import { fulfillOrder, type ShippingAddress } from "@/lib/fulfillment";
+import { confirmSubscriber, findByEmail } from "@/lib/newsletter";
 
 interface OrderRow {
   id: string;
@@ -16,6 +17,10 @@ interface OrderRow {
   payment_amount: number | null;
   locale: string | null;
   shipping_address: (ShippingAddress & { phone?: string }) | string | null;
+  created_at: string;
+  /** Erst nach hostpoint-migration-newsletter.sql vorhanden */
+  marketing_consent?: number | boolean | null;
+  recovery_email_sent_at?: string | null;
 }
 
 interface ItemRow {
@@ -36,9 +41,10 @@ interface ItemRow {
  * Einrichtung: Stripe-Dashboard → Developers → Webhooks → Endpoint
  *   https://<domain>/api/stripe/webhook
  * mit den Events checkout.session.completed,
- * checkout.session.async_payment_succeeded und
- * checkout.session.async_payment_failed. Das Signing-Secret gehört in
- * STRIPE_WEBHOOK_SECRET.
+ * checkout.session.async_payment_succeeded,
+ * checkout.session.async_payment_failed und checkout.session.expired
+ * (für die Erinnerung bei abgebrochener Zahlung). Das Signing-Secret gehört
+ * in STRIPE_WEBHOOK_SECRET.
  */
 export async function POST(req: Request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -73,10 +79,14 @@ export async function POST(req: Request) {
       }
       case "checkout.session.async_payment_failed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        const orderId = session.metadata?.orderId ?? session.client_reference_id;
+        const orderId = await resolveOrderId(session);
         if (orderId) {
           await query("UPDATE orders SET status = 'payment_failed' WHERE id = ? AND status = 'pending'", [orderId]);
         }
+        break;
+      }
+      case "checkout.session.expired": {
+        await sendRecoveryIfAllowed(event.data.object as Stripe.Checkout.Session);
         break;
       }
       default:
@@ -100,7 +110,7 @@ export async function POST(req: Request) {
  * doppelt mailen.
  */
 async function markPaid(session: Stripe.Checkout.Session) {
-  const orderId = session.metadata?.orderId ?? session.client_reference_id;
+  const orderId = await resolveOrderId(session);
   if (!orderId) {
     console.error("[stripe] Session ohne orderId:", session.id);
     return;
@@ -125,7 +135,33 @@ async function markPaid(session: Stripe.Checkout.Session) {
     );
   }
 
-  const order = await queryOne<OrderRow>("SELECT * FROM orders WHERE id = ?", [orderId]);
+  // Gutscheincode eingelöst: tatsächlich belasteten Betrag übernehmen, damit
+  // Bestätigungsmail und Admin den echten Zahlbetrag zeigen.
+  const discountCents = session.total_details?.amount_discount ?? 0;
+  if (discountCents > 0 && session.amount_total != null && session.amount_subtotal) {
+    const before = await queryOne<{ subtotal: number }>("SELECT subtotal FROM orders WHERE id = ?", [orderId]);
+    const goods = await queryOne<{ goods: number }>(
+      "SELECT sum(price * quantity) AS goods FROM order_items WHERE order_id = ? AND product_slug <> '_shipping'",
+      [orderId]
+    );
+    if (before && goods) {
+      // subtotal ist in CHF, Stripe rechnet in der Zahlungswährung — der Rabatt
+      // wird deshalb anteilig übertragen. amount_subtotal umfasst nur die
+      // Artikel (Versand ist eine Versandoption), also Anteil am Warenwert.
+      const chfBefore = Number(before.subtotal);
+      const chfDiscount = Math.round(Number(goods.goods) * (discountCents / session.amount_subtotal) * 100) / 100;
+      await query("UPDATE orders SET subtotal = ?, payment_amount = ? WHERE id = ?", [
+        Math.round((chfBefore - chfDiscount) * 100) / 100,
+        session.amount_total / 100,
+        orderId,
+      ]);
+      await query("UPDATE orders SET discount_amount = ? WHERE id = ?", [chfDiscount, orderId]).catch((err) =>
+        console.error("[stripe] discount_amount:", err instanceof Error ? err.message : err)
+      );
+    }
+  }
+
+  const order = await queryOne<OrderRow & { discount_amount?: number | null }>("SELECT * FROM orders WHERE id = ?", [orderId]);
   if (!order) {
     console.error("[stripe] Bestellung nicht gefunden:", orderId);
     return;
@@ -156,6 +192,7 @@ async function markPaid(session: Stripe.Checkout.Session) {
     shippingAddress: address,
     locale,
     paid: true,
+    discount: order.discount_amount == null ? 0 : Number(order.discount_amount),
   }).catch(console.error);
 
   sendAdminNewOrderNotification({
@@ -170,6 +207,16 @@ async function markPaid(session: Stripe.Checkout.Session) {
     paid: true,
   }).catch(console.error);
 
+  // Häkchen im Bestellformular + bezahlt = Newsletter-Anmeldung bestätigt.
+  if (order.marketing_consent) {
+    try {
+      const sub = await findByEmail(order.customer_email);
+      if (sub && !sub.unsubscribed_at) await confirmSubscriber(sub);
+    } catch (err) {
+      console.error("[stripe] Newsletter-Bestätigung:", err instanceof Error ? err.message : err);
+    }
+  }
+
   // Wie im Admin-Flow: Fehler landen in fulfillment_error, nicht im Webhook-Status.
   await fulfillOrder({
     orderId: order.id,
@@ -179,4 +226,93 @@ async function markPaid(session: Stripe.Checkout.Session) {
     address,
     items,
   });
+}
+
+/**
+ * Bestell-ID zu einer Session. Über den Erinnerungslink entsteht eine neue
+ * Session als Kopie der abgelaufenen; fehlen dort die Metadaten, führt
+ * `recovered_from` zurück zur ursprünglichen Session und damit zur Bestellung.
+ */
+async function resolveOrderId(session: Stripe.Checkout.Session): Promise<string | null> {
+  const direct = session.metadata?.orderId ?? session.client_reference_id;
+  if (direct) return direct;
+
+  for (const sessionId of [session.id, session.recovered_from]) {
+    if (!sessionId) continue;
+    const row = await queryOne<{ id: string }>("SELECT id FROM orders WHERE stripe_session_id = ?", [sessionId]).catch(
+      () => null
+    );
+    if (row) return row.id;
+  }
+  return null;
+}
+
+/** Höchstens eine Erinnerung pro Adresse in diesem Zeitraum — auch bei mehreren Abbrüchen. */
+const RECOVERY_COOLDOWN_DAYS = 7;
+
+/**
+ * Bezahlseite abgelaufen, ohne dass bezahlt wurde: einmalige Erinnerung mit
+ * dem Wiederherstellungslink von Stripe. Gilt rechtlich als Werbung, deshalb
+ * nur mit Häkchen aus dem Bestellformular und nie an abgemeldete Adressen.
+ */
+async function sendRecoveryIfAllowed(session: Stripe.Checkout.Session) {
+  const recoveryUrl = session.after_expiration?.recovery?.url;
+  const orderId = await resolveOrderId(session);
+  if (!recoveryUrl || !orderId) return;
+
+  let order: OrderRow | null;
+  try {
+    order = await queryOne<OrderRow>("SELECT * FROM orders WHERE id = ?", [orderId]);
+  } catch {
+    return;
+  }
+  if (!order || order.status !== "pending" || !order.marketing_consent || order.recovery_email_sent_at) return;
+
+  // Inzwischen doch gekauft (z. B. neuer Anlauf über den Warenkorb)? Dann keine Erinnerung.
+  const later = await queryOne<{ id: string }>(
+    `SELECT id FROM orders
+      WHERE customer_email = ? AND id <> ? AND created_at >= ?
+        AND status NOT IN ('pending', 'payment_failed')
+      LIMIT 1`,
+    [order.customer_email, order.id, order.created_at]
+  );
+  if (later) return;
+
+  const sub = await findByEmail(order.customer_email);
+  if (!sub?.token || sub.unsubscribed_at) return;
+
+  const recent = await queryOne<{ id: string }>(
+    `SELECT id FROM orders
+      WHERE customer_email = ? AND recovery_email_sent_at > date_sub(now(), interval ${RECOVERY_COOLDOWN_DAYS} day)
+      LIMIT 1`,
+    [order.customer_email]
+  );
+  if (recent) return;
+
+  // Sperre: Stripe stellt Events mehrfach zu — nur ein Durchlauf verschickt.
+  const claimed = await execute(
+    "UPDATE orders SET recovery_email_sent_at = now() WHERE id = ? AND recovery_email_sent_at IS NULL",
+    [order.id]
+  );
+  if (claimed === 0) return;
+
+  const rows = await query<ItemRow>(
+    "SELECT product_slug, product_name, price, quantity, size, color_name, image FROM order_items WHERE order_id = ?",
+    [order.id]
+  );
+
+  try {
+    await sendCartRecovery({
+      to: order.customer_email,
+      customerName: order.customer_name ?? "",
+      items: rows.filter((row) => row.product_slug !== "_shipping"),
+      recoveryUrl,
+      token: sub.token,
+      locale: order.locale === "en" ? "en" : "de",
+    });
+  } catch (err) {
+    // Sperre lösen; der Fehler führt zu 500, Stripe stellt erneut zu.
+    await query("UPDATE orders SET recovery_email_sent_at = NULL WHERE id = ?", [order.id]);
+    throw err;
+  }
 }

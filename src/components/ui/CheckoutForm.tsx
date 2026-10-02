@@ -100,6 +100,8 @@ export default function CheckoutForm({
   // aktiv wählen, statt eine Vorgabe zu übersehen.
   const [country, setCountry] = useState<ShippingCountry>("");
   const [payCurrency, setPayCurrency] = useState("");
+  // Einwilligung für Newsletter & Erinnerung — bewusst nicht vorausgewählt.
+  const [newsletter, setNewsletter] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   // Wird erst beim Absenden gefüllt — nicht schon beim Tippen, sonst wird die
@@ -221,6 +223,7 @@ export default function CheckoutForm({
         body: JSON.stringify({
           locale,
           currency: payCurrency,
+          newsletter,
           customer: { name, email, phone },
           address: { line1, line2, postal_code: postal, city, country },
           items: items.map((i) => ({
@@ -527,6 +530,18 @@ export default function CheckoutForm({
                 <span style={{ fontSize: "20px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#1A3040" }}>{total === null ? "—" : formatPrice(total, payCurrency)}</span>
               </div>
             </div>
+
+            <label style={{ display: "flex", gap: "10px", alignItems: "flex-start", marginTop: "18px", cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={newsletter}
+                onChange={(e) => setNewsletter(e.target.checked)}
+                style={{ marginTop: "2px", width: "16px", height: "16px", accentColor: "#1A3040", flexShrink: 0 }}
+              />
+              <span style={{ fontSize: "11px", color: "rgba(26,48,64,0.65)", lineHeight: 1.6 }}>
+                {t("newsletter_optin")}
+              </span>
+            </label>
 
             {error && (
               <p style={{ fontSize: "12px", color: "#C0392B", marginTop: "14px" }}>{error}</p>

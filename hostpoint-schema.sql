@@ -53,6 +53,9 @@ create table if not exists orders (
   tracking_provider varchar(100),
   shipped_at        datetime,
   review_request_sent_at datetime,
+  marketing_consent boolean default false,
+  recovery_email_sent_at datetime,
+  discount_amount   decimal(10,2),
   created_at        datetime default current_timestamp,
   updated_at        datetime default current_timestamp on update current_timestamp
 );
@@ -95,6 +98,13 @@ create table if not exists newsletter_subscribers (
   id         char(36) primary key,
   email      varchar(200) unique not null,
   locale     varchar(5) default 'de',
+  token      char(32) unique,
+  source     varchar(20) default 'form',
+  confirmed_at    datetime,
+  confirm_sent_at datetime,
+  unsubscribed_at datetime,
+  welcome_code    varchar(40),
+  welcome_sent_at datetime,
   created_at datetime default current_timestamp
 );
 

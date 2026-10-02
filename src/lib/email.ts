@@ -30,6 +30,7 @@ const T = {
     color: "Farbe",
     subtotal: "Zwischensumme",
     shipping: "Versand",
+    discount: "Rabatt",
     total: "Total",
     payTitle: "So bezahlst du — 2 Möglichkeiten",
     optionA: "Option A · Manuelle Überweisung (jede Währung)",
@@ -81,6 +82,7 @@ const T = {
     color: "Color",
     subtotal: "Subtotal",
     shipping: "Shipping",
+    discount: "Discount",
     total: "Total",
     payTitle: "How to pay — 2 options",
     optionA: "Option A · Manual bank transfer (any currency)",
@@ -178,6 +180,8 @@ interface SendOrderConfirmationParams {
    * Webhook nach bestätigter Zahlung.
    */
   paid?: boolean;
+  /** Gutschein-Rabatt in CHF; `total` ist bereits abzüglich Rabatt. */
+  discount?: number;
 }
 
 /**
@@ -198,6 +202,7 @@ export async function sendOrderConfirmation({
   shippingAddress,
   locale = "de",
   paid = false,
+  discount = 0,
 }: SendOrderConfirmationParams) {
   const t = T[locale];
   const iban = process.env.PAYMENT_IBAN || "";
@@ -349,7 +354,11 @@ export async function sendOrderConfirmation({
         <tr>
           <td style="font-family:sans-serif;font-size:13px;color:rgba(26,48,64,0.6);padding:4px 0;">${t.shipping}</td>
           <td style="font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">CHF ${shippingCost.toFixed(2)}</td>
-        </tr>
+        </tr>${discount > 0 ? `
+        <tr>
+          <td style="font-family:sans-serif;font-size:13px;color:rgba(26,48,64,0.6);padding:4px 0;">${t.discount}</td>
+          <td style="font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">− CHF ${discount.toFixed(2)}</td>
+        </tr>` : ""}
         <tr>
           <td style="font-family:sans-serif;font-size:13px;font-weight:700;color:#1A3040;text-transform:uppercase;letter-spacing:0.1em;padding:12px 0 0;border-top:2px solid #1A3040;">${t.total}</td>
           <td style="font-family:sans-serif;font-size:18px;font-weight:900;color:#1A3040;text-align:right;padding:12px 0 0;border-top:2px solid #1A3040;">CHF ${total.toFixed(2)}</td>
@@ -628,5 +637,254 @@ export async function sendReviewRequest({
     replyTo: REPLY_TO,
     subject: t.subjectReview(orderNumber),
     html,
+  });
+}
+
+/* ─── Newsletter & Erinnerung ──────────────────────────────────────────────
+ * Werbe-Mails (im Gegensatz zu den Transaktionsmails oben): Sie gehen nur an
+ * Adressen mit Einwilligung, tragen einen Abmeldelink im Footer und den
+ * List-Unsubscribe-Header (Ein-Klick-Abmeldung in Gmail/Apple Mail, RFC 8058).
+ */
+
+const M = {
+  de: {
+    confirmTitle: "Fast geschafft",
+    confirmIntro:
+      "Bitte bestätige noch kurz, dass du unseren Newsletter erhalten möchtest. Erst danach schicken wir dir etwas.",
+    confirmCta: "Anmeldung bestätigen",
+    confirmIgnore: "Du hast dich nicht angemeldet? Dann ignoriere diese Mail einfach — ohne Bestätigung passiert nichts.",
+    subjectConfirm: "Bitte bestätige deine Anmeldung — Verano Exotico",
+    welcomeTitle: "Willkommen",
+    welcomeIntro:
+      "Schön, dass du dabei bist. Du hörst von uns, wenn neue Modelle reinkommen oder es etwas Besonderes gibt — nicht öfter.",
+    welcomeCodeLabel: (pct: number) => `${pct} % auf deine nächste Bestellung`,
+    welcomeCodeHint: (days: number) =>
+      `Gib den Code auf der Bezahlseite bei „Gutscheincode hinzufügen“ ein. Gilt auf alle Artikel (nicht auf den Versand), einmal einlösbar, ${days} Tage gültig.`,
+    welcomeCta: "Zum Shop →",
+    subjectWelcome: (pct: number | null) =>
+      pct ? `Willkommen — dein Code für ${pct} % Rabatt` : "Willkommen bei Verano Exotico",
+    recoveryTitle: "Noch da?",
+    recoveryIntro:
+      "Deine Bestellung ist nicht ganz durchgegangen — die Zahlung wurde nicht abgeschlossen. Deine Auswahl haben wir dir aufbewahrt:",
+    recoveryCta: "Bestellung abschliessen →",
+    recoveryNote:
+      "Der Link ist 30 Tage gültig. Falls etwas beim Bezahlen nicht geklappt hat, antworte einfach auf diese Mail — wir helfen gern.",
+    subjectRecovery: "Deine Auswahl wartet noch auf dich",
+    unsubscribe: "Abmelden",
+    unsubscribeNote: "Du bekommst diese Mail, weil du dich für Neuigkeiten von Verano Exotico angemeldet hast.",
+  },
+  en: {
+    confirmTitle: "Almost there",
+    confirmIntro: "Please confirm that you'd like to receive our newsletter. We won't send you anything until you do.",
+    confirmCta: "Confirm subscription",
+    confirmIgnore: "Didn't sign up? Just ignore this email — nothing happens without confirmation.",
+    subjectConfirm: "Please confirm your subscription — Verano Exotico",
+    welcomeTitle: "Welcome",
+    welcomeIntro:
+      "Glad you're here. You'll hear from us when new styles arrive or there's something special — no more than that.",
+    welcomeCodeLabel: (pct: number) => `${pct}% off your next order`,
+    welcomeCodeHint: (days: number) =>
+      `Enter the code on the payment page under "Add promotion code". Applies to all items (not shipping), single use, valid for ${days} days.`,
+    welcomeCta: "Visit the shop →",
+    subjectWelcome: (pct: number | null) =>
+      pct ? `Welcome — your code for ${pct}% off` : "Welcome to Verano Exotico",
+    recoveryTitle: "Still there?",
+    recoveryIntro: "Your order didn't quite go through — the payment wasn't completed. We've saved your selection:",
+    recoveryCta: "Complete your order →",
+    recoveryNote:
+      "The link is valid for 30 days. If something went wrong with the payment, just reply to this email — we're happy to help.",
+    subjectRecovery: "Your selection is still waiting for you",
+    unsubscribe: "Unsubscribe",
+    unsubscribeNote: "You're receiving this email because you signed up for news from Verano Exotico.",
+  },
+} as const;
+
+function siteUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+}
+
+/** Ziel des Abmeldelinks im Footer: Seite mit Abmelde-Knopf (kein GET-Abmelden — Link-Scanner würden sonst abmelden). */
+function unsubscribePageUrl(token: string, locale: EmailLocale) {
+  return `${siteUrl()}/${locale}/newsletter?a=abmelden&t=${token}`;
+}
+
+/** Ein-Klick-Abmeldung per POST, wie Gmail/Apple Mail sie über den Header auslösen. */
+function unsubscribeHeaders(token: string): Record<string, string> {
+  return {
+    "List-Unsubscribe": `<${siteUrl()}/api/newsletter/unsubscribe?t=${token}>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+  };
+}
+
+function marketingFooter(locale: EmailLocale, token: string) {
+  const m = M[locale];
+  return `
+    <div style="background:#F8F3E8;padding:0 40px 20px;text-align:center;">
+      <p style="font-family:sans-serif;font-size:10px;color:rgba(26,48,64,0.45);margin:0;line-height:1.6;">
+        ${m.unsubscribeNote}
+        <a href="${unsubscribePageUrl(token, locale)}" style="color:rgba(26,48,64,0.6);">${m.unsubscribe}</a>
+      </p>
+    </div>`;
+}
+
+function shell(locale: EmailLocale, title: string, body: string, extraFooter = "") {
+  return `
+<!DOCTYPE html>
+<html>
+<head>${EMAIL_HEAD}</head>
+<body style="margin:0;padding:0;background:#F8F3E8;">
+  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
+    <div style="background:#1A3040;padding:32px 40px;text-align:center;">
+      <p style="color:#D4AF37;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
+      <h1 style="color:#F8F3E8;font-family:sans-serif;font-size:22px;font-weight:900;text-transform:uppercase;margin:0;letter-spacing:0.05em;">
+        ${title}
+      </h1>
+    </div>
+    <div style="padding:32px 40px;">
+      ${body}
+    </div>
+    ${footer(locale)}
+    ${extraFooter}
+  </div>
+</body>
+</html>`;
+}
+
+function button(href: string, label: string) {
+  return `
+      <div style="text-align:center;margin:28px 0;">
+        <a href="${href}" style="display:inline-block;background:#1A3040;color:#F8F3E8;font-family:sans-serif;font-size:12px;font-weight:900;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;padding:16px 32px;border-radius:9999px;">
+          ${label}
+        </a>
+      </div>`;
+}
+
+/** Double-Opt-in: Bestätigungslink nach Anmeldung über das Formular auf der Website. */
+export async function sendNewsletterConfirmation({
+  to,
+  token,
+  locale = "de",
+}: {
+  to: string;
+  token: string;
+  locale?: EmailLocale;
+}) {
+  const m = M[locale];
+  const confirmUrl = `${siteUrl()}/api/newsletter/confirm?t=${token}`;
+  const html = shell(
+    locale,
+    m.confirmTitle,
+    `
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.7);line-height:1.6;margin:0;">${m.confirmIntro}</p>
+      ${button(confirmUrl, m.confirmCta)}
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);line-height:1.6;margin:0;">${m.confirmIgnore}</p>`
+  );
+
+  await resend.emails.send({ from: FROM, to, replyTo: REPLY_TO, subject: m.subjectConfirm, html });
+}
+
+/** Begrüssung nach bestätigter Anmeldung, optional mit persönlichem Rabattcode. */
+export async function sendNewsletterWelcome({
+  to,
+  token,
+  code,
+  percent,
+  validDays,
+  locale = "de",
+}: {
+  to: string;
+  token: string;
+  code: string | null;
+  percent: number;
+  validDays: number;
+  locale?: EmailLocale;
+}) {
+  const m = M[locale];
+  const codeBox = code
+    ? `
+      <div style="background:#1A3040;border-radius:12px;padding:24px;margin-top:24px;text-align:center;">
+        <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#D4AF37;margin:0 0 12px;">${m.welcomeCodeLabel(percent)}</p>
+        <p style="font-family:monospace;font-size:24px;font-weight:700;color:#F8F3E8;margin:0;letter-spacing:0.1em;">${code}</p>
+        <p style="font-family:sans-serif;font-size:11px;color:rgba(248,243,232,0.6);line-height:1.6;margin:14px 0 0;">${m.welcomeCodeHint(validDays)}</p>
+      </div>`
+    : "";
+
+  const html = shell(
+    locale,
+    m.welcomeTitle,
+    `
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.7);line-height:1.6;margin:0;">${m.welcomeIntro}</p>
+      ${codeBox}
+      ${button(`${siteUrl()}/${locale}/collection`, m.welcomeCta)}`,
+    marketingFooter(locale, token)
+  );
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    replyTo: REPLY_TO,
+    subject: m.subjectWelcome(code ? percent : null),
+    html,
+    headers: unsubscribeHeaders(token),
+  });
+}
+
+/**
+ * Erinnerung bei abgebrochener Zahlung — nur mit Einwilligung aus dem
+ * Bestellformular. Der Link führt auf eine neue Stripe-Bezahlseite mit
+ * denselben Artikeln (after_expiration.recovery, 30 Tage gültig).
+ */
+export async function sendCartRecovery({
+  to,
+  customerName,
+  items,
+  recoveryUrl,
+  token,
+  locale = "de",
+}: {
+  to: string;
+  customerName: string;
+  items: OrderItem[];
+  recoveryUrl: string;
+  token: string;
+  locale?: EmailLocale;
+}) {
+  const m = M[locale];
+  const t = T[locale];
+  const itemRows = items
+    .map((item) => {
+      const variant = [item.size, item.color_name].filter(Boolean).join(" · ");
+      return `
+      <tr>
+        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;">
+          <strong>${item.product_name}</strong>
+          ${variant ? `<br><span style="color:#9E9E9E;font-size:11px;">${variant}</span>` : ""}
+        </td>
+        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">
+          ${item.quantity}×
+        </td>
+      </tr>`;
+    })
+    .join("");
+
+  const html = shell(
+    locale,
+    m.recoveryTitle,
+    `
+      <p style="font-family:sans-serif;font-size:15px;color:#1A3040;margin:0 0 8px;">${t.greeting(customerName || "")}</p>
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.7);line-height:1.6;margin:0 0 20px;">${m.recoveryIntro}</p>
+      <table style="width:100%;border-collapse:collapse;">${itemRows}</table>
+      ${button(recoveryUrl, m.recoveryCta)}
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);line-height:1.6;margin:0;">${m.recoveryNote}</p>`,
+    marketingFooter(locale, token)
+  );
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    replyTo: REPLY_TO,
+    subject: m.subjectRecovery,
+    html,
+    headers: unsubscribeHeaders(token),
   });
 }
