@@ -275,11 +275,15 @@ async function publishReel({ video, caption, story = false }) {
       params.upload_type = "resumable";
     }
     if (audio && !story) {
-      params.audio_configuration = JSON.stringify({
+      // Als OBJEKT, nicht als JSON-Text: graph() schickt den Body bereits als
+      // JSON. Metas Doku-Beispiel ist form-kodiert ('audio_configuration={…}');
+      // ein zusätzlich stringifizierter Wert wird im JSON-Body stillschweigend
+      // ignoriert — so ging am 02.10. ein Reel als "Original-Audio" raus.
+      params.audio_configuration = {
         audio_id: audio.id,
         audio_volume: Number(arg("audio-volume", "100")),
         video_volume: Number(arg("video-volume", "0")),
-      });
+      };
     }
     const container = await graph(`/${USER_ID}/media`, params, "POST");
     console.log(container.id);
