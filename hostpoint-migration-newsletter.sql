@@ -36,3 +36,13 @@ alter table orders add column marketing_consent boolean default false;
 alter table orders add column recovery_email_sent_at datetime;
 -- Rabatt aus einem Stripe-Gutscheincode, in CHF (subtotal ist bereits abzüglich Rabatt)
 alter table orders add column discount_amount decimal(10,2);
+
+-- Versandprotokoll für Newsletter (tools/newsletter-send.mjs): eine Zeile pro
+-- Kampagne und Empfänger. Verhindert Doppelversand, wenn ein Lauf abbricht
+-- und neu gestartet wird.
+create table if not exists newsletter_sends (
+  campaign      varchar(80) not null,
+  subscriber_id char(36) not null,
+  sent_at       datetime default current_timestamp,
+  primary key (campaign, subscriber_id)
+);

@@ -780,7 +780,8 @@ export async function sendNewsletterConfirmation({
       <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);line-height:1.6;margin:0;">${m.confirmIgnore}</p>`
   );
 
-  await resend.emails.send({ from: FROM, to, replyTo: REPLY_TO, subject: m.subjectConfirm, html });
+  const { error } = await resend.emails.send({ from: FROM, to, replyTo: REPLY_TO, subject: m.subjectConfirm, html });
+  if (error) throw new Error(`Resend: ${error.message}`);
 }
 
 /** Begrüssung nach bestätigter Anmeldung, optional mit persönlichem Rabattcode. */
@@ -819,7 +820,7 @@ export async function sendNewsletterWelcome({
     marketingFooter(locale, token)
   );
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FROM,
     to,
     replyTo: REPLY_TO,
@@ -827,6 +828,7 @@ export async function sendNewsletterWelcome({
     html,
     headers: unsubscribeHeaders(token),
   });
+  if (error) throw new Error(`Resend: ${error.message}`);
 }
 
 /**
@@ -879,7 +881,7 @@ export async function sendCartRecovery({
     marketingFooter(locale, token)
   );
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FROM,
     to,
     replyTo: REPLY_TO,
@@ -887,4 +889,83 @@ export async function sendCartRecovery({
     html,
     headers: unsubscribeHeaders(token),
   });
+  if (error) throw new Error(`Resend: ${error.message}`);
+}
+
+/* ─── Newsletter-Kampagnen (tools/newsletter-send.mjs) ────────────────────── */
+
+/** Eigener Absender möglich, z. B. news@… — sonst derselbe wie die Bestellmails. */
+const NEWSLETTER_FROM = process.env.NEWSLETTER_FROM_EMAIL ?? FROM;
+
+export interface NewsletterContent {
+  subject: string;
+  /** Vorschautext, den Mailprogramme hinter dem Betreff zeigen */
+  preheader?: string;
+  /** Bereits gerendertes HTML des Textteils (aus Markdown, siehe Tool) */
+  html: string;
+  buttonLabel?: string;
+  /** Absolute URL des Buttons */
+  buttonUrl?: string;
+}
+
+export interface NewsletterRecipient {
+  email: string;
+  token: string;
+  locale: EmailLocale;
+}
+
+export function renderNewsletter(content: NewsletterContent, locale: EmailLocale, token: string) {
+  const preheader = content.preheader
+    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${content.preheader}</div>`
+    : "";
+  const body = `
+      ${preheader}
+      <div style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.8);line-height:1.7;">
+        ${content.html}
+      </div>
+      ${content.buttonLabel && content.buttonUrl ? button(content.buttonUrl, content.buttonLabel) : ""}`;
+  return shell(locale, "Verano Exotico", body, marketingFooter(locale, token));
+}
+
+/**
+ * Verschickt einen Newsletter an bis zu 100 Empfänger in einem Resend-Aufruf
+ * (Batch-API). Jede Mail ist einzeln adressiert und trägt den eigenen
+ * Abmeldelink — keine Sammelmail mit sichtbaren Adressen.
+ */
+export async function sendNewsletterBatch(
+  recipients: NewsletterRecipient[],
+  contentByLocale: Record<EmailLocale, NewsletterContent>,
+  idempotencyKey: string
+) {
+  if (recipients.length === 0) return;
+  if (recipients.length > 100) throw new Error("Resend-Batch: höchstens 100 Empfänger pro Aufruf");
+
+  const { error } = await resend.batch.send(
+    recipients.map((r) => {
+      const content = contentByLocale[r.locale];
+      return {
+        from: NEWSLETTER_FROM,
+        to: r.email,
+        replyTo: REPLY_TO,
+        subject: content.subject,
+        html: renderNewsletter(content, r.locale, r.token),
+        headers: unsubscribeHeaders(r.token),
+      };
+    }),
+    { idempotencyKey }
+  );
+  if (error) throw new Error(`Resend: ${error.message}`);
+}
+
+/** Einzelne Testmail, Betreff mit [TEST] markiert. */
+export async function sendNewsletterTest(to: string, content: NewsletterContent, locale: EmailLocale) {
+  const { error } = await resend.emails.send({
+    from: NEWSLETTER_FROM,
+    to,
+    replyTo: REPLY_TO,
+    subject: `[TEST] ${content.subject}`,
+    // Platzhalter-Token: Der Abmeldelink führt in der Testmail auf "Link ungültig".
+    html: renderNewsletter(content, locale, "0".repeat(32)),
+  });
+  if (error) throw new Error(`Resend: ${error.message}`);
 }

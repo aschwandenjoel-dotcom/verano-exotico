@@ -108,6 +108,14 @@ create table if not exists newsletter_subscribers (
   created_at datetime default current_timestamp
 );
 
+-- Versandprotokoll für Newsletter-Kampagnen (kein Doppelversand bei Neustart)
+create table if not exists newsletter_sends (
+  campaign      varchar(80) not null,
+  subscriber_id char(36) not null,
+  sent_at       datetime default current_timestamp,
+  primary key (campaign, subscriber_id)
+);
+
 -- Hinweis: Es gibt bewusst keine Row-Level-Security wie bei Supabase —
 -- MySQL kennt kein RLS. Der Zugriffsschutz erfolgt ausschliesslich auf
 -- App-Ebene (alle Schreib-/Leseoperationen laufen server-seitig über
