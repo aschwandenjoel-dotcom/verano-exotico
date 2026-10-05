@@ -1,6 +1,6 @@
 ---
 name: verano-instagram
-description: "Steuert den kompletten Instagram-Auftritt von Verano Exotico: nimmt die wöchentlichen TikTok-Trends entgegen, leitet daraus Themen und Hooks ab, wählt Produkte aus dem Katalog, erzeugt die Reels, schreibt Captions und veröffentlicht direkt über die Instagram Graph API. Nutze diesen Skill bei allem rund um Instagram, Reels, Wochenplan, Posting, TikTok-Trends oder Social Content für diesen Shop — auch bei 'was poste ich heute', 'neue Reels', 'Trends auswerten' oder 'Woche planen'."
+description: "Steuert den kompletten Instagram-Auftritt von Verano Exotico: nimmt die wöchentlichen TikTok-Trends entgegen, leitet daraus Themen und Hooks ab, wählt Produkte aus dem Katalog, erzeugt die Reels, schreibt Captions, veröffentlicht direkt über die Instagram Graph API und stellt das TikTok-Wochenpaket zum Planen in TikTok Studio zusammen. Nutze diesen Skill bei allem rund um Instagram, TikTok, Reels, Wochenplan, Posting, TikTok-Trends oder Social Content für diesen Shop — auch bei 'was poste ich heute', 'neue Reels', 'TikTok-Paket', 'Trends auswerten' oder 'Woche planen'."
 ---
 
 # Instagram-Autopilot für Verano Exotico
@@ -19,8 +19,9 @@ es erzeugen und veröffentlicht es.
 - **Konto:** `@veranoexotico`, Shop `https://verano-exotico.ch`.
 - **Sprache:** Deutsch. Englische Captions liegen in jeder `.md` daneben, der
   Wechsel auf Englisch kommt später (Joels Entscheidung vom 20.09.2026).
-- **Rhythmus:** 3 Posts pro Woche (Mo/Mi/Fr, abends 18–20 Uhr). Auf TikTok
-  darf dasselbe Material täglich raus.
+- **Rhythmus:** 3 Posts pro Woche (Mo/Mi/Fr, abends 18–20 Uhr), auf
+  Instagram und TikTok dieselben Videos. Mehr TikTok-Posts erst, wenn Joel
+  die 15–20 Minuten pro Woche zuverlässig schafft.
 - **Mischung pro Woche:** 1× Produkt-Reel, 1× Nutzen-Reel (Liste/Beratung),
   1× Persönliches oder Kundenstimme.
 
@@ -61,7 +62,10 @@ Joel öffnet das [TikTok Creative Center](https://ads.tiktok.com/business/creati
 (eingeloggt mit dem Business-Konto) und kopiert:
 
 - **Hashtags:** Top 10 für die Schweiz, letzte 7 Tage
-- **Songs:** Top 10 aufsteigend ("Breakout"), Schweiz
+- **Songs:** Top 10 aufsteigend ("Breakout"), Schweiz, **Filter „Approved
+  for business use“ eingeschaltet**. Nur diese Sounds darf ein Business-Konto
+  auf TikTok verwenden (kommerzielle Musikbibliothek, seit 25.07.2025 streng
+  durchgesetzt). Sie sind die Quelle für die TikTok-Sound-Vorschläge.
 - **Top Ads / Videos:** 3 Beispiele aus Mode/Bekleidung, jeweils den Aufbau
   in einem Satz (was passiert in den ersten 2 Sekunden?)
 
@@ -137,6 +141,46 @@ alles ausser dem Veröffentlichen — zum Testen. Voraussetzungen und Einrichtun
 
 Fehlt der Token, bricht es mit einer klaren Meldung ab — dann den Post als
 "von Hand" in `.tmp/reels/manuell/` legen und Joel Bescheid geben.
+
+### 5b. TikTok-Paket (Joel plant in TikTok Studio)
+
+TikTok lässt sich nicht selbst automatisch posten: Über die API
+veröffentlichte Videos bleiben privat, bis TikTok die App prüft — und
+Werkzeuge fürs eigene Konto werden in der Prüfung ausdrücklich abgelehnt.
+Trend-Sounds lassen sich über keine API anhängen (auch nicht über Buffer &
+Co.). Deshalb: Paket vorbereiten, Joel lädt es in **TikTok Studio** hoch,
+wählt den Sound und plant — TikTok veröffentlicht dann selbst (bis 10 Tage
+im Voraus).
+
+1. In jede Reel-`.md` einen Abschnitt `## TikTok` mit 2–3 Sound-Vorschlägen
+   aus Joels Songs-Liste (nur „Approved for business use“) schreiben, passend
+   zur Stimmung des Videos. Optional eine eigene TikTok-Caption — sonst baut
+   das Tool die deutsche Instagram-Caption um (URL raus, 5 Hashtags).
+
+   ```markdown
+   ## TikTok
+   Sounds: Titel A – Künstler | Titel B – Künstler | Titel C – Künstler
+   Caption:
+   Hook in der ersten Zeile …
+   ```
+
+2. Paket bauen (Reihenfolge = Posting-Reihenfolge):
+
+   ```bash
+   node tools/tiktok-package.mjs --reels name1,name2,name3 [--start JJJJ-MM-TT] [--days mo,mi,fr] [--time 19:00]
+   ```
+
+   Ergebnis: `.tmp/tiktok/<datum>/` mit `PLAN.md` (Schritt-für-Schritt,
+   Termine, Sounds, Captions), den Videos und je einer `.txt` zum Kopieren.
+
+3. Joel den Ordner nennen. Das Paket muss vor dem ersten Termin hochgeladen
+   sein; Termine über 10 Tage voraus meldet das Tool als Hinweis.
+
+Voraussetzung: TikTok-**Business**-Konto (Planen gibt es nur für Creator-
+und Business-Konten; als Shop sind wir ohnehin an die kommerzielle
+Musikbibliothek gebunden). In TikTok Studio bei jedem Post „Werbeinhalte →
+Deine Marke“ einschalten. Website-Link in der TikTok-Bio pflegen — Links
+in Captions sind nicht klickbar.
 
 ### 6. Nachfassen
 
