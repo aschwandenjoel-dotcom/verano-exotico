@@ -6,6 +6,9 @@
 
   Alles hängt an renderFrame(t): jeder Zustand wird aus der Zeit berechnet,
   keine CSS-Transitions — so ist jedes Bild reproduzierbar.
+
+  Regel (Joel, 06.10.2026): keine schwarzen oder leeren Frames. Bild 0 zeigt
+  den Hook (= Titelbild im Feed), Szenen überblenden sich ohne Lücke.
 -->
 <html lang="de">
 <head>
@@ -253,7 +256,7 @@ window.SOUND = {
   duration: 17,
   sections: { intro: [0, 4], groove: [4, 13], pause: [13, 15], outro: [15, 17] },
   cues: [
-    { t: 2.45, type: "shimmer" },  // Logo
+    { t: 2.15, type: "shimmer" },  // Logo
     { t: 2.9, type: "riser", len: 1.1 },
     { t: 3.9, type: "whoosh" },    // Handy fliegt ein
     { t: 5.95, type: "tap" },      // Produkt
@@ -265,7 +268,7 @@ window.SOUND = {
     { t: 10.75, type: "tap" },     // Bezahlen
     { t: 11.9, type: "success" },  // Bestellt!
     { t: 12.85, type: "whoosh" },  // Handy fliegt weg
-    { t: 13.5, type: "hit" },      // "Drei Taps."
+    { t: 13.2, type: "hit" },      // "Drei Taps."
     { t: 15.0, type: "impact" }    // Endkarte
   ]
 };
@@ -314,25 +317,28 @@ window.renderFrame = function (t) {
   const gx = 540 + Math.sin(t * 0.6) * 120, gy = 760 + Math.cos(t * 0.5) * 90;
   const goldBoost = 0.55 + 0.25 * E.outCubic(seg(t, 2.4, 3.2)) + 0.3 * E.outCubic(seg(t, 13.8, 14.6));
   $("#glowGold").style.transform = `translate(${gx - 450}px, ${gy - 450}px) scale(${0.9 + Math.sin(t * 1.1) * 0.06})`;
-  $("#glowGold").style.opacity = goldBoost * E.outCubic(seg(t, 0, 0.8));
+  $("#glowGold").style.opacity = goldBoost;
   $("#glowTeal").style.transform = `translate(${-200 + Math.cos(t * 0.4) * 140}px, ${1100 + Math.sin(t * 0.7) * 120}px)`;
-  $("#glowTeal").style.opacity = 0.7 * E.outCubic(seg(t, 0.2, 1.2));
+  $("#glowTeal").style.opacity = 0.7;
   $("#grain").style.transform = `translate(${(Math.floor(t * 24) * 37) % 200}px, ${(Math.floor(t * 24) * 53) % 200}px)`;
 
   // ── Szene 1: Hook ──
   show($("#hook"), t < 2.6);
-  $$("#hook .word").forEach((w, i) => blurIn(w, t, [0.15, 0.32, 0.9, 1.05, 1.2][i], 0.55, 2.05 + i * 0.03, 0.4));
+  // Kein leeres Startbild: "Ferien gebucht?" steht ab Bild 0 (dient auch als
+  // Titelbild), nur die zweite Zeile blendet ein.
+  $$("#hook .word").forEach((w, i) => blurIn(w, t, [-1, -1, 0.55, 0.7, 0.85][i], 0.55, 1.9 + i * 0.02, 0.28));
+  $("#hook .l1").style.transform = `scale(${lerp(1.06, 1, E.outCubic(seg(t, 0, 1.2)))})`;
 
   // ── Szene 2: Logo mit Lichtkante ──
-  show($("#logo"), t > 2.3 && t < 4.4);
-  const lIn = E.outExpo(seg(t, 2.45, 3.1)), lOut = E.inCubic(seg(t, 3.85, 4.3));
+  show($("#logo"), t > 2.1 && t < 4.4);
+  const lIn = E.outExpo(seg(t, 2.15, 2.8)), lOut = E.inCubic(seg(t, 3.85, 4.3));
   const logo = $("#logo");
   logo.style.opacity = lIn * (1 - lOut);
   logo.style.filter = `blur(${(1 - lIn) * 30 + lOut * 20}px)`;
   logo.style.transform = `scale(${lerp(1.18, 1, lIn) + lOut * 0.25})`;
-  $("#logo .mark").style.backgroundPosition = `${lerp(100, -50, E.inOutCubic(seg(t, 2.9, 3.8)))}% 0`;
-  $("#logo .tag").style.opacity = E.outCubic(seg(t, 3.1, 3.5));
-  $("#logo .tag").style.letterSpacing = `${lerp(0.6, 0.35, E.outExpo(seg(t, 3.1, 3.7)))}em`;
+  $("#logo .mark").style.backgroundPosition = `${lerp(100, -50, E.inOutCubic(seg(t, 2.7, 3.6)))}% 0`;
+  $("#logo .tag").style.opacity = E.outCubic(seg(t, 2.9, 3.3));
+  $("#logo .tag").style.letterSpacing = `${lerp(0.6, 0.35, E.outExpo(seg(t, 2.9, 3.5)))}em`;
 
   // ── Handy: Anflug, Schweben, Abflug ──
   const pin = E.outBack(seg(t, 3.9, 5.1));
@@ -418,8 +424,8 @@ window.renderFrame = function (t) {
   });
 
   // ── Szene: "Drei Taps." ──
-  show($("#outro"), t > 13.4 && t < 15.3);
-  $$("#outro .word").forEach((w, i) => blurIn(w, t, [13.5, 13.65, 14.0, 14.12, 14.24, 14.36][i], 0.5, 14.85, 0.35));
+  show($("#outro"), t > 13.15 && t < 15.3);
+  $$("#outro .word").forEach((w, i) => blurIn(w, t, [13.2, 13.35, 13.75, 13.87, 13.99, 14.11][i], 0.5, 14.85, 0.35));
 
   // ── Endkarte ──
   show($("#end"), t > 14.9);
