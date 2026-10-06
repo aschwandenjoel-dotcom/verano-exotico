@@ -72,7 +72,9 @@ wählen. Das Konten-Center allein genügt der Schnittstelle nicht.
    `verano-exotico` wählen
 2. **Berechtigungen hinzufügen:** `instagram_basic`,
    `instagram_content_publish`, `instagram_manage_insights`,
-   `pages_show_list`, `pages_read_engagement`
+   `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`
+   (letztere seit 06.10.2026: damit jeder Post auch als Reel auf die
+   Facebook-Seite geht — Instagram teilt API-Posts nicht selbst)
 3. **Generate Access Token** → im Dialog Facebook-Konto, die Seite und das
    Instagram-Konto freigeben
 4. Das angezeigte (kurzlebige) Token kopieren und in `.env.local` hinter

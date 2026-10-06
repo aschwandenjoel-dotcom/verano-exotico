@@ -145,6 +145,10 @@ node tools/instagram-publish.mjs --video … --caption-file … --audio-id <id>
 node tools/instagram-publish.mjs --video … --caption-file … --audio trending --dry-run
 ```
 
+**Facebook läuft mit:** Nach dem Instagram-Post lädt das Tool dasselbe Video
+als Reel auf die Facebook-Seite (Instagram teilt API-Posts nicht selbst).
+`--no-facebook` lässt das weg, `--facebook-only` holt es nach.
+
 Das Tool legt den Media-Container an (mit `audio_configuration`), lädt das
 Video direkt zu Meta hoch (`upload_type=resumable`, kein Zwischenspeicher),
 wartet auf die Verarbeitung und veröffentlicht. Mit `--prepare-only` läuft

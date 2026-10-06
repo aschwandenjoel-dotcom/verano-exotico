@@ -23,6 +23,8 @@
  *   node tools/instagram-publish.mjs --video x.mp4 --caption-file x.md [--audio trending|"<suche>"|--audio-id <id>]
  *   node tools/instagram-publish.mjs --list-audio [--query "summer beach"] [--limit 10]
  *   node tools/instagram-publish.mjs --video … --caption-file … --dry-run
+ *   … --no-facebook        nur Instagram (Standard: danach auch als Reel auf die Facebook-Seite)
+ *   … --facebook-only      nur Facebook (z. B. zum Nachholen)
  *   node tools/instagram-publish.mjs --insights [--limit 10] | --profile | --whoami
  *   node tools/instagram-publish.mjs --exchange-token <kurzlebiges-Token>   (Einrichtung)
  *
@@ -343,6 +345,15 @@ async function publishReel({ video, caption, story = false }) {
 
     const permalink = await graph(`/${published.id}`, { fields: "permalink" }).catch(() => null);
     console.log(`\n✅ Veröffentlicht: ${permalink?.permalink ?? published.id}`);
+
+    // Instagram teilt API-Posts nicht selbst auf Facebook — deshalb hier
+    // zusätzlich als Reel auf die Seite. Ein Fehler dort macht den
+    // Instagram-Post nicht rückgängig, er wird nur gemeldet.
+    if (!story && !has("no-facebook")) {
+      await publishFacebookReel(abs, caption).catch((err) =>
+        console.error(`⚠️  Facebook fehlgeschlagen: ${err.message}\n   Nachholen: --video … --caption-file … --facebook-only`)
+      );
+    }
   } finally {
     await cleanup();
   }
@@ -406,6 +417,50 @@ async function whoami(token = TOKEN) {
       console.log("  kein Instagram-Konto verknüpft");
     }
   }
+}
+
+/**
+ * Reel auf die Facebook-Seite (Reels Publishing API): start → Upload der
+ * Datei → finish mit video_state=PUBLISHED → Status abfragen. Das Seiten-Token
+ * braucht pages_manage_posts (seit 06.10.2026 im Token).
+ * Links sind auf Facebook anklickbar — der Zusatz "(Link in Bio)" fällt weg.
+ */
+async function publishFacebookReel(file, caption) {
+  const description = caption.replace(/\s*\((link in bio|Link in Bio)\)/gi, "");
+  const page = await graph("/me", { fields: "id,name" });
+  process.stdout.write(`📘 Facebook-Reel auf „${page.name}" … `);
+
+  const start = await graph(`/${page.id}/video_reels`, { upload_phase: "start" }, "POST");
+  const bytes = readFileSync(file);
+  const res = await fetch(start.upload_url ?? `https://rupload.facebook.com/video-upload/v23.0/${start.video_id}`, {
+    method: "POST",
+    headers: { Authorization: `OAuth ${TOKEN}`, offset: "0", file_size: String(bytes.length) },
+    body: bytes,
+  });
+  const up = await res.json().catch(() => ({}));
+  if (!res.ok || up.success === false || up.error) {
+    throw new Error(`Upload (HTTP ${res.status}): ${up.error?.message ?? up.debug_info?.message ?? JSON.stringify(up).slice(0, 200)}`);
+  }
+  await graph(
+    `/${page.id}/video_reels`,
+    { upload_phase: "finish", video_id: start.video_id, video_state: "PUBLISHED", description },
+    "POST"
+  );
+
+  // Verarbeitung abwarten, damit Fehler hier auffallen und nicht still verschwinden
+  const deadline = Date.now() + 10 * 60 * 1000;
+  let st;
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 5000));
+    st = (await graph(`/${start.video_id}`, { fields: "status" })).status;
+    if (st?.video_status === "error") throw new Error(`Verarbeitung: ${JSON.stringify(st.processing_phase?.error ?? st).slice(0, 200)}`);
+    if (st?.publishing_phase?.status === "complete") break;
+    process.stdout.write(".");
+  }
+  if (st?.publishing_phase?.status !== "complete") throw new Error(`Nach 10 Minuten nicht veröffentlicht (Status: ${JSON.stringify(st).slice(0, 200)})`);
+  const v = await graph(`/${start.video_id}`, { fields: "permalink_url" }).catch(() => ({}));
+  const link = v.permalink_url ? (v.permalink_url.startsWith("http") ? v.permalink_url : `https://www.facebook.com${v.permalink_url}`) : start.video_id;
+  console.log(` ok\n✅ Facebook: ${link}`);
 }
 
 /**
@@ -502,7 +557,8 @@ try {
       process.exit(1);
     }
     const caption = story ? "" : (captionArg ?? captionFromFile(path.resolve(ROOT, captionFile)));
-    await publishReel({ video, caption, story });
+    if (has("facebook-only")) await publishFacebookReel(path.resolve(ROOT, video), caption);
+    else await publishReel({ video, caption, story });
   }
 } catch (err) {
   console.error(`\n❌ ${err.message}`);
