@@ -1,0 +1,413 @@
+<!doctype html>
+<!--
+  Werbespot "Drei Taps" — Verano Exotico, 9:16, 17 s, komplett aus Code.
+  Rendern: node tools/render-html-video.mjs --html assets/ads/kauf-in-3-taps.html --out .tmp/ads/kauf-in-3-taps.mp4
+  Standbild: … --preview 6.4
+
+  Alles hängt an renderFrame(t): jeder Zustand wird aus der Zeit berechnet,
+  keine CSS-Transitions — so ist jedes Bild reproduzierbar.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Drei Taps</title>
+<style>
+  @font-face { font-family: "Archivo Black"; src: url("../fonts/ArchivoBlack-Regular.ttf"); }
+  @font-face { font-family: "DM Serif"; src: url("../fonts/DMSerifDisplay-Italic.ttf"); font-style: italic; }
+  @font-face { font-family: "Geist Mono"; src: url("../fonts/GeistMono[wght].ttf"); }
+
+  :root {
+    --navy: #1A3040; --deep: #07131C; --teal: #0A3D52;
+    --gold: #D4AF37; --cream: #F8F3E8; --sand: #EDE6D6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--deep); }
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: var(--cream); }
+
+  #stage { position: absolute; inset: 0; overflow: hidden; perspective: 2600px; }
+  #bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(120% 80% at 50% 40%, #0F2635 0%, var(--deep) 60%, #03080C 100%);
+  }
+  .glow { position: absolute; border-radius: 50%; filter: blur(140px); will-change: transform, opacity; }
+  #glowGold { width: 900px; height: 900px; background: radial-gradient(circle, rgba(212,175,55,0.75), rgba(212,175,55,0) 70%); }
+  #glowTeal { width: 1100px; height: 1100px; background: radial-gradient(circle, rgba(20,110,140,0.65), rgba(20,110,140,0) 70%); }
+  #grain {
+    position: absolute; inset: -50%; opacity: 0.06; mix-blend-mode: overlay; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── Text-Ebenen ── */
+  .layer { position: absolute; left: 0; right: 0; text-align: center; }
+  .big { font-family: "Archivo Black", sans-serif; text-transform: uppercase; letter-spacing: -0.01em; line-height: 0.95; }
+  .serif { font-family: "DM Serif", serif; font-style: italic; color: var(--gold); }
+  .word { display: inline-block; will-change: transform, opacity, filter; }
+
+  #hook { top: 700px; }
+  #hook .l1 { font-size: 124px; }
+  #hook .l2 { font-size: 112px; margin-top: 28px; }
+
+  #logo { top: 760px; }
+  #logo .mark {
+    font-family: "Archivo Black", sans-serif; font-size: 150px; line-height: 0.92; letter-spacing: 0.04em;
+    background: linear-gradient(100deg, var(--cream) 0%, var(--cream) 40%, #FFF3C4 50%, var(--cream) 60%, var(--cream) 100%);
+    background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #logo .tag { font-family: "Geist Mono", monospace; font-size: 30px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); margin-top: 40px; }
+
+  #caption { top: 150px; height: 260px; }
+  .cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .cap .num {
+    width: 86px; height: 86px; border-radius: 50%; background: var(--gold); color: var(--navy);
+    font-family: "Archivo Black", sans-serif; font-size: 46px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 60px rgba(212,175,55,0.55);
+  }
+  .cap .txt { font-family: "Archivo Black", sans-serif; font-size: 84px; text-transform: uppercase; }
+
+  #outro { top: 600px; }
+  #outro .a { font-size: 148px; }
+  #outro .b { font-size: 92px; margin-top: 30px; line-height: 1.1; }
+
+  #end { top: 560px; }
+  #end .mark { font-family: "Archivo Black", sans-serif; font-size: 132px; line-height: 0.92; letter-spacing: 0.04em; }
+  #end .claim { font-size: 96px; margin-top: 70px; }
+  #end .price { font-family: "Archivo Black", sans-serif; font-size: 64px; margin-top: 26px; text-transform: uppercase; }
+  #end .price b { color: var(--gold); }
+  #end .url {
+    display: inline-block; margin-top: 90px; padding: 30px 64px; border-radius: 999px;
+    background: var(--gold); color: var(--navy); font-family: "Archivo Black", sans-serif; font-size: 52px;
+    box-shadow: 0 20px 80px rgba(212,175,55,0.45);
+  }
+  #end .note { font-family: "Geist Mono", monospace; font-size: 28px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(248,243,232,0.6); margin-top: 44px; }
+
+  /* ── Handy ── */
+  #phoneWrap { position: absolute; left: 50%; top: 400px; width: 600px; height: 1230px; margin-left: -300px; transform-origin: 50% 0; transform-style: preserve-3d; will-change: transform; }
+  #phoneShadow { position: absolute; left: 50%; top: 1500px; width: 560px; height: 90px; margin-left: -280px; border-radius: 50%; background: rgba(0,0,0,0.7); filter: blur(40px); }
+  #phone {
+    position: absolute; inset: 0; border-radius: 92px; padding: 20px;
+    background: linear-gradient(145deg, #3A4650, #11181E 40%, #2A333B 70%, #0A0F13);
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,0.12), inset 0 0 0 10px #05080B, 0 60px 160px rgba(0,0,0,0.7), 0 0 120px rgba(212,175,55,0.18);
+  }
+  #screen { position: relative; width: 100%; height: 100%; border-radius: 74px; overflow: hidden; background: var(--cream); color: var(--navy); }
+  #island { position: absolute; top: 22px; left: 50%; width: 190px; height: 56px; margin-left: -95px; border-radius: 30px; background: #000; z-index: 50; }
+  #shine { position: absolute; inset: 0; border-radius: 74px; pointer-events: none; z-index: 60; background: linear-gradient(115deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.18) 45%, rgba(255,255,255,0) 60%); background-size: 300% 100%; }
+
+  .scr { position: absolute; inset: 0; padding-top: 100px; will-change: transform; }
+  .bar { display: flex; align-items: center; justify-content: space-between; padding: 0 36px; height: 70px; }
+  .bar .brand { font-family: "Archivo Black", sans-serif; font-size: 26px; letter-spacing: 0.08em; }
+  .bar .cart { position: relative; width: 48px; height: 48px; }
+  .bar .cart svg { width: 48px; height: 48px; }
+  .badge { position: absolute; right: -10px; top: -8px; width: 34px; height: 34px; border-radius: 50%; background: var(--gold); color: var(--navy); font: 700 20px/34px -apple-system, sans-serif; text-align: center; transform: scale(0); }
+  .back { font-size: 34px; }
+
+  /* Home */
+  .hero { margin: 14px 28px 0; height: 250px; border-radius: 30px; background: linear-gradient(135deg, var(--navy), var(--teal)); color: var(--cream); padding: 36px; position: relative; overflow: hidden; }
+  .hero .k { font-family: "Geist Mono", monospace; font-size: 18px; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; }
+  .hero .h { font-family: "Archivo Black", sans-serif; font-size: 54px; text-transform: uppercase; line-height: 1; margin-top: 18px; }
+  .hero .s { font-family: "DM Serif", serif; font-style: italic; font-size: 40px; color: var(--gold); margin-top: 8px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 26px 28px; }
+  .card { background: #fff; border-radius: 26px; overflow: hidden; box-shadow: 0 8px 24px rgba(26,48,64,0.08); will-change: transform; }
+  .card .img { height: 300px; background-size: cover; background-position: center 20%; }
+  .card .n { font-size: 19px; font-weight: 700; padding: 14px 16px 2px; text-transform: uppercase; line-height: 1.2; }
+  .card .p { font-family: "Geist Mono", monospace; font-size: 20px; padding: 0 16px 16px; color: rgba(26,48,64,0.6); }
+
+  /* Produkt */
+  .pimg { height: 450px; margin: 6px 28px 0; border-radius: 34px; background: url("../../public/products/cumbre-leopard-model.jpg") center 30% / cover; }
+  .pinfo { padding: 26px 40px 0; }
+  .pinfo .n { font-family: "Archivo Black", sans-serif; font-size: 34px; text-transform: uppercase; line-height: 1.1; }
+  .pinfo .p { font-family: "Archivo Black", sans-serif; font-size: 44px; color: var(--gold); margin-top: 10px; }
+  .sizes { display: flex; gap: 16px; padding: 20px 40px 0; }
+  .chip { width: 92px; height: 70px; border-radius: 20px; border: 2px solid rgba(26,48,64,0.2); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 26px; will-change: transform; }
+  .addBtn { margin: 24px 40px 0; height: 98px; border-radius: 999px; background: var(--navy); color: var(--cream); display: flex; align-items: center; justify-content: center; font-family: "Archivo Black", sans-serif; font-size: 26px; letter-spacing: 0.12em; text-transform: uppercase; will-change: transform; }
+  .toast { position: absolute; left: 50%; top: 190px; width: 420px; margin-left: -210px; height: 80px; border-radius: 999px; background: var(--navy); color: var(--cream); display: flex; align-items: center; justify-content: center; gap: 14px; font-weight: 700; font-size: 26px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); opacity: 0; }
+  .toast i { color: var(--gold); font-style: normal; }
+
+  /* Kasse */
+  .h2 { font-family: "Archivo Black", sans-serif; font-size: 44px; text-transform: uppercase; padding: 20px 40px 26px; }
+  .row { display: flex; align-items: center; gap: 22px; margin: 0 40px; padding: 22px; background: #fff; border-radius: 26px; }
+  .row .thumb { width: 120px; height: 120px; border-radius: 18px; background: url("../../public/products/cumbre-leopard-model.jpg") center 30% / cover; }
+  .row .t { font-weight: 800; font-size: 22px; text-transform: uppercase; line-height: 1.25; }
+  .row .v { font-family: "Geist Mono", monospace; font-size: 20px; color: rgba(26,48,64,0.55); margin-top: 6px; }
+  .sum { margin: 30px 40px 0; font-size: 26px; }
+  .sum div { display: flex; justify-content: space-between; padding: 10px 0; color: rgba(26,48,64,0.65); }
+  .sum .tot { border-top: 3px solid var(--navy); margin-top: 10px; padding-top: 18px; color: var(--navy); font-family: "Archivo Black", sans-serif; font-size: 36px; }
+  .pay { display: flex; gap: 16px; margin: 30px 40px 0; }
+  .pay div { flex: 1; height: 84px; border-radius: 22px; border: 2px solid rgba(26,48,64,0.18); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 24px; }
+  .pay .on { border-color: var(--navy); background: rgba(26,48,64,0.05); }
+  .payBtn { margin: 30px 40px 0; height: 104px; border-radius: 999px; background: var(--gold); color: var(--navy); display: flex; align-items: center; justify-content: center; font-family: "Archivo Black", sans-serif; font-size: 28px; letter-spacing: 0.1em; text-transform: uppercase; position: relative; will-change: transform; }
+  .spinner { position: absolute; width: 50px; height: 50px; border-radius: 50%; border: 6px solid rgba(26,48,64,0.25); border-top-color: var(--navy); opacity: 0; }
+  .secure { text-align: center; font-family: "Geist Mono", monospace; font-size: 18px; color: rgba(26,48,64,0.45); margin-top: 22px; letter-spacing: 0.1em; }
+
+  /* Bestätigt */
+  #scrDone { background: var(--navy); color: var(--cream); display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 0; text-align: center; }
+  #scrDone svg { width: 260px; height: 260px; }
+  #scrDone .h { font-family: "Archivo Black", sans-serif; font-size: 70px; text-transform: uppercase; margin-top: 40px; }
+  #scrDone .s { font-family: "DM Serif", serif; font-style: italic; font-size: 44px; color: var(--gold); margin-top: 12px; }
+  #scrDone .m { font-family: "Geist Mono", monospace; font-size: 20px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(248,243,232,0.55); margin-top: 40px; line-height: 1.8; }
+
+  /* Tap */
+  #tap { position: absolute; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%; background: rgba(255,255,255,0.55); border: 3px solid rgba(255,255,255,0.9); box-shadow: 0 6px 30px rgba(0,0,0,0.25); z-index: 70; opacity: 0; }
+  #ripple { position: absolute; width: 96px; height: 96px; margin: -48px 0 0 -48px; border-radius: 50%; border: 4px solid rgba(212,175,55,0.9); z-index: 69; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+  <div class="glow" id="glowTeal"></div>
+  <div class="glow" id="glowGold"></div>
+
+  <div class="layer" id="hook">
+    <div class="big l1"><span class="word">Ferien</span> <span class="word">gebucht?</span></div>
+    <div class="serif l2"><span class="word">Bikini</span> <span class="word">fehlt</span> <span class="word">noch?</span></div>
+  </div>
+
+  <div class="layer" id="logo">
+    <div class="mark">VERANO<br>EXOTICO</div>
+    <div class="tag">Bademode für endlose Sommer</div>
+  </div>
+
+  <div class="layer" id="caption">
+    <div class="cap" id="cap1"><div class="num">1</div><div class="txt">Aussuchen.</div></div>
+    <div class="cap" id="cap2"><div class="num">2</div><div class="txt">Grösse wählen.</div></div>
+    <div class="cap" id="cap3"><div class="num">3</div><div class="txt">Bezahlen.</div></div>
+  </div>
+
+  <div id="phoneShadow"></div>
+  <div id="phoneWrap">
+    <div id="phone">
+      <div id="screen">
+        <div id="island"></div>
+
+        <div class="scr" id="scrHome">
+          <div class="bar"><span class="brand">VERANO EXOTICO</span><span class="cart"><svg viewBox="0 0 24 24" fill="none" stroke="#1A3040" stroke-width="1.8"><path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></span></div>
+          <div class="hero"><div class="k">Neu im Shop</div><div class="h">Ferienbikinis</div><div class="s">ab CHF 26.90</div></div>
+          <div class="grid">
+            <div class="card" id="cardTarget"><div class="img" style="background-image:url('../../public/products/cumbre-leopard-model.jpg')"></div><div class="n">Cumbre High-Waist</div><div class="p">CHF 45.90</div></div>
+            <div class="card"><div class="img" style="background-image:url('../../public/products/costa-set-aquarell-model.jpg')"></div><div class="n">Costa Beach Set</div><div class="p">CHF 44.90</div></div>
+            <div class="card"><div class="img" style="background-image:url('../../public/products/ola-tie-dye-bikini-1.jpg')"></div><div class="n">Ola Tie-Dye</div><div class="p">CHF 34.90</div></div>
+            <div class="card"><div class="img" style="background-image:url('../../public/products/bahia-bandeau-bikini-1.jpg')"></div><div class="n">Bahía Bandeau</div><div class="p">CHF 34.90</div></div>
+          </div>
+        </div>
+
+        <div class="scr" id="scrProduct">
+          <div class="bar"><span class="back">←</span><span class="brand">VERANO EXOTICO</span><span class="cart"><svg viewBox="0 0 24 24" fill="none" stroke="#1A3040" stroke-width="1.8"><path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="badge" id="badge">1</span></span></div>
+          <div class="pimg"></div>
+          <div class="pinfo"><div class="n">Cumbre High-Waist Bikini – Leopard</div><div class="p">CHF 45.90</div></div>
+          <div class="sizes"><div class="chip">S</div><div class="chip" id="chipM">M</div><div class="chip">L</div><div class="chip">XL</div></div>
+          <div class="addBtn" id="addBtn">In den Warenkorb</div>
+          <div class="toast" id="toast"><i>✓</i> Im Warenkorb</div>
+        </div>
+
+        <div class="scr" id="scrCheckout">
+          <div class="bar"><span class="back">←</span><span class="brand">VERANO EXOTICO</span><span style="width:48px"></span></div>
+          <div class="h2">Kasse</div>
+          <div class="row"><div class="thumb"></div><div><div class="t">Cumbre High-Waist<br>Bikini – Leopard</div><div class="v">Grösse M · 1×</div></div></div>
+          <div class="sum">
+            <div><span>Zwischensumme</span><span>CHF 45.90</span></div>
+            <div><span>Versand · Schweiz</span><span>CHF 4.90</span></div>
+            <div class="tot"><span>TOTAL</span><span>CHF 50.80</span></div>
+          </div>
+          <div class="pay"><div class="on">Karte</div><div>TWINT</div></div>
+          <div class="payBtn" id="payBtn"><span id="payLabel">Jetzt bezahlen</span><span class="spinner" id="spinner"></span></div>
+          <div class="secure">🔒 Sicher bezahlen über Stripe</div>
+        </div>
+
+        <div class="scr" id="scrDone">
+          <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#D4AF37" stroke-width="5" id="ring" stroke-dasharray="276.5" stroke-dashoffset="276.5" transform="rotate(-90 50 50)"/><path d="M30 52 L44 65 L71 37" fill="none" stroke="#F8F3E8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" id="check" stroke-dasharray="62" stroke-dashoffset="62"/></svg>
+          <div class="h">Bestellt!</div>
+          <div class="s">Die Ferien können kommen.</div>
+          <div class="m">Bestätigung per E-Mail</div>
+        </div>
+
+        <div id="ripple"></div>
+        <div id="tap"></div>
+        <div id="shine"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" id="outro">
+    <div class="big a"><span class="word">Drei</span> <span class="word">Taps.</span></div>
+    <div class="serif b"><span class="word">Dein</span> <span class="word">Ferienbikini</span><br><span class="word">ist</span> <span class="word">unterwegs.</span></div>
+  </div>
+
+  <div class="layer" id="end">
+    <div class="mark" id="endMark">VERANO<br>EXOTICO</div>
+    <div class="serif claim" id="endClaim">Ferienbikinis</div>
+    <div class="price" id="endPrice">ab <b>CHF 26.90</b></div>
+    <div><span class="url" id="endUrl">verano-exotico.ch</span></div>
+    <div class="note" id="endNote">Schweizer Online-Shop · Link in Bio</div>
+  </div>
+
+  <div id="grain"></div>
+</div>
+
+<script>
+window.VIDEO = { duration: 17, fps: 30, width: 1080, height: 1920 };
+
+// ── Hilfsfunktionen ──
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, p) => a + (b - a) * p;
+const E = {
+  outExpo: (p) => (p === 1 ? 1 : 1 - Math.pow(2, -10 * p)),
+  outCubic: (p) => 1 - Math.pow(1 - p, 3),
+  inCubic: (p) => p * p * p,
+  inOutCubic: (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2),
+  outBack: (p) => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); },
+};
+/** Ein-/Ausblenden mit Unschärfe — die typische "Blur-in"-Bewegung der Apple-Spots */
+function blurIn(el, t, a, dur = 0.55, out = null, outDur = 0.4, dy = 60) {
+  const pIn = E.outExpo(seg(t, a, a + dur));
+  const pOut = out === null ? 0 : E.inCubic(seg(t, out, out + outDur));
+  el.style.opacity = pIn * (1 - pOut);
+  el.style.filter = `blur(${(1 - pIn) * 24 + pOut * 24}px)`;
+  el.style.transform = `translateY(${(1 - pIn) * dy - pOut * dy}px) scale(${1 - pOut * 0.04})`;
+}
+function show(el, visible) { el.style.display = visible ? "" : "none"; }
+
+// Tap-Ziele: Zeitpunkt + Element. Die Position wird aus dem Layout gemessen
+// (offsetLeft/Top bis #screen — unabhängig von den 3D-Transforms).
+const TAPS = [
+  { at: 5.95, el: "#cardTarget" }, // Produkt antippen
+  { at: 7.55, el: "#chipM" },      // Grösse M
+  { at: 8.35, el: "#addBtn" },     // In den Warenkorb
+  { at: 10.75, el: "#payBtn" },    // Bezahlen
+];
+function centerInScreen(el) {
+  let x = el.offsetWidth / 2, y = el.offsetHeight / 2, n = el;
+  while (n && n.id !== "screen") { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+  return { x, y };
+}
+for (const tap of TAPS) Object.assign(tap, centerInScreen($(tap.el)));
+
+window.renderFrame = function (t) {
+  // ── Hintergrund-Licht: atmet langsam, wird zum Schluss heller ──
+  const gx = 540 + Math.sin(t * 0.6) * 120, gy = 760 + Math.cos(t * 0.5) * 90;
+  const goldBoost = 0.55 + 0.25 * E.outCubic(seg(t, 2.4, 3.2)) + 0.3 * E.outCubic(seg(t, 13.8, 14.6));
+  $("#glowGold").style.transform = `translate(${gx - 450}px, ${gy - 450}px) scale(${0.9 + Math.sin(t * 1.1) * 0.06})`;
+  $("#glowGold").style.opacity = goldBoost * E.outCubic(seg(t, 0, 0.8));
+  $("#glowTeal").style.transform = `translate(${-200 + Math.cos(t * 0.4) * 140}px, ${1100 + Math.sin(t * 0.7) * 120}px)`;
+  $("#glowTeal").style.opacity = 0.7 * E.outCubic(seg(t, 0.2, 1.2));
+  $("#grain").style.transform = `translate(${(Math.floor(t * 24) * 37) % 200}px, ${(Math.floor(t * 24) * 53) % 200}px)`;
+
+  // ── Szene 1: Hook ──
+  show($("#hook"), t < 2.6);
+  $$("#hook .word").forEach((w, i) => blurIn(w, t, [0.15, 0.32, 0.9, 1.05, 1.2][i], 0.55, 2.05 + i * 0.03, 0.4));
+
+  // ── Szene 2: Logo mit Lichtkante ──
+  show($("#logo"), t > 2.3 && t < 4.4);
+  const lIn = E.outExpo(seg(t, 2.45, 3.1)), lOut = E.inCubic(seg(t, 3.85, 4.3));
+  const logo = $("#logo");
+  logo.style.opacity = lIn * (1 - lOut);
+  logo.style.filter = `blur(${(1 - lIn) * 30 + lOut * 20}px)`;
+  logo.style.transform = `scale(${lerp(1.18, 1, lIn) + lOut * 0.25})`;
+  $("#logo .mark").style.backgroundPosition = `${lerp(100, -50, E.inOutCubic(seg(t, 2.9, 3.8)))}% 0`;
+  $("#logo .tag").style.opacity = E.outCubic(seg(t, 3.1, 3.5));
+  $("#logo .tag").style.letterSpacing = `${lerp(0.6, 0.35, E.outExpo(seg(t, 3.1, 3.7)))}em`;
+
+  // ── Handy: Anflug, Schweben, Abflug ──
+  const pin = E.outBack(seg(t, 3.9, 5.1));
+  const pout = E.inOutCubic(seg(t, 12.85, 13.5));
+  const float = Math.sin(t * 1.6) * 10;
+  const tiltY = Math.sin(t * 0.8) * 4;
+  // Leichter Kamera-Zoom auf den Bereich, der gerade bedient wird
+  const zoomSize = E.inOutCubic(seg(t, 7.0, 7.4)) * (1 - E.inOutCubic(seg(t, 8.9, 9.3)));
+  // Grundgrösse 0.9 und hoch angesetzt: Die Bedienelemente bleiben über dem
+  // Bereich, den TikTok unten mit Name, Caption und Buttons überdeckt.
+  const ty = lerp(1500, 0, pin) + float + zoomSize * -20 + pout * 1600;
+  const rx = lerp(38, 6, pin) + pout * -30;
+  const ry = lerp(-24, -8, pin) + tiltY + pout * 25;
+  const rz = lerp(-14, 0, pin) + pout * 12;
+  const sc = lerp(0.74, 0.9, pin) + zoomSize * 0.06 - pout * 0.15;
+  show($("#phoneWrap"), t > 3.8 && t < 13.55);
+  show($("#phoneShadow"), t > 3.8 && t < 13.55);
+  $("#phoneWrap").style.transform = `translateY(${ty}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`;
+  $("#phoneShadow").style.opacity = clamp(pin) * (1 - pout) * 0.8;
+  $("#phoneShadow").style.transform = `scale(${0.8 + float / 100})`;
+  $("#shine").style.backgroundPosition = `${lerp(120, -40, (t * 0.12) % 1)}% 0`;
+
+  // ── Bildschirme: Wischübergänge ──
+  const toProduct = E.inOutCubic(seg(t, 6.15, 6.65));
+  const toCheckout = E.inOutCubic(seg(t, 9.35, 9.85));
+  const toDone = E.outCubic(seg(t, 11.55, 12.0));
+  $("#scrHome").style.transform = `translateX(${-toProduct * 100}%)`;
+  $("#scrProduct").style.transform = `translateX(${(1 - toProduct) * 100 - toCheckout * 100}%)`;
+  $("#scrCheckout").style.transform = `translateX(${(1 - toCheckout) * 100}%)`;
+  $("#scrDone").style.transform = `translateY(${(1 - toDone) * 100}%)`;
+
+  // ── Taps: Finger-Punkt + Welle, Ziel gibt nach ──
+  let tapOp = 0, tapScale = 1, tx = 0, tyy = 0, rip = 0, ripOp = 0;
+  for (const tap of TAPS) {
+    const local = t - tap.at;
+    const press = local > -0.12 && local < 0.12 ? 1 - Math.abs(local) / 0.12 : 0;
+    if (local > -0.45 && local < 0.4) {
+      tapOp = Math.max(tapOp, E.outCubic(seg(local, -0.45, -0.2)) * (1 - seg(local, 0.15, 0.4)));
+      tapScale = 1 - press * 0.25;
+      tx = tap.x; tyy = tap.y;
+    }
+    if (local >= 0 && local < 0.6) { rip = E.outCubic(seg(local, 0, 0.6)); ripOp = 1 - rip; tx = tap.x; tyy = tap.y; }
+    const target = $(tap.el);
+    target.dataset.press = Math.max(Number(target.dataset.press || 0), press);
+  }
+  $("#tap").style.cssText += `;left:${tx}px;top:${tyy}px;opacity:${tapOp};transform:scale(${tapScale})`;
+  $("#ripple").style.cssText += `;left:${tx}px;top:${tyy}px;opacity:${ripOp};transform:scale(${1 + rip * 1.6})`;
+  for (const tap of TAPS) {
+    const target = $(tap.el);
+    target.style.transform = `scale(${1 - Number(target.dataset.press) * 0.06})`;
+    target.dataset.press = 0;
+  }
+
+  // Grösse M wird ausgewählt
+  const mOn = t >= 7.55;
+  Object.assign($("#chipM").style, {
+    background: mOn ? "#1A3040" : "transparent",
+    color: mOn ? "#F8F3E8" : "#1A3040",
+    borderColor: mOn ? "#1A3040" : "rgba(26,48,64,0.2)",
+  });
+  // Warenkorb: Badge springt, Toast erscheint
+  $("#badge").style.transform = `scale(${E.outBack(seg(t, 8.45, 8.75))})`;
+  const toastP = E.outBack(seg(t, 8.5, 8.85)) * (1 - E.inCubic(seg(t, 9.25, 9.45)));
+  $("#toast").style.opacity = clamp(toastP);
+  $("#toast").style.transform = `translateY(${(1 - toastP) * -40}px) scale(${0.9 + toastP * 0.1})`;
+  // Bezahlen: Knopf lädt
+  const loading = t > 10.85 && t < 11.6;
+  $("#payLabel").style.opacity = loading || t >= 11.6 ? 0 : 1;
+  $("#spinner").style.opacity = loading ? 1 : 0;
+  $("#spinner").style.transform = `rotate(${t * 720}deg)`;
+  // Erfolg: Kreis und Haken zeichnen sich
+  $("#ring").style.strokeDashoffset = 276.5 * (1 - E.inOutCubic(seg(t, 11.9, 12.5)));
+  $("#check").style.strokeDashoffset = 62 * (1 - E.outCubic(seg(t, 12.35, 12.7)));
+  $$("#scrDone .h, #scrDone .s, #scrDone .m").forEach((el, i) => blurIn(el, t, 12.45 + i * 0.15, 0.5, null, 0, 30));
+
+  // ── Schritt-Beschriftung über dem Handy ──
+  blurIn($("#cap1"), t, 5.0, 0.5, 6.85, 0.3, 40);
+  blurIn($("#cap2"), t, 7.05, 0.5, 9.2, 0.3, 40);
+  blurIn($("#cap3"), t, 9.4, 0.5, 12.7, 0.3, 40);
+  $$(".cap .num").forEach((n, i) => {
+    const a = [5.0, 7.05, 9.4][i];
+    n.style.transform = `scale(${E.outBack(seg(t, a, a + 0.45))})`;
+  });
+
+  // ── Szene: "Drei Taps." ──
+  show($("#outro"), t > 13.4 && t < 15.3);
+  $$("#outro .word").forEach((w, i) => blurIn(w, t, [13.5, 13.65, 14.0, 14.12, 14.24, 14.36][i], 0.5, 14.85, 0.35));
+
+  // ── Endkarte ──
+  show($("#end"), t > 14.9);
+  blurIn($("#endMark"), t, 15.0, 0.6, null, 0, 50);
+  blurIn($("#endClaim"), t, 15.3, 0.5, null, 0, 40);
+  blurIn($("#endPrice"), t, 15.45, 0.5, null, 0, 40);
+  const urlP = E.outBack(seg(t, 15.75, 16.2));
+  $("#endUrl").style.opacity = clamp(urlP * 1.5);
+  $("#endUrl").style.transform = `scale(${0.7 + urlP * 0.3})`;
+  blurIn($("#endNote"), t, 16.0, 0.5, null, 0, 20);
+  $("#endMark").style.letterSpacing = `${lerp(0.14, 0.04, E.outExpo(seg(t, 15.0, 15.9)))}em`;
+};
+
+window.renderFrame(0);
+</script>
+</body>
+</html>
