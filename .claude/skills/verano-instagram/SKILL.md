@@ -25,12 +25,24 @@ es erzeugen und veröffentlicht es.
 - **Mischung pro Woche:** 1× Produkt-Reel, 1× Nutzen-Reel (Liste/Beratung),
   1× Persönliches oder Kundenstimme.
 
-## Musik: automatisch über die Audio API
+## Musik: Achtung, der API-Sound kommt nicht an
 
-Metas Audio API liefert Trending-Sounds und Suche (`--list-audio`), und das
-Publishing-Tool hängt den Sound beim Veröffentlichen an (`--audio trending`,
-`--audio "<suche>"`, `--audio-id <id>`). Das ist der Normalfall — Reels gehen
-**mit** Sound raus.
+**Stand 06.10.2026: `audio_configuration` wird von Instagram stillschweigend
+ignoriert.** Zwei Reels gingen trotz `--audio-id` ohne Ton raus (02.10. und
+06.10.), obwohl das Tool keinen Fehler meldete. Die offizielle Referenz von
+IG User Media kennt nur `audio_name`, kein `audio_configuration`.
+
+Bis das geklärt ist, gilt: **Ton gehört in die MP4 selbst.**
+
+- Code-Spots: `node tools/synth-soundtrack.mjs --html <spot.html> --out <ton.wav>`
+  erzeugt Musik + Geräusche aus `window.SOUND` im Spot; danach mit ffmpeg
+  zur Videospur legen (siehe `tools/render-html-video.mjs --audio`).
+- Andere Reels: lizenzfreie Musik in die Datei mischen, oder das Reel in
+  `.tmp/reels/manuell/` legen und Joel den Sound in der App wählen lassen.
+- Nach jedem Post mit API-Sound das Reel einmal anhören (lassen), bevor die
+  nächste Woche so geplant wird.
+
+Der Rest dieses Abschnitts beschreibt die API, wie sie gedacht war:
 
 Zwei Grenzen, die man kennen und beim Planen berücksichtigen muss:
 

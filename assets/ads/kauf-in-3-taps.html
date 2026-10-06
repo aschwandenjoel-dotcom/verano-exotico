@@ -245,6 +245,32 @@
 <script>
 window.VIDEO = { duration: 17, fps: 30, width: 1080, height: 1920 };
 
+// Tonspur (tools/synth-soundtrack.mjs): Musik-Abschnitte im 120-BPM-Raster
+// und Geräusche synchron zu den Bewegungen unten. Zeiten in Sekunden.
+// SOUND-START
+window.SOUND = {
+  bpm: 120,
+  duration: 17,
+  sections: { intro: [0, 4], groove: [4, 13], pause: [13, 15], outro: [15, 17] },
+  cues: [
+    { t: 2.45, type: "shimmer" },  // Logo
+    { t: 2.9, type: "riser", len: 1.1 },
+    { t: 3.9, type: "whoosh" },    // Handy fliegt ein
+    { t: 5.95, type: "tap" },      // Produkt
+    { t: 6.15, type: "swipe" },
+    { t: 7.55, type: "tap" },      // Grösse M
+    { t: 8.35, type: "tap" },      // Warenkorb
+    { t: 8.45, type: "pop" },      // Badge
+    { t: 9.35, type: "swipe" },
+    { t: 10.75, type: "tap" },     // Bezahlen
+    { t: 11.9, type: "success" },  // Bestellt!
+    { t: 12.85, type: "whoosh" },  // Handy fliegt weg
+    { t: 13.5, type: "hit" },      // "Drei Taps."
+    { t: 15.0, type: "impact" }    // Endkarte
+  ]
+};
+// SOUND-END
+
 // ── Hilfsfunktionen ──
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
