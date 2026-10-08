@@ -121,6 +121,9 @@ Original vor der Umstellung vom 08.10.2026: `.tmp/seo/backup-originaltexte-2026-
   brauchen bis zu mehreren Sekunden. Beim Abrufen vieler Seiten per Skript immer
   ein Timeout setzen (ein Aufruf ohne Timeout hing beim ersten Versuch endlos).
 - Beim Ansehen der Bilder fielen am 08.10.2026 Unstimmigkeiten zwischen Bildern
-  und Farb-/Produktdaten auf (z. B. ola mit Wickelrock, playa Ziegelrot anderes
-  Modell, lucia nur „Weiss" in den Daten, Micro-Push-up ohne sichtbaren Push-up).
-  Solche Funde nicht stillschweigend im Text glätten, sondern Joel melden.
+  und Farb-/Produktdaten auf (playa Ziegelrot anderes Modell, lucia nur „Weiss"
+  in den Daten, costa ist Wickeltop + Rock statt Kleid, cumbre-leopard mit zwei
+  verschiedenen Oberteilen, Micro-Push-up ohne sichtbaren Push-up → „String-Bikini").
+  Joel hat die gewählten Namen und Texte dazu bestätigt; der Wickelrock beim
+  Batik-Bikini (ola) wird wirklich mitgeliefert. Solche Funde nicht
+  stillschweigend im Text glätten, sondern Joel melden.
