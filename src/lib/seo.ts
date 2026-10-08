@@ -61,6 +61,22 @@ export function pageMetadata(
   };
 }
 
+/** Erster Absatz eines Produkttexts als Fliesstext (für Meta-Beschreibung). */
+export function firstParagraph(text: string | undefined, max = 160): string {
+  const para = (text ?? "").split(/\n\s*\n/)[0].replace(/\s+/g, " ").trim();
+  return para.length <= max ? para : `${para.slice(0, max - 1).replace(/\s+\S*$/, "")}…`;
+}
+
+/** Produkttext ohne Aufzählungszeichen, Zeilen zu Sätzen (für JSON-LD/Feeds). */
+export function plainText(text: string | undefined): string {
+  return (text ?? "")
+    .split("\n")
+    .map((l) => l.trim().replace(/^[–-]\s+/, ""))
+    .filter(Boolean)
+    .map((l) => (/[.!?…]$/.test(l) ? l : `${l}.`))
+    .join(" ");
+}
+
 /** Shop als Organisation + Website — einmal auf der Startseite. */
 export function organizationJsonLd() {
   return [
@@ -104,7 +120,7 @@ export function productJsonLd(product: Product, locale: Locale) {
       "@type": "Product",
       "@id": `${url}#product`,
       name: product.name[locale],
-      description: product.description[locale],
+      description: plainText(product.description[locale]),
       sku: product.slug,
       url,
       image: images,
@@ -139,6 +155,38 @@ export function productJsonLd(product: Product, locale: Locale) {
         { "@type": "ListItem", position: 1, name: SITE_NAME, item: `${SITE_URL}/${locale}` },
         { "@type": "ListItem", position: 2, name: "Shop", item: `${SITE_URL}/${locale}/collection` },
         { "@type": "ListItem", position: 3, name: product.name[locale], item: url },
+      ],
+    },
+  ];
+}
+
+/** Kategorieseite: Produktliste + Breadcrumb. */
+export function categoryJsonLd(locale: Locale, slug: string, name: string, products: Product[]) {
+  const url = `${SITE_URL}/${locale}/${slug}`;
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name,
+      url,
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: products.length,
+        itemListElement: products.map((p, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: `${SITE_URL}/${locale}/product/${p.slug}`,
+          name: p.name[locale],
+        })),
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: SITE_NAME, item: `${SITE_URL}/${locale}` },
+        { "@type": "ListItem", position: 2, name: "Shop", item: `${SITE_URL}/${locale}/collection` },
+        { "@type": "ListItem", position: 3, name, item: url },
       ],
     },
   ];

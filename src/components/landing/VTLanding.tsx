@@ -226,9 +226,9 @@ export default function VTLanding({ locale, products }: Props) {
           <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>
             {t("season", { year })}
           </span>
-          <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>
-            Golden Days, Timeless Wear
-          </span>
+          <h1 style={{ fontSize: "10px", fontWeight: 400, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", margin: 0 }}>
+            {t("seo_h1")}
+          </h1>
         </div>
 
         {/* Headline */}
@@ -239,14 +239,14 @@ export default function VTLanding({ locale, products }: Props) {
               {t("badge", { year })}
             </span>
           </div>
-          <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
             <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.02em", color: "#1A3040" }}>
               Golden Days,
             </span>
             <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", textTransform: "none", letterSpacing: "-0.02em" }}>
               Timeless Wear.
             </span>
-          </h1>
+          </p>
         </div>
 
         {/* Bottom row */}

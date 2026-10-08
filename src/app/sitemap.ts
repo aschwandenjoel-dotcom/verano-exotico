@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
 import { fetchProducts } from "@/lib/api";
+import { CATEGORIES } from "@/lib/categories";
 import { SITE_URL as BASE } from "@/lib/seo";
 
 const LOCALES = ["de", "en"] as const;
 
 /** Seiten mit deutscher und englischer Fassung (hreflang-Paare). */
-const TRANSLATED_PATHS = ["", "/collection", "/about"];
+const TRANSLATED_PATHS = ["", "/collection", ...CATEGORIES.map((c) => `/${c.slug}`), "/about"];
 /** Nur Deutsch — /en zeigt per Canonical auf /de, gehört also nicht in die Sitemap. */
 const GERMAN_ONLY_PATHS = ["/versand", "/faq", "/agb", "/widerruf", "/impressum", "/datenschutz"];
 
@@ -22,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       entries.push({
         url: `${BASE}/${locale}${path}`,
         changeFrequency: path === "/collection" ? "daily" : "weekly",
-        priority: path === "" ? 1 : path === "/collection" ? 0.9 : 0.5,
+        priority: path === "" ? 1 : path === "/about" ? 0.5 : 0.9,
         alternates: { languages: languages(path) },
       });
     }

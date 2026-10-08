@@ -23,6 +23,8 @@ function swimType(p: Product): "onepiece" | "set" | "bikini" {
 interface Props {
   products: Product[];
   locale: Locale;
+  /** Typ-Filter ausblenden (Kategorieseiten sind schon gefiltert). */
+  showFilters?: boolean;
 }
 
 /* ─── Single card ────────────────────────────────────────────── */
@@ -232,7 +234,7 @@ function BershkaCard({
 }
 
 /* ─── Main grid ──────────────────────────────────────────────── */
-export default function CollectionGrid({ products, locale }: Props) {
+export default function CollectionGrid({ products, locale, showFilters = true }: Props) {
   const t = useTranslations("collection");
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("default");
@@ -275,6 +277,7 @@ export default function CollectionGrid({ products, locale }: Props) {
           }}
         >
           {/* Filter pills */}
+          {showFilters && (
           <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
             {FILTERS.map((f) => (
               <button
@@ -299,6 +302,7 @@ export default function CollectionGrid({ products, locale }: Props) {
               </button>
             ))}
           </div>
+          )}
 
           {/* Sort + item count */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }}>

@@ -4,6 +4,8 @@ import ShopHeroCarousel from "@/components/sections/ShopHeroCarousel";
 import ShopShell from "@/components/ui/ShopShell";
 import { fetchProducts } from "@/lib/api";
 import { pageMetadata } from "@/lib/seo";
+import { CATEGORIES } from "@/lib/categories";
+import Link from "next/link";
 import type { Locale } from "@/types";
 
 export async function generateMetadata({
@@ -214,6 +216,23 @@ export default async function CollectionPage({
             boxShadow: "0 -8px 40px rgba(10,61,82,0.18)",
           }}
         >
+          {/* Kategorien — interne Links für Google und schnelle Navigation */}
+          <nav
+            aria-label={locale === "en" ? "Categories" : "Kategorien"}
+            className="flex gap-2 overflow-x-auto px-6 md:px-10 pt-6 pb-2"
+            style={{ scrollbarWidth: "none" }}
+          >
+            {CATEGORIES.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/${locale}/${c.slug}`}
+                className="px-4 py-2 text-[11px] font-mono rounded-full whitespace-nowrap"
+                style={{ border: "1px solid rgba(26,48,64,0.2)", color: "#1A3040" }}
+              >
+                {c[locale as Locale].label}
+              </Link>
+            ))}
+          </nav>
           <CollectionGrid products={products} locale={locale as Locale} />
         </div>
 

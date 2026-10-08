@@ -249,13 +249,38 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
             >
               {label}
             </h3>
-            <p className="text-sm leading-relaxed" style={{ color: "rgba(26,48,64,0.65)" }}>
-              {content}
-            </p>
+            <DetailText text={content} />
           </div>
         ))}
       </div>
 
+    </div>
+  );
+}
+
+/**
+ * Detailtext mit einfacher Gliederung: Leerzeile = neuer Absatz,
+ * Zeilen mit "– " oder "- " am Anfang = Aufzählung.
+ */
+function DetailText({ text }: { text: string }) {
+  const color = "rgba(26,48,64,0.65)";
+  return (
+    <div className="space-y-3">
+      {text.split(/\n\s*\n/).map((block, i) => {
+        const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
+        const isList = lines.length > 0 && lines.every((l) => /^[–-]\s/.test(l));
+        return isList ? (
+          <ul key={i} className="text-sm leading-relaxed list-disc pl-5 space-y-1" style={{ color }}>
+            {lines.map((l) => (
+              <li key={l}>{l.replace(/^[–-]\s+/, "")}</li>
+            ))}
+          </ul>
+        ) : (
+          <p key={i} className="text-sm leading-relaxed" style={{ color }}>
+            {lines.join(" ")}
+          </p>
+        );
+      })}
     </div>
   );
 }

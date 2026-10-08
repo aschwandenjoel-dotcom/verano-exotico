@@ -1,4 +1,5 @@
 import { fetchProducts } from "@/lib/api";
+import { plainText } from "@/lib/seo";
 import { calcShipping } from "@/lib/shipping";
 import type { Product } from "@/types";
 
@@ -50,7 +51,7 @@ function imagesOf(product: Product): string[] {
 }
 
 function describe(product: Product): string {
-  const parts = [product.description[FEED_LOCALE], product.material[FEED_LOCALE]].filter(Boolean);
+  const parts = [plainText(product.description[FEED_LOCALE]), product.material[FEED_LOCALE]].filter(Boolean);
   return parts.join(" ").slice(0, 5000);
 }
 
@@ -123,7 +124,7 @@ export async function GET() {
   <channel>
     <title>${esc(BRAND)}</title>
     <link>${SITE}/${FEED_LOCALE}</link>
-    <description>Bademode für endlose Sommer — Bikinis und Badeanzüge aus der Schweiz.</description>
+    <description>Bademode für endlose Sommer — Bikinis und Badeanzüge vom Schweizer Onlineshop.</description>
 ${items.join("\n")}
   </channel>
 </rss>

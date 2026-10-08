@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { CATEGORIES } from "@/lib/categories";
 
 const INSTAGRAM_URL = "https://www.instagram.com/veranoexotico/";
 
@@ -18,6 +19,11 @@ const linkStyle: React.CSSProperties = {
 export default function Footer() {
   const t = useTranslations("footer");
   const locale = useLocale();
+
+  const categoryLinks = CATEGORIES.map((c) => ({
+    href: `/${locale}/${c.slug}`,
+    label: c[locale === "en" ? "en" : "de"].label,
+  }));
 
   const links = [
     { href: `/${locale}/versand`, label: t("links_shipping") },
@@ -63,6 +69,18 @@ export default function Footer() {
               </a>
             </div>
 
+            <div style={{ display: "flex", flexDirection: "column", rowGap: "20px" }}>
+            <nav aria-label={locale === "en" ? "Categories" : "Kategorien"} style={{ display: "flex", columnGap: "28px", rowGap: "16px", flexWrap: "wrap" }}>
+              {categoryLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  style={{ ...linkStyle, color: "#1A3040" }}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
             <div style={{ display: "flex", columnGap: "28px", rowGap: "16px", flexWrap: "wrap" }}>
               {links.map((link) => (
                 <a
@@ -75,6 +93,7 @@ export default function Footer() {
                   {link.label}
                 </a>
               ))}
+            </div>
             </div>
           </div>
 

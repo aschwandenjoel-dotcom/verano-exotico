@@ -7,7 +7,7 @@ import ProductView from "@/components/ui/ProductView";
 import ReviewSection from "@/components/ui/ReviewSection";
 import CustomerVoices from "@/components/ui/CustomerVoices";
 import { fetchProductBySlug, fetchProducts } from "@/lib/api";
-import { pageMetadata, productJsonLd } from "@/lib/seo";
+import { firstParagraph, pageMetadata, productJsonLd } from "@/lib/seo";
 import type { Locale } from "@/types";
 
 export async function generateStaticParams() {
@@ -27,7 +27,7 @@ export async function generateMetadata({
   if (!product) return {};
   const loc = locale as Locale;
   const title = `${product.name[loc]} — Verano Exotico`;
-  const description = (product.description[loc] ?? "").slice(0, 160);
+  const description = firstParagraph(product.description[loc]);
   const image = product.colorImages?.[0] || product.images?.[0];
   return pageMetadata(locale, `/product/${slug}`, title, description, { image });
 }
