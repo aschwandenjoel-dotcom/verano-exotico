@@ -7,6 +7,11 @@ import { renderSwissQrDataUrl } from "@/lib/swissQr";
 import { paymentMode } from "@/lib/stripe";
 import type { Locale } from "@/types";
 
+export const metadata = {
+  title: "Bestellbestätigung – Verano Exotico",
+  robots: { index: false, follow: false },
+};
+
 interface OrderRow {
   id: string;
   order_number: number;

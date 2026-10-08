@@ -220,10 +220,24 @@
     "copyright": "© 2025 Verano Exotico. Alle Rechte vorbehalten."
   },
   "meta": {
-    "home_title": "Verano Exotico — Bademode für endlose Sommer",
-    "home_description": "Sorgfältig kuratierte Bikinis, Badeanzüge und Beach-Sets. Lieferung nach CH, DE, AT & LI in 5–14 Werktagen.",
-    "collection_title": "Shop — Verano Exotico",
-    "about_title": "Über uns — Verano Exotico"
+    "home_title": "Bikinis & Bademode online kaufen | Verano Exotico",
+    "home_description": "Bikinis, Badeanzüge und Beach-Sets für endlose Sommer. Schweizer Onlineshop — bezahlen mit TWINT oder Karte, Versand in die Schweiz ab CHF 4.90.",
+    "collection_title": "Alle Bikinis & Badeanzüge — Shop | Verano Exotico",
+    "about_title": "Über uns — Verano Exotico",
+    "collection_description": "Entdecke alle Bikinis, Badeanzüge und Beach-Sets von Verano Exotico. Viele Farben und Grössen, TWINT oder Karte, Versand in die Schweiz ab CHF 4.90.",
+    "about_description": "Wer hinter Verano Exotico steckt und wie wir unsere Bademode aussuchen: ein kleiner Schweizer Onlineshop für Bikinis und Beach-Sets.",
+    "faq_title": "FAQ — Lieferung, Grössen & Bezahlung | Verano Exotico",
+    "faq_description": "Antworten zu Lieferzeit, Versandkosten, Grössen, Rückgabe und Bezahlung mit TWINT oder Karte bei Verano Exotico.",
+    "versand_title": "Versand & Rückgabe — Verano Exotico",
+    "versand_description": "Versandkosten und Lieferzeiten für die Schweiz, Europa und weltweit sowie alles zu Rückgabe und Reklamation.",
+    "widerruf_title": "Rückgabe & Reklamation — Verano Exotico",
+    "widerruf_description": "So meldest du einen Mangel und so läuft eine Rücksendung bei Verano Exotico ab.",
+    "agb_title": "AGB — Verano Exotico",
+    "agb_description": "Allgemeine Geschäftsbedingungen des Onlineshops Verano Exotico.",
+    "impressum_title": "Impressum — Verano Exotico",
+    "impressum_description": "Impressum und Kontakt von Verano Exotico.",
+    "datenschutz_title": "Datenschutzerklärung — Verano Exotico",
+    "datenschutz_description": "Wie Verano Exotico deine Daten bei Bestellung, Zahlung und Newsletter verarbeitet."
   },
   "landing": {
     "season": "Sommer {year}",

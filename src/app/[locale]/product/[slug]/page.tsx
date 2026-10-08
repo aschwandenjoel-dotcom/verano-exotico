@@ -7,6 +7,7 @@ import ProductView from "@/components/ui/ProductView";
 import ReviewSection from "@/components/ui/ReviewSection";
 import CustomerVoices from "@/components/ui/CustomerVoices";
 import { fetchProductBySlug, fetchProducts } from "@/lib/api";
+import { pageMetadata, productJsonLd } from "@/lib/seo";
 import type { Locale } from "@/types";
 
 export async function generateStaticParams() {
@@ -27,19 +28,8 @@ export async function generateMetadata({
   const loc = locale as Locale;
   const title = `${product.name[loc]} — Verano Exotico`;
   const description = (product.description[loc] ?? "").slice(0, 160);
-  const image = product.colorImages?.[0] ?? product.images?.[0];
-  return {
-    title,
-    description,
-    alternates: {
-      languages: { de: `/de/product/${slug}`, en: `/en/product/${slug}` },
-    },
-    openGraph: {
-      title,
-      description,
-      ...(image ? { images: [{ url: image }] } : {}),
-    },
-  };
+  const image = product.colorImages?.[0] || product.images?.[0];
+  return pageMetadata(locale, `/product/${slug}`, title, description, { image });
 }
 
 export default async function ProductPage({
@@ -55,27 +45,8 @@ export default async function ProductPage({
   const t = await getTranslations({ locale, namespace: "product" });
   const loc = locale as Locale;
 
-  // Strukturierte Daten für Google (Preis, Verfügbarkeit, Bilder)
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const images = [...(product.colorImages ?? []), ...(product.images ?? [])]
-    .filter(Boolean)
-    .slice(0, 6)
-    .map((img) => `${base}${img}`);
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.name[loc],
-    description: product.description[loc],
-    image: images,
-    brand: { "@type": "Brand", name: "Verano Exotico" },
-    offers: {
-      "@type": "Offer",
-      url: `${base}/${loc}/product/${product.slug}`,
-      priceCurrency: "CHF",
-      price: product.price.toFixed(2),
-      availability: "https://schema.org/InStock",
-    },
-  };
+  // Strukturierte Daten für Google (Preis, Versand, Bilder, Breadcrumb)
+  const jsonLd = productJsonLd(product, loc);
 
   return (
     <ShopShell locale={loc}>

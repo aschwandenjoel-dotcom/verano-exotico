@@ -2,10 +2,19 @@ import type React from "react";
 import ConsentReset from "@/components/ui/ConsentReset";
 import ShopShell from "@/components/ui/ShopShell";
 import type { Locale } from "@/types";
+import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Datenschutzerklärung – Verano Exotico",
-};
+// Inhalt gibt es nur auf Deutsch — /en/datenschutz zeigt per Canonical auf /de/datenschutz.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale: "de", namespace: "meta" });
+  return pageMetadata(locale, "/datenschutz", t("datenschutz_title"), t("datenschutz_description"), { germanOnly: true });
+}
 
 export default async function DatenschutzPage({
   params,

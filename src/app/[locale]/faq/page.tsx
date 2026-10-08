@@ -1,9 +1,18 @@
 import { LegalPage, Section } from "@/components/ui/LegalSections";
 import type { Locale } from "@/types";
+import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "FAQ – Verano Exotico",
-};
+// Inhalt gibt es nur auf Deutsch — /en/faq zeigt per Canonical auf /de/faq.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale: "de", namespace: "meta" });
+  return pageMetadata(locale, "/faq", t("faq_title"), t("faq_description"), { germanOnly: true });
+}
 
 export default async function FaqPage({
   params,

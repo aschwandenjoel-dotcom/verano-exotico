@@ -1,10 +1,19 @@
 import type React from "react";
 import ShopShell from "@/components/ui/ShopShell";
 import type { Locale } from "@/types";
+import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Impressum – Verano Exotico",
-};
+// Inhalt gibt es nur auf Deutsch — /en/impressum zeigt per Canonical auf /de/impressum.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale: "de", namespace: "meta" });
+  return pageMetadata(locale, "/impressum", t("impressum_title"), t("impressum_description"), { germanOnly: true });
+}
 
 export default async function ImpressumPage({
   params,

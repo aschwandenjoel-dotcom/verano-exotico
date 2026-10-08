@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 import BrandStory from "@/components/sections/BrandStory";
 import ShopShell from "@/components/ui/ShopShell";
 import type { Locale } from "@/types";
@@ -10,7 +11,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
-  return { title: t("about_title") };
+  return pageMetadata(locale, "/about", t("about_title"), t("about_description"));
 }
 
 export default async function AboutPage({

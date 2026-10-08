@@ -54,9 +54,6 @@ export async function generateMetadata({
     },
     title: t("home_title"),
     description: t("home_description"),
-    alternates: {
-      languages: { de: "/de", en: "/en" },
-    },
     openGraph: {
       type: "website",
       siteName: "Verano Exotico",

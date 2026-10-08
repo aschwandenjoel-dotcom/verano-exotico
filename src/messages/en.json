@@ -220,10 +220,12 @@
     "copyright": "© 2025 Verano Exotico. All rights reserved."
   },
   "meta": {
-    "home_title": "Verano Exotico — Swimwear for endless summers",
-    "home_description": "Carefully curated bikinis, one-pieces and beach sets. Delivery to CH, DE, AT & LI in 5–14 business days.",
-    "collection_title": "Shop — Verano Exotico",
-    "about_title": "About us — Verano Exotico"
+    "home_title": "Bikinis & Swimwear Online | Verano Exotico",
+    "home_description": "Bikinis, one-pieces and beach sets for endless summers. Swiss online shop — pay with TWINT or card, shipping to Switzerland from CHF 4.90.",
+    "collection_title": "All Bikinis & Swimsuits — Shop | Verano Exotico",
+    "about_title": "About us — Verano Exotico",
+    "collection_description": "Browse all bikinis, swimsuits and beach sets by Verano Exotico. Many colours and sizes, TWINT or card, shipping to Switzerland from CHF 4.90.",
+    "about_description": "Who is behind Verano Exotico and how we choose our swimwear: a small Swiss online shop for bikinis and beach sets."
   },
   "landing": {
     "season": "Summer {year}",

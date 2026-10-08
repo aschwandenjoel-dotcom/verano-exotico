@@ -1,9 +1,18 @@
 import { LegalPage, Section } from "@/components/ui/LegalSections";
 import type { Locale } from "@/types";
+import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "AGB – Verano Exotico",
-};
+// Inhalt gibt es nur auf Deutsch — /en/agb zeigt per Canonical auf /de/agb.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale: "de", namespace: "meta" });
+  return pageMetadata(locale, "/agb", t("agb_title"), t("agb_description"), { germanOnly: true });
+}
 
 export default async function AgbPage({
   params,

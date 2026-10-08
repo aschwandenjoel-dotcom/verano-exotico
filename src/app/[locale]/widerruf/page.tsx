@@ -1,9 +1,18 @@
 import { LegalPage, Section, ulStyle } from "@/components/ui/LegalSections";
 import type { Locale } from "@/types";
+import { getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Rückgabe & Reklamation – Verano Exotico",
-};
+// Inhalt gibt es nur auf Deutsch — /en/widerruf zeigt per Canonical auf /de/widerruf.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale: "de", namespace: "meta" });
+  return pageMetadata(locale, "/widerruf", t("widerruf_title"), t("widerruf_description"), { germanOnly: true });
+}
 
 export default async function WiderrufPage({
   params,

@@ -3,6 +3,7 @@ import CollectionGrid from "@/components/sections/CollectionGrid";
 import ShopHeroCarousel from "@/components/sections/ShopHeroCarousel";
 import ShopShell from "@/components/ui/ShopShell";
 import { fetchProducts } from "@/lib/api";
+import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/types";
 
 export async function generateMetadata({
@@ -12,7 +13,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
-  return { title: t("collection_title") };
+  return pageMetadata(locale, "/collection", t("collection_title"), t("collection_description"));
 }
 
 export default async function CollectionPage({

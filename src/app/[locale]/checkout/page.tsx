@@ -5,6 +5,7 @@ import type { Locale } from "@/types";
 
 export const metadata = {
   title: "Kasse – Verano Exotico",
+  robots: { index: false, follow: true },
 };
 
 export default async function CheckoutPage({

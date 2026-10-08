@@ -43,6 +43,8 @@ export default function ProductGallery({ product, locale, activeColor, onSelectC
   }
 
   const mainSrc = sel.k === "color" ? colorSrc(sel.i) : general[sel.i];
+  const name = product.name[locale];
+  const mainAlt = sel.k === "color" && colorNames[sel.i] ? `${name} – ${colorNames[sel.i]}` : name;
 
   // Thumbnails: erst pro Farbe (mit Bild), dann die allgemeinen Produktfotos
   const colorThumbs = colors
@@ -59,7 +61,7 @@ export default function ProductGallery({ product, locale, activeColor, onSelectC
         <Image
           key={mainSrc}
           src={mainSrc}
-          alt={product.name.de}
+          alt={mainAlt}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
           style={{ objectFit: "contain" }}
@@ -112,7 +114,7 @@ export default function ProductGallery({ product, locale, activeColor, onSelectC
                 flexShrink: 0, background: "#EDE9E2", cursor: "pointer", padding: 0,
               }}
             >
-              <Image src={colorImages[i]} alt={colorNames[i] ?? ""} fill sizes="60px" className="object-cover object-top" />
+              <Image src={colorImages[i]} alt={colorNames[i] ? `${name} – ${colorNames[i]}` : name} fill sizes="60px" className="object-cover object-top" />
             </button>
           );
         })}
@@ -131,14 +133,14 @@ export default function ProductGallery({ product, locale, activeColor, onSelectC
                 flexShrink: 0, background: "#EDE9E2", cursor: "pointer", padding: 0,
               }}
             >
-              <Image src={src} alt="" fill sizes="60px" className="object-cover object-top" />
+              <Image src={src} alt={name} fill sizes="60px" className="object-cover object-top" />
             </button>
           );
         })}
       </div>
 
       {zoomOpen && mainSrc && (
-        <ZoomOverlay src={mainSrc} alt={product.name.de} onClose={() => setZoomOpen(false)} />
+        <ZoomOverlay src={mainSrc} alt={mainAlt} onClose={() => setZoomOpen(false)} />
       )}
     </div>
   );
