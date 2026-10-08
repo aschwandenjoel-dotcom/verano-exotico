@@ -18,6 +18,7 @@ function rowToProduct(row: Record<string, unknown>): Product {
     },
     sizes: parseJson<string[]>(row.sizes, []),
     images: parseJson<string[]>(row.images, []),
+    colorImages: parseJson<string[]>(row.color_images, []),
     description: { de: row.description_de as string, en: row.description_en as string },
     material: { de: row.material_de as string, en: row.material_en as string },
     care: { de: row.care_de as string, en: row.care_en as string },

@@ -1,3 +1,4 @@
+import imageOverrides from "@/data/feed-image-overrides.json";
 import { fetchProducts } from "@/lib/api";
 import { plainText } from "@/lib/seo";
 import { calcShipping } from "@/lib/shipping";
@@ -13,9 +14,18 @@ import type { Product } from "@/types";
  * Liegt bewusst unter /feed/ und nicht unter /api/: robots.txt sperrt /api/
  * für Crawler, und Google holt den Feed mit dem Googlebot ab.
  *
- * Eine Zeile pro Grösse (item_group_id = Produkt), weil Google für Bekleidung
- * Varianten mit `size` erwartet. Preise in CHF, Sprache Deutsch, Land Schweiz —
- * für DE/AT wäre ein zweiter Feed mit EUR-Preisen nötig (siehe Doku).
+ * Eine Zeile pro Farbe × Grösse (item_group_id = Produkt): Google erlaubt pro
+ * Artikel höchstens drei Farben und verlangt, dass das Hauptbild genau die
+ * angegebene Farbe zeigt. Produkte mit nur einer Farbe behalten ihre alten IDs
+ * (`<slug>-<grösse>`), mehrfarbige bekommen `<slug>-c<index>-<grösse>`.
+ * Der Link führt mit `?farbe=<index>` direkt zur passenden Farbe.
+ *
+ * `src/data/feed-image-overrides.json` ersetzt das Hauptbild einzelner Farben —
+ * für Artikel, die Google wegen zu freizügiger Modelbilder als „nur für
+ * Erwachsene" abgelehnt hat (Format: { slug: { farbindex: "/products/…" } }).
+ *
+ * Preise in CHF, Sprache Deutsch, Land Schweiz — für DE/AT wäre ein zweiter
+ * Feed mit EUR-Preisen nötig (siehe Doku).
  */
 export const revalidate = 3600;
 
@@ -42,12 +52,39 @@ function absolute(path: string): string {
   return path.startsWith("http") ? path : `${SITE}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
-/** Hauptbild wie im Shop: Galerie zuerst, sonst das erste Farbbild. */
-function imagesOf(product: Product): string[] {
-  const gallery = product.images ?? [];
-  const colorImages = (product.colorImages ?? []).filter(Boolean);
-  const all = [...gallery, ...colorImages.filter((img) => !gallery.includes(img))];
-  return all.map(absolute);
+const OVERRIDES = imageOverrides as Record<string, Record<string, string>>;
+
+interface Variant {
+  /** Index in colors/colorNames/colorImages; null = Produkt ohne Farbangabe */
+  colorIndex: number | null;
+  colorName: string | null;
+  image: string;
+  /** Mehrere Farben → Farbe in ID, Titel und Link */
+  multiColor: boolean;
+}
+
+/** Eine Variante pro Farbe, jeweils mit dem Bild genau dieser Farbe. */
+function variantsOf(product: Product): Variant[] {
+  const names = product.colorNames?.[FEED_LOCALE] ?? [];
+  const colorImages = product.colorImages ?? [];
+  const gallery = (product.images ?? []).filter(Boolean);
+  const override = OVERRIDES[product.slug] ?? {};
+  const imageFor = (i: number) => override[String(i)] || colorImages[i] || "";
+
+  if (names.length <= 1) {
+    const image = imageFor(0) || gallery[0] || "";
+    return image ? [{ colorIndex: names.length ? 0 : null, colorName: names[0] ?? null, image, multiColor: false }] : [];
+  }
+  return names
+    .map((name, i) => ({ colorIndex: i, colorName: name, image: imageFor(i), multiColor: true }))
+    // Ohne eigenes Farbbild fällt die Farbe weg: ein Galeriebild zeigte die falsche Farbe.
+    .filter((v) => v.image);
+}
+
+/** Weitere Bilder: Galerie ohne das Hauptbild — bei ersetzten Bildern keine, damit Google nur das sichere Bild prüft. */
+function moreImages(product: Product, main: string): string[] {
+  if (OVERRIDES[product.slug]) return [];
+  return (product.images ?? []).filter((img) => img && img !== main).slice(0, 10);
 }
 
 function describe(product: Product): string {
@@ -55,19 +92,23 @@ function describe(product: Product): string {
   return parts.join(" ").slice(0, 5000);
 }
 
-function itemXml(product: Product, size: string | null, images: string[]): string {
-  const id = size ? `${product.slug}-${size}` : product.slug;
-  const colorName = (product.colorNames?.[FEED_LOCALE] ?? []).filter(Boolean).join("/");
-  const link = `${SITE}/${FEED_LOCALE}/product/${product.slug}`;
-  const [main, ...more] = images;
+function itemXml(product: Product, variant: Variant, size: string | null): string {
+  const colorPart = variant.multiColor ? `-c${variant.colorIndex}` : "";
+  const id = `${product.slug}${colorPart}${size ? `-${size}` : ""}`;
+  const title = variant.multiColor && variant.colorName
+    ? `${product.name[FEED_LOCALE]} – ${variant.colorName}`
+    : product.name[FEED_LOCALE];
+  const link = `${SITE}/${FEED_LOCALE}/product/${product.slug}${variant.multiColor ? `?farbe=${variant.colorIndex}` : ""}`;
+  const main = absolute(variant.image);
+  const more = moreImages(product, variant.image).map(absolute);
 
   const fields: Array<[string, string]> = [
     ["g:id", id],
-    ["g:title", product.name[FEED_LOCALE]],
+    ["g:title", title.slice(0, 150)],
     ["g:description", describe(product)],
     ["g:link", link],
     ["g:image_link", main],
-    ...more.slice(0, 10).map((img): [string, string] => ["g:additional_image_link", img]),
+    ...more.map((img): [string, string] => ["g:additional_image_link", img]),
     ["g:availability", "in_stock"],
     ["g:price", chf(product.price)],
     ["g:brand", BRAND],
@@ -80,11 +121,9 @@ function itemXml(product: Product, size: string | null, images: string[]): strin
     // Bekleidungsartikel ab.
     ["g:identifier_exists", "no"],
   ];
-  if (colorName) fields.push(["g:color", colorName]);
-  if (size) {
-    fields.push(["g:size", size]);
-    fields.push(["g:item_group_id", product.slug]);
-  }
+  if (variant.colorName) fields.push(["g:color", variant.colorName]);
+  if (size) fields.push(["g:size", size]);
+  if (size || variant.multiColor) fields.push(["g:item_group_id", product.slug]);
   if (product.isNew) fields.push(["g:custom_label_0", "new"]);
 
   const body = fields.map(([tag, value]) => `      <${tag}>${esc(value)}</${tag}>`).join("\n");
@@ -109,13 +148,11 @@ export async function GET() {
 
   const items: string[] = [];
   for (const product of products) {
-    const images = imagesOf(product);
-    if (images.length === 0) continue; // Google lehnt Artikel ohne Bild ab
     const sizes = (product.sizes ?? []).filter(Boolean);
-    if (sizes.length === 0) {
-      items.push(itemXml(product, null, images));
-    } else {
-      for (const size of sizes) items.push(itemXml(product, size, images));
+    // Varianten ohne Bild fallen weg — Google lehnt Artikel ohne Bild ab
+    for (const variant of variantsOf(product)) {
+      if (sizes.length === 0) items.push(itemXml(product, variant, null));
+      else for (const size of sizes) items.push(itemXml(product, variant, size));
     }
   }
 
