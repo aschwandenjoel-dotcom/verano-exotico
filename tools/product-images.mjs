@@ -74,7 +74,7 @@ if (cmd === "convert") {
   if (model) {
     // Gemini liefert fast genau 4:5 – nur ein paar Pixel Rand fallen weg
     await sharp(model)
-      .resize(W, H, { fit: "cover", position: "centre" })
+      .resize(W, H, { fit: "cover", position: "centre", withoutEnlargement: true }) // kleine Bilder nicht aufblasen
       .withXmp(AI_XMP)
       .jpeg({ quality: 88, mozjpeg: true })
       .toFile(`${ROOT}public${modelPath}`);
