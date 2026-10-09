@@ -52,10 +52,10 @@ export default async function AgbPage({
         </p>
         <p style={{ marginTop: "12px" }}>
           Die Zahlung erfolgt <strong>per Kreditkarte, Debitkarte oder TWINT</strong> über
-          unseren Zahlungsdienstleister Stripe. Nach dem Absenden der Bestellung werden Sie
-          auf die gesicherte Bezahlseite von Stripe weitergeleitet; Ihre Karten- und
-          Zahlungsdaten werden ausschliesslich dort erfasst und gelangen nicht auf unsere
-          Systeme. Der Kaufvertrag kommt mit erfolgreicher Zahlung zustande. Es fallen
+          unseren Zahlungsdienstleister Stripe. Aus dem Warenkorb werden Sie auf die
+          gesicherte Bezahlseite von Stripe weitergeleitet und geben dort Lieferadresse
+          und Zahlungsdaten ein; Ihre Karten- und Zahlungsdaten werden ausschliesslich dort
+          erfasst und gelangen nicht auf unsere Systeme. Der Kaufvertrag kommt mit erfolgreicher Zahlung zustande. Es fallen
           keine zusätzlichen Zahlungsgebühren an.
         </p>
       </Section>

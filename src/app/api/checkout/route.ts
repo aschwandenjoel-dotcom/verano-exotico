@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { query, queryOne, parseJson, toJson } from "@/lib/db";
-import { calcShipping, isShippingCountry } from "@/lib/shipping";
+import { calcShipping, isShippingCountry, zoneCountries } from "@/lib/shipping";
 import { CURRENCIES, convert } from "@/lib/currency";
 import { sendOrderConfirmation, sendAdminNewOrderNotification } from "@/lib/email";
 import { paymentMode, stripe, toMinorUnits } from "@/lib/stripe";
@@ -62,6 +62,12 @@ interface OrderRow {
  * - `prepay`: Kunde erhält sofort die Zahlungsanweisungen per E-Mail
  *   (IBAN + Referenz VE-Nr); CJ-Fulfillment startet, wenn der Admin die
  *   Zahlung im /admin bestätigt.
+ *
+ * Schnellkasse (`express: true`, nur Stripe): Der Warenkorb schickt nur Artikel,
+ * Lieferland, Währung und Newsletter-Häkchen. Name, E-Mail, Telefon und Adresse
+ * erfasst Stripe auf der Bezahlseite; der Webhook trägt sie in die Bestellung
+ * nach. Das Lieferland bestimmt nur die Versandzone — Stripe lässt danach jede
+ * Adresse innerhalb dieser Zone zu.
  */
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -72,6 +78,12 @@ export async function POST(req: Request) {
   const mode = paymentMode();
   if (mode === "stripe" && !process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json({ error: "payment_unavailable" }, { status: 503 });
+  }
+
+  const express = body.express === true;
+  if (express && mode !== "stripe") {
+    // Vorkasse braucht die Adresse vorab — der Warenkorb leitet dann aufs Formular.
+    return NextResponse.json({ error: "use_form" }, { status: 409 });
   }
 
   const locale = body.locale === "en" ? "en" : "de";
@@ -93,10 +105,12 @@ export async function POST(req: Request) {
   // Häkchen "Newsletter & Erinnerung" — muss aktiv gesetzt sein, nie vorausgefüllt.
   const marketingConsent = body.newsletter === true;
 
-  if (name.length < 2) return NextResponse.json({ error: "name" }, { status: 400 });
-  if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "email" }, { status: 400 });
-  if (phone.replace(/\D/g, "").length < 7) return NextResponse.json({ error: "phone" }, { status: 400 });
-  if (!address.line1 || !address.city || !address.postal_code) return NextResponse.json({ error: "address" }, { status: 400 });
+  if (!express) {
+    if (name.length < 2) return NextResponse.json({ error: "name" }, { status: 400 });
+    if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "email" }, { status: 400 });
+    if (phone.replace(/\D/g, "").length < 7) return NextResponse.json({ error: "phone" }, { status: 400 });
+    if (!address.line1 || !address.city || !address.postal_code) return NextResponse.json({ error: "address" }, { status: 400 });
+  }
   if (!isShippingCountry(address.country)) return NextResponse.json({ error: "country" }, { status: 400 });
   if (!CURRENCIES.some((c) => c.code === currency)) {
     return NextResponse.json({ error: "currency", allowed: CURRENCIES.map((c) => c.code) }, { status: 400 });
@@ -206,13 +220,16 @@ export async function POST(req: Request) {
         100
       : Math.round(convert(total, currency) * 100) / 100;
 
-  // Bestellung anlegen — Telefon wandert mit in die Lieferadresse (für CJ nötig)
+  // Bestellung anlegen — Telefon wandert mit in die Lieferadresse (für CJ nötig).
+  // Schnellkasse: Kundendaten fehlen noch, der Webhook füllt sie aus der Session.
   const orderId = randomUUID();
   try {
     await query(
       `INSERT INTO orders (id, customer_email, customer_name, shipping_address, subtotal, payment_currency, payment_amount, locale, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
-      [orderId, email, name, toJson({ ...address, phone }), total, currency, paymentAmount, locale]
+      express
+        ? [orderId, "", null, null, total, currency, paymentAmount, locale]
+        : [orderId, email, name, toJson({ ...address, phone }), total, currency, paymentAmount, locale]
     );
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Bestellung fehlgeschlagen" }, { status: 500 });
@@ -229,9 +246,13 @@ export async function POST(req: Request) {
     await query("UPDATE orders SET marketing_consent = true WHERE id = ?", [order.id]).catch((err) =>
       console.error("[checkout] marketing_consent:", err instanceof Error ? err.message : err)
     );
-    await subscribeViaCheckout(email, locale).catch((err) =>
-      console.error("[checkout] Newsletter-Eintrag:", err instanceof Error ? err.message : err)
-    );
+    // Bei der Schnellkasse ist die E-Mail-Adresse erst nach Stripe bekannt — dann trägt
+    // der Webhook ein (src/app/api/stripe/webhook/route.ts).
+    if (!express) {
+      await subscribeViaCheckout(email, locale).catch((err) =>
+        console.error("[checkout] Newsletter-Eintrag:", err instanceof Error ? err.message : err)
+      );
+    }
   }
 
   try {
@@ -281,7 +302,24 @@ export async function POST(req: Request) {
               },
             },
           ],
-          customer_email: email,
+          ...(express
+            ? {
+                // Stripe fragt Lieferadresse und Telefon ab (CJ braucht beides)
+                // und lässt nur Länder der gewählten Versandzone zu.
+                shipping_address_collection: {
+                  allowed_countries: zoneCountries(address.country) as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[],
+                },
+                phone_number_collection: { enabled: true },
+                custom_text: {
+                  submit: {
+                    message:
+                      locale === "en"
+                        ? `By paying you accept our [terms](${base}/en/agb) and have read our [returns policy](${base}/en/widerruf).`
+                        : `Mit der Zahlung akzeptierst du unsere [AGB](${base}/de/agb) und hast die Bedingungen zu [Rückgabe & Reklamation](${base}/de/widerruf) zur Kenntnis genommen.`,
+                  },
+                },
+              }
+            : { customer_email: email }),
           client_reference_id: order.id,
           // Der Webhook findet die Bestellung ausschliesslich hierüber — nicht
           // über eine DB-Spalte, damit er auch ohne Migration funktioniert.
@@ -290,18 +328,23 @@ export async function POST(req: Request) {
             description: `Verano Exotico VE-${order.order_number}`,
             metadata: { orderId: order.id, orderNumber: String(order.order_number) },
             // Lieferadresse mitgeben: verbessert die Betrugserkennung (Radar) und
-            // liegt bei einer Rückbuchung als Beleg im Stripe-Dashboard.
-            shipping: {
-              name,
-              phone,
-              address: {
-                line1: address.line1,
-                line2: address.line2 ?? undefined,
-                city: address.city,
-                postal_code: address.postal_code,
-                country: address.country,
-              },
-            },
+            // liegt bei einer Rückbuchung als Beleg im Stripe-Dashboard. Bei der
+            // Schnellkasse übernimmt Stripe die selbst erfasste Adresse.
+            ...(express
+              ? {}
+              : {
+                  shipping: {
+                    name,
+                    phone,
+                    address: {
+                      line1: address.line1,
+                      line2: address.line2 ?? undefined,
+                      city: address.city,
+                      postal_code: address.postal_code,
+                      country: address.country,
+                    },
+                  },
+                }),
           },
           // Kennzeichnet diesen Checkout-Flow im Stripe-Dashboard (Auswertung
           // pro Integration). Fester Wert, der Suffix ist Stripe-Konvention.

@@ -84,6 +84,25 @@ export function isShippingCountry(c: string): boolean {
   return SHIPPING_COUNTRIES.includes(c);
 }
 
+/**
+ * Länder, die wir beliefern, Stripe Checkout aber nicht als Lieferland
+ * anbietet (Mikronesien, Marshallinseln, Palau). Ein solcher Code in
+ * `allowed_countries` lässt die ganze Session scheitern.
+ */
+const STRIPE_UNSUPPORTED = ["FM", "MH", "PW"];
+
+/**
+ * Alle Lieferländer derselben Versandzone. Die Versandkosten hängen nur von
+ * Zone und Artikelanzahl ab — beschränkt die Stripe-Bezahlseite die Adresse
+ * auf diese Länder, stimmt der vorab berechnete Versand für jede Adresse.
+ */
+export function zoneCountries(country: string): string[] {
+  const key = zoneFor(country);
+  if (!key) return [];
+  const list = key === "near" ? NEAR_COUNTRIES : key === "europe" ? EUROPE_COUNTRIES : WORLD_COUNTRIES;
+  return list.filter((c) => !EXCLUDED_COUNTRIES.includes(c) && !STRIPE_UNSUPPORTED.includes(c));
+}
+
 /** Versandkosten in CHF für ein Zielland und die Gesamtzahl der Artikel. */
 export function calcShipping(country: string, itemCount: number): number {
   const key = zoneFor(country);

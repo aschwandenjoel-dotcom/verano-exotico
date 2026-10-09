@@ -84,6 +84,7 @@ function PrivacyContent() {
           <li>Vor- und Nachname</li>
           <li>Lieferadresse</li>
           <li>E-Mail-Adresse</li>
+          <li>Telefonnummer (für die Zustellung)</li>
           <li>Bestelldetails (Artikel, Menge, Preis)</li>
         </ul>
         <p>Die Zahlung erfolgt per Karte oder TWINT über unseren Zahlungsdienstleister Stripe (siehe Abschnitt 4). Karten- und Zahlungsdaten werden von uns weder erhoben noch gespeichert.</p>
@@ -91,7 +92,7 @@ function PrivacyContent() {
       </Section>
 
       <Section title="4. Zahlungsabwicklung (Stripe)">
-        <p>Die Bezahlung erfolgt über Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland («Stripe»). Beim Bezahlvorgang werden Sie auf die gesicherte Bezahlseite von Stripe weitergeleitet. Dort erfasst Stripe die für die Zahlung erforderlichen Daten (Karten- bzw. TWINT-Daten, Name, E-Mail-Adresse, Rechnungs- und Lieferadresse, Betrag) und verarbeitet sie in eigener Verantwortung zur Zahlungsabwicklung und Betrugsprävention. Wir selbst erhalten keine vollständigen Kartendaten, sondern lediglich eine Zahlungsbestätigung, die Zahlungsreferenz und die letzten Ziffern des Zahlungsmittels.</p>
+        <p>Die Bezahlung erfolgt über Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland («Stripe»). Beim Bezahlvorgang werden Sie auf die gesicherte Bezahlseite von Stripe weitergeleitet. Dort erfasst Stripe die für die Zahlung erforderlichen Daten (Karten- bzw. TWINT-Daten, Name, E-Mail-Adresse, Rechnungs- und Lieferadresse, Betrag) und verarbeitet sie in eigener Verantwortung zur Zahlungsabwicklung und Betrugsprävention. Stripe übermittelt uns Name, E-Mail-Adresse, Telefonnummer und Lieferadresse, damit wir die Bestellung ausführen können. Kartendaten erhalten wir nicht vollständig, sondern lediglich eine Zahlungsbestätigung, die Zahlungsreferenz und die letzten Ziffern des Zahlungsmittels.</p>
         <p style={{ marginTop: "12px" }}>Rechtsgrundlage ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO bzw. Art. 31 Abs. 2 lit. a DSG). Stripe kann Daten in die USA übermitteln; dies erfolgt auf Basis der Standardvertragsklauseln der EU-Kommission. Weitere Informationen: <a href="https://stripe.com/ch/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#1A3040" }}>stripe.com/ch/privacy</a>.</p>
       </Section>
 
@@ -122,7 +123,7 @@ function PrivacyContent() {
 
       <Section title="9. Newsletter & Produktbewertungen">
         <p><strong>Newsletter:</strong> Wenn Sie sich über das Formular auf unserer Website anmelden, senden wir Ihnen zuerst eine E-Mail mit einem Bestätigungslink (Double-Opt-in). Erst nach Ihrer Bestätigung erhalten Sie Newsletter. Wir speichern Ihre E-Mail-Adresse, die gewählte Sprache sowie den Zeitpunkt von Anmeldung und Bestätigung in unserer Datenbank (Hostpoint), bis Sie sich abmelden. Nach der Bestätigung erhalten Sie einmalig einen persönlichen Rabattcode, den wir dafür bei Stripe (siehe Abschnitt 4) anlegen.</p>
-        <p style={{ marginTop: "12px" }}><strong>Einwilligung beim Bestellen:</strong> Im Bestellformular können Sie freiwillig ein Häkchen setzen, um Newsletter zu erhalten. In diesem Fall schicken wir Ihnen zusätzlich einmalig eine Erinnerung per E-Mail, wenn Sie die Bezahlung nicht abschliessen; sie enthält einen Link, mit dem Sie die Bestellung fortsetzen können. Ohne Häkchen erhalten Sie weder Newsletter noch Erinnerungen.</p>
+        <p style={{ marginTop: "12px" }}><strong>Einwilligung beim Bestellen:</strong> Im Warenkorb bzw. Bestellformular können Sie freiwillig ein Häkchen setzen, um Newsletter zu erhalten. In diesem Fall schicken wir Ihnen zusätzlich einmalig eine Erinnerung per E-Mail, wenn Sie die Bezahlung nicht abschliessen und Ihre E-Mail-Adresse bereits eingegeben haben; sie enthält einen Link, mit dem Sie die Bestellung fortsetzen können. Ohne Häkchen erhalten Sie weder Newsletter noch Erinnerungen.</p>
         <p style={{ marginTop: "12px" }}>Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können sie jederzeit widerrufen — über den Abmeldelink in jeder dieser E-Mails oder per E-Mail an uns. Bestellbestätigungen und Versandinformationen erhalten Sie weiterhin.</p>
         <p style={{ marginTop: "12px" }}><strong>Produktbewertungen:</strong> Wenn Sie eine Bewertung hinterlassen, speichern wir den von Ihnen angegebenen Namen (freiwillig, auch Pseudonym möglich), die Bewertung und den Kommentartext. Die Bewertung wird öffentlich auf der jeweiligen Produktseite angezeigt. Sie können die Löschung jederzeit per E-Mail verlangen.</p>
       </Section>

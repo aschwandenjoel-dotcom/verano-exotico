@@ -62,7 +62,11 @@
     "shipping_note": "Versandkosten werden an der Kasse berechnet",
     "checkout": "Zur Kasse →",
     "loading": "Wird geladen…",
-    "checkout_error": "Da ist etwas schiefgelaufen — bitte versuche es erneut."
+    "checkout_error": "Da ist etwas schiefgelaufen — bitte versuche es erneut.",
+    "ship_to": "Lieferland",
+    "currency": "Währung",
+    "pay_now": "Weiter zur Zahlung →",
+    "pay_note": "Adresse und Zahlung (Karte oder TWINT) gibst du im nächsten Schritt auf der sicheren Stripe-Bezahlseite ein."
   },
   "checkout": {
     "title": "Kasse",

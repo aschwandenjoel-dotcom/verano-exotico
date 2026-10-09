@@ -1,22 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
+import ExpressCheckout from "@/components/ui/ExpressCheckout";
+import type { Locale } from "@/types";
 
 export default function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, totalPrice } = useCart();
+  const { items, isOpen, closeCart, removeItem, updateQuantity } = useCart();
   const t = useTranslations("cart");
   const params = useParams();
-  const router = useRouter();
   const locale = (params?.locale as string) ?? "de";
-
-  function handleCheckout() {
-    closeCart();
-    router.push(`/${locale}/checkout`);
-  }
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -155,25 +151,7 @@ export default function CartDrawer() {
         {/* Footer */}
         {items.length > 0 && (
           <div style={{ padding: "20px 24px", borderTop: "1px solid rgba(26,48,64,0.08)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "16px" }}>
-              <span style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(26,48,64,0.5)" }}>
-                {t("subtotal")}
-              </span>
-              <span style={{ fontSize: "18px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#1A3040" }}>
-                CHF {totalPrice.toFixed(2)}
-              </span>
-            </div>
-            <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.4)", marginBottom: "14px", textAlign: "center" }}>
-              {t("shipping_note")}
-            </p>
-            <button
-              onClick={handleCheckout}
-              style={{ width: "100%", padding: "15px", background: "#1A3040", color: "#F8F3E8", border: "none", borderRadius: "9999px", fontSize: "12px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", transition: "opacity 0.2s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
-            >
-              {t("checkout")}
-            </button>
+            <ExpressCheckout locale={locale as Locale} onLeave={closeCart} />
           </div>
         )}
       </div>

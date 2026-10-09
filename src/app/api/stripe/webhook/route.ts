@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { query, queryOne, execute, parseJson } from "@/lib/db";
+import { query, queryOne, execute, parseJson, toJson } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { sendOrderConfirmation, sendAdminNewOrderNotification, sendCartRecovery } from "@/lib/email";
 import { fulfillOrder, type ShippingAddress } from "@/lib/fulfillment";
-import { confirmSubscriber, findByEmail } from "@/lib/newsletter";
+import { confirmSubscriber, findByEmail, subscribeViaCheckout } from "@/lib/newsletter";
 
 interface OrderRow {
   id: string;
@@ -127,6 +127,8 @@ async function markPaid(session: Stripe.Checkout.Session) {
     return;
   }
 
+  await applyCustomerDetails(orderId, session);
+
   const paymentIntent =
     typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id ?? null;
   if (paymentIntent) {
@@ -208,8 +210,11 @@ async function markPaid(session: Stripe.Checkout.Session) {
   }).catch(console.error);
 
   // Häkchen im Bestellformular + bezahlt = Newsletter-Anmeldung bestätigt.
-  if (order.marketing_consent) {
+  // Bei der Schnellkasse entsteht der Eintrag erst hier, weil die Adresse vorher
+  // unbekannt war; beim Formular ist der Aufruf eine harmlose Wiederholung.
+  if (order.marketing_consent && order.customer_email) {
     try {
+      await subscribeViaCheckout(order.customer_email, locale);
       const sub = await findByEmail(order.customer_email);
       if (sub && !sub.unsubscribed_at) await confirmSubscriber(sub);
     } catch (err) {
@@ -226,6 +231,42 @@ async function markPaid(session: Stripe.Checkout.Session) {
     address,
     items,
   });
+}
+
+/**
+ * Schnellkasse: Name, E-Mail, Telefon und Lieferadresse hat erst Stripe erfasst.
+ * Übernommen wird nur, was in der Bestellung noch fehlt — Angaben aus dem
+ * Kassenformular bleiben unangetastet.
+ */
+async function applyCustomerDetails(orderId: string, session: Stripe.Checkout.Session) {
+  const details = session.customer_details;
+  const shipping = session.collected_information?.shipping_details;
+  const email = details?.email?.trim().toLowerCase();
+  const name = shipping?.name ?? details?.name ?? null;
+
+  if (email) {
+    await query("UPDATE orders SET customer_email = ? WHERE id = ? AND customer_email = ''", [email, orderId]);
+  }
+  if (name) {
+    await query("UPDATE orders SET customer_name = ? WHERE id = ? AND customer_name IS NULL", [name, orderId]);
+  }
+  if (shipping?.address) {
+    const a = shipping.address;
+    const address = {
+      line1: a.line1 ?? "",
+      line2: a.line2 || null,
+      city: a.city ?? "",
+      state: a.state || null,
+      postal_code: a.postal_code ?? "",
+      country: a.country ?? "",
+      // Wie beim Formular: Telefon steckt in der Lieferadresse (für CJ nötig).
+      phone: details?.phone ?? "",
+    };
+    await query("UPDATE orders SET shipping_address = ? WHERE id = ? AND shipping_address IS NULL", [
+      toJson(address),
+      orderId,
+    ]);
+  }
 }
 
 /**
@@ -260,6 +301,9 @@ async function sendRecoveryIfAllowed(session: Stripe.Checkout.Session) {
   const orderId = await resolveOrderId(session);
   if (!recoveryUrl || !orderId) return;
 
+  // Schnellkasse: Die E-Mail kennt nur Stripe — und nur, wenn sie eingetippt wurde.
+  await applyCustomerDetails(orderId, session);
+
   let order: OrderRow | null;
   try {
     order = await queryOne<OrderRow>("SELECT * FROM orders WHERE id = ?", [orderId]);
@@ -267,6 +311,7 @@ async function sendRecoveryIfAllowed(session: Stripe.Checkout.Session) {
     return;
   }
   if (!order || order.status !== "pending" || !order.marketing_consent || order.recovery_email_sent_at) return;
+  if (!order.customer_email) return;
 
   // Inzwischen doch gekauft (z. B. neuer Anlauf über den Warenkorb)? Dann keine Erinnerung.
   const later = await queryOne<{ id: string }>(
@@ -278,6 +323,11 @@ async function sendRecoveryIfAllowed(session: Stripe.Checkout.Session) {
   );
   if (later) return;
 
+  // Häkchen gesetzt, aber bei der Schnellkasse noch kein Eintrag: jetzt anlegen
+  // (unbestätigt, wie beim Formular) — der Abmeldelink braucht das Token.
+  if (!(await findByEmail(order.customer_email))) {
+    await subscribeViaCheckout(order.customer_email, order.locale === "en" ? "en" : "de");
+  }
   const sub = await findByEmail(order.customer_email);
   if (!sub?.token || sub.unsubscribed_at) return;
 

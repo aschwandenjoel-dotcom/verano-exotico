@@ -62,7 +62,11 @@
     "shipping_note": "Shipping is calculated at checkout",
     "checkout": "Checkout →",
     "loading": "Loading…",
-    "checkout_error": "Something went wrong — please try again."
+    "checkout_error": "Something went wrong — please try again.",
+    "ship_to": "Ship to",
+    "currency": "Currency",
+    "pay_now": "Continue to payment →",
+    "pay_note": "You'll enter your address and payment (card or TWINT) in the next step on the secure Stripe payment page."
   },
   "checkout": {
     "title": "Checkout",

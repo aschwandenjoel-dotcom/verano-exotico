@@ -10,6 +10,8 @@
  * pro 1 CHF).
  */
 
+import { zoneCountries } from "@/lib/shipping";
+
 export interface Currency {
   code: string;
   symbol: string;
@@ -27,6 +29,20 @@ export const CURRENCIES: Currency[] = [
 ];
 
 export const DEFAULT_CURRENCY = "CHF";
+
+/**
+ * Naheliegende Zahlungswährung für ein Lieferland — nur als Vorauswahl im
+ * Warenkorb, die Kundin kann sie dort ändern.
+ */
+export function currencyForCountry(country: string): string {
+  if (country === "CH" || country === "LI") return "CHF";
+  if (country === "GB") return "GBP";
+  if (country === "CA") return "CAD";
+  if (country === "AU") return "AUD";
+  // Übriges Europa, auch ausserhalb des Euro: EUR liegt näher als CHF.
+  if (zoneCountries("DE").includes(country)) return "EUR";
+  return "USD";
+}
 
 export function getCurrency(code: string): Currency {
   return CURRENCIES.find((c) => c.code === code) ?? CURRENCIES[0];
