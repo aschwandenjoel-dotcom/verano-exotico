@@ -47,8 +47,10 @@ export default function ProductView({ product, locale, labels }: Props) {
   const urlColor = useSyncExternalStore(noopSubscribe, readUrlColor, () => null);
   const [pickedColor, setActiveColor] = useState<number | null>(null);
   const colorCount = product.colors?.length ?? 0;
+  // Ohne Vorgabe startet die Farbe mit Packshot – dasselbe Bild wie auf der Produktkarte
+  const packshotColor = (product.colorImages ?? []).findIndex((s) => s?.includes("-packshot"));
   const activeColor =
-    pickedColor ?? (urlColor !== null && urlColor < colorCount ? urlColor : 0);
+    pickedColor ?? (urlColor !== null && urlColor < colorCount ? urlColor : Math.max(packshotColor, 0));
 
   return (
     <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">

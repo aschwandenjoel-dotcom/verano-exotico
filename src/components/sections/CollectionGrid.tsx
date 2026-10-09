@@ -44,8 +44,11 @@ function BershkaCard({
   const all = [...colorImgs, ...(product.images ?? []).filter((s) => s && !colorImgs.includes(s))];
   // Wie bei H&M: Packshot auf Weiss als Titelbild, beim Überfahren das Model-Bild
   // (Dateinamen <slug>-packshot / <slug>-model, siehe tools/product-images.mjs)
-  const title = all.find((s) => s.includes("-packshot")) ?? all[0];
-  const hoverImg = all.find((s) => s.includes("-model")) ?? all.find((s) => s !== title);
+  const packshot = all.find((s) => s.includes("-packshot"));
+  const title = packshot ?? all[0];
+  // Hat das Produkt schon einen Packshot, aber noch kein Model-Bild, bleibt der Packshot
+  // stehen – sonst käme ein altes Lieferantenfoto, oft in einer anderen Farbe
+  const hoverImg = all.find((s) => s.includes("-model")) ?? (packshot ? undefined : all.find((s) => s !== title));
   const name = product.name[locale];
 
   return (
