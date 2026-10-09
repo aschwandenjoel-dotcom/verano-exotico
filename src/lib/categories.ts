@@ -306,3 +306,26 @@ export function productsInCategory(category: Category, products: Product[]): Pro
 export function categoryText(category: Category, locale: Locale): CategoryText {
   return category[locale];
 }
+
+/**
+ * Genau eine Hauptkategorie pro Produkt — für `product_type` im Google-/Pinterest-
+ * Feed (Pinterest bildet daraus Produktgruppen). Reihenfolge = Vorrang: ein
+ * „Push-up-Bikini" ist dort Push-up, nicht allgemein Bikini.
+ */
+const FEED_TYPE_ORDER = ["badeanzuege", "bikini-sets", "push-up-bikinis", "triangel-bikinis", "neckholder-bikinis"];
+
+export function feedProductType(product: Product): string {
+  for (const slug of FEED_TYPE_ORDER) {
+    const category = getCategory(slug);
+    if (!category?.match(product)) continue;
+    return slug === "badeanzuege" || slug === "bikini-sets"
+      ? `Bademode > ${category.de.label}`
+      : `Bademode > Bikinis > ${category.de.label}`;
+  }
+  // Weitere Typen nur für den Feed (zu wenige Produkte für eine eigene Seite)
+  const name = product.name.de;
+  if (/bandeau/i.test(name)) return "Bademode > Bikinis > Bandeau-Bikinis";
+  if (/string|tanga/i.test(name)) return "Bademode > Bikinis > String- & Tanga-Bikinis";
+  if (/bralette/i.test(name)) return "Bademode > Bikinis > Bralette-Bikinis";
+  return "Bademode > Bikinis > Weitere Bikinis";
+}

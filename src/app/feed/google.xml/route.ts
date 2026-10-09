@@ -1,5 +1,6 @@
 import imageOverrides from "@/data/feed-image-overrides.json";
 import { fetchProducts } from "@/lib/api";
+import { feedProductType } from "@/lib/categories";
 import { plainText } from "@/lib/seo";
 import { calcShipping } from "@/lib/shipping";
 import type { Product } from "@/types";
@@ -114,7 +115,7 @@ function itemXml(product: Product, variant: Variant, size: string | null): strin
     ["g:brand", BRAND],
     ["g:condition", "new"],
     ["g:google_product_category", GOOGLE_CATEGORY],
-    ["g:product_type", "Bademode > Bikinis & Badeanzüge"],
+    ["g:product_type", feedProductType(product)],
     ["g:gender", "female"],
     ["g:age_group", "adult"],
     // Keine GTIN/EAN vorhanden (Eigenmarke) — ohne diese Angabe lehnt Google
