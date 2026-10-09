@@ -39,48 +39,55 @@ function BershkaCard({
 }) {
   const t = useTranslations("collection");
   const [hovered, setHovered] = useState(false);
-  const [activeImg, setActiveImg] = useState(0);
   // Farb-Bilder zuerst, dann allgemeine Bilder – ohne Duplikate
   const colorImgs = (product.colorImages ?? []).filter(Boolean);
   const all = [...colorImgs, ...(product.images ?? []).filter((s) => s && !colorImgs.includes(s))];
   // Wie bei H&M: Packshot auf Weiss als Titelbild, beim Überfahren das Model-Bild
   // (Dateinamen <slug>-packshot / <slug>-model, siehe tools/product-images.mjs)
   const title = all.find((s) => s.includes("-packshot")) ?? all[0];
-  const hoverImg = all.find((s) => s.includes("-model"));
-  const images = [title, hoverImg, ...all].filter((s, i, arr): s is string => !!s && arr.indexOf(s) === i);
+  const hoverImg = all.find((s) => s.includes("-model")) ?? all.find((s) => s !== title);
   const name = product.name[locale];
 
   return (
     <Link
       href={`/${locale}/product/${product.slug}`}
       className="block group"
-      onMouseEnter={() => { setHovered(true); if (hoverImg) setActiveImg(1); }}
-      onMouseLeave={() => { setHovered(false); setActiveImg(0); }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{ textDecoration: "none" }}
     >
-      {/* Image container */}
+      {/* Image container – Hochformat, damit das Model von Kopf bis Fuss Platz hat */}
       <div
         className="relative overflow-hidden"
         style={{
-          aspectRatio: "1 / 1",
+          aspectRatio: "4 / 5",
           background: "#E8E4DE",
         }}
       >
-        {images.length > 0 ? (
-          <Image
-            src={images[activeImg]}
-            alt={name}
-            fill
-            sizes={featured
-              ? "(max-width: 768px) 100vw, 66vw"
-              : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"}
-            className="object-cover object-center"
-            style={{
-              transform: hovered ? "scale(1.04)" : "scale(1)",
-              transition: "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-            }}
-            priority={featured}
-          />
+        {title ? (
+          <>
+            <Image
+              src={title}
+              alt={name}
+              fill
+              sizes={featured
+                ? "(max-width: 768px) 100vw, 66vw"
+                : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"}
+              className="object-cover object-center"
+              priority={featured}
+            />
+            {/* Zweites Bild liegt schon geladen darüber und wird beim Überfahren eingeblendet */}
+            {hoverImg && (
+              <Image
+                src={hoverImg}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover object-center"
+                style={{ opacity: hovered ? 1 : 0, transition: "opacity 0.35s ease" }}
+              />
+            )}
+          </>
         ) : (
           <div
             className="w-full h-full flex items-end justify-center pb-8 gap-2"
@@ -88,63 +95,6 @@ function BershkaCard({
           >
             {product.colors.slice(0, 3).map((c, i) => (
               <div key={c} style={{ background: c, width: 32, height: 48 + i * 20, opacity: 0.85 }} />
-            ))}
-          </div>
-        )}
-
-        {/* Hover overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(26,48,64,0.18)",
-            opacity: hovered ? 1 : 0,
-            transition: "opacity 0.3s ease",
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "center",
-            paddingBottom: "20px",
-          }}
-        >
-          <span
-            style={{
-              background: "#F8F3E8",
-              color: "#1A3040",
-              fontSize: "10px",
-              fontFamily: "var(--font-archivo-black), sans-serif",
-              fontWeight: 900,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              padding: "10px 24px",
-              transform: hovered ? "translateY(0)" : "translateY(8px)",
-              transition: "transform 0.3s ease",
-            }}
-          >
-            {t("view_product")}
-          </span>
-        </div>
-
-        {/* Image switcher dots on hover */}
-        {images.length > 1 && hovered && (
-          <div
-            className="absolute top-3 left-0 right-0 flex justify-center gap-1.5"
-            style={{ zIndex: 10 }}
-          >
-            {images.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={(e) => { e.preventDefault(); setActiveImg(i); }}
-                style={{
-                  width: i === activeImg ? "20px" : "6px",
-                  height: "2px",
-                  background: i === activeImg ? "#F8F3E8" : "rgba(248,243,232,0.5)",
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  padding: 0,
-                }}
-              />
             ))}
           </div>
         )}

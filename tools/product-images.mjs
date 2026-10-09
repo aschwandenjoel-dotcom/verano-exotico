@@ -3,9 +3,9 @@
  *
  * Schritt 1 – Bilder umwandeln (lokal, danach committen und deployen):
  *   node tools/product-images.mjs convert --slug <slug> [--packshot <datei>] [--model <datei>]
- *   → public/products/<slug>-packshot.jpg  (auf weisses Quadrat erweitert, nichts abgeschnitten)
- *   → public/products/<slug>-model.jpg     (quadratisch, oben ausgerichtet, Kopf bleibt drin)
- *   Beide 1600×1600 mit IPTC-Kennzeichnung "KI-generiert" (Google Merchant Center verlangt sie).
+ *   → public/products/<slug>-packshot.jpg  (auf weisses 4:5 erweitert, nichts abgeschnitten)
+ *   → public/products/<slug>-model.jpg     (4:5 wie die Produktkarte, Kopf bis Fuss bleibt drin)
+ *   Beide 1600×2000 mit IPTC-Kennzeichnung "KI-generiert" (Google Merchant Center verlangt sie).
  *
  * Schritt 2 – im Live-Shop eintragen (erst wenn die Dateien deployed sind):
  *   node tools/product-images.mjs apply --slug <slug> [--color <index>] [--dry-run]
@@ -21,7 +21,7 @@ import sharp from "sharp";
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const SITE = process.env.SITE_URL ?? "https://verano-exotico.ch";
-const SIZE = 1600;
+const W = 1600, H = 2000; // 4:5 – Format der Produktkarten
 
 // IPTC DigitalSourceType: Bild wurde von einer KI erzeugt
 const AI_XMP =
@@ -53,26 +53,28 @@ if (cmd === "convert") {
   if (!packshot && !model) throw new Error("--packshot und/oder --model angeben");
 
   if (packshot) {
-    // Auf weisses Quadrat erweitern statt zuschneiden – Träger und Bänder bleiben sichtbar
+    // Auf weisses 4:5 erweitern statt zuschneiden – Träger und Bänder bleiben sichtbar,
+    // dazu etwas Weissraum rundherum
     const { width, height } = await sharp(packshot).metadata();
-    const side = Math.round(Math.max(width, height) * 1.08); // etwas Weissraum rundherum
-    const padX = Math.floor((side - width) / 2), padY = Math.floor((side - height) / 2);
+    const cw = Math.round(Math.max(width * 1.08, height * 1.08 * (W / H)));
+    const ch = Math.round(cw * (H / W));
+    const padX = Math.floor((cw - width) / 2), padY = Math.floor((ch - height) / 2);
     // Zwei Durchgänge: sharp verkleinert sonst immer vor dem Erweitern
-    const square = await sharp(packshot)
+    const padded = await sharp(packshot)
       .flatten({ background: "#ffffff" })
-      .extend({ left: padX, right: side - width - padX, top: padY, bottom: side - height - padY, background: "#ffffff" })
+      .extend({ left: padX, right: cw - width - padX, top: padY, bottom: ch - height - padY, background: "#ffffff" })
       .toBuffer();
-    await sharp(square)
-      .resize(SIZE, SIZE)
+    await sharp(padded)
+      .resize(W, H)
       .withXmp(AI_XMP)
       .jpeg({ quality: 88, mozjpeg: true })
       .toFile(`${ROOT}public${packshotPath}`);
     console.log(`🖼  public${packshotPath}`);
   }
   if (model) {
-    // Quadrat von oben – Kopf und Pose bleiben, unten fällt der Kniebereich weg
+    // Gemini liefert fast genau 4:5 – nur ein paar Pixel Rand fallen weg
     await sharp(model)
-      .resize(SIZE, SIZE, { fit: "cover", position: "top" })
+      .resize(W, H, { fit: "cover", position: "centre" })
       .withXmp(AI_XMP)
       .jpeg({ quality: 88, mozjpeg: true })
       .toFile(`${ROOT}public${modelPath}`);
