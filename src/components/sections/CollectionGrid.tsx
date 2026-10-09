@@ -40,16 +40,21 @@ function BershkaCard({
   const t = useTranslations("collection");
   const [hovered, setHovered] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
-  // Titelbild = Farb-Bild (Model) zuerst, dann allgemeine Bilder – ohne Duplikate
+  // Farb-Bilder zuerst, dann allgemeine Bilder – ohne Duplikate
   const colorImgs = (product.colorImages ?? []).filter(Boolean);
-  const images = [...colorImgs, ...(product.images ?? []).filter((s) => s && !colorImgs.includes(s))];
+  const all = [...colorImgs, ...(product.images ?? []).filter((s) => s && !colorImgs.includes(s))];
+  // Wie bei H&M: Packshot auf Weiss als Titelbild, beim Überfahren das Model-Bild
+  // (Dateinamen <slug>-packshot / <slug>-model, siehe tools/product-images.mjs)
+  const title = all.find((s) => s.includes("-packshot")) ?? all[0];
+  const hoverImg = all.find((s) => s.includes("-model"));
+  const images = [title, hoverImg, ...all].filter((s, i, arr): s is string => !!s && arr.indexOf(s) === i);
   const name = product.name[locale];
 
   return (
     <Link
       href={`/${locale}/product/${product.slug}`}
       className="block group"
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={() => { setHovered(true); if (hoverImg) setActiveImg(1); }}
       onMouseLeave={() => { setHovered(false); setActiveImg(0); }}
       style={{ textDecoration: "none" }}
     >

@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { isAdminRequest } from "@/lib/adminAuth";
-import { query, queryOne, parseJson } from "@/lib/db";
+import { query, queryOne, parseJson, toJson } from "@/lib/db";
 import type { Product } from "@/types";
 
 function rowToProduct(row: Record<string, unknown>): Product {
@@ -37,7 +37,7 @@ export async function GET(
   return NextResponse.json(rowToProduct(row));
 }
 
-/** Texte, die per PATCH geändert werden dürfen — Preis, Bilder, Varianten bleiben unberührt. */
+/** Texte, die per PATCH geändert werden dürfen — Preis und Varianten bleiben unberührt. */
 const EDITABLE_TEXT_COLUMNS = [
   "name_de", "name_en",
   "description_de", "description_en",
@@ -45,10 +45,14 @@ const EDITABLE_TEXT_COLUMNS = [
   "care_de", "care_en",
 ] as const;
 
+/** Bildlisten, die per PATCH ersetzt werden dürfen — nur Pfade unter /products/. */
+const EDITABLE_IMAGE_COLUMNS = ["images", "color_images"] as const;
+const IMAGE_PATH = /^\/products\/[A-Za-z0-9._-]+$/;
+
 /**
- * Produkttexte ändern (Admin): Header `x-admin-key: <ADMIN_PASSWORD>`,
- * Body z. B. { "name_de": "…", "description_de": "…" }. Genutzt von
- * tools/update-product-texts.mjs.
+ * Produkttexte oder Bildlisten ändern (Admin): Header `x-admin-key: <ADMIN_PASSWORD>`,
+ * Body z. B. { "name_de": "…" } oder { "images": ["/products/…"] }. Genutzt von
+ * tools/update-product-texts.mjs und tools/product-images.mjs.
  */
 export async function PATCH(
   req: Request,
@@ -61,9 +65,18 @@ export async function PATCH(
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return NextResponse.json({ error: "Ungültiges JSON" }, { status: 400 });
 
-  const updates = EDITABLE_TEXT_COLUMNS.filter((c) => typeof body[c] === "string" && (body[c] as string).trim());
-  const unknown = Object.keys(body).filter((k) => !(EDITABLE_TEXT_COLUMNS as readonly string[]).includes(k));
+  const allowed: readonly string[] = [...EDITABLE_TEXT_COLUMNS, ...EDITABLE_IMAGE_COLUMNS];
+  const unknown = Object.keys(body).filter((k) => !allowed.includes(k));
   if (unknown.length) return NextResponse.json({ error: `Unbekannte Felder: ${unknown.join(", ")}` }, { status: 400 });
+
+  const badImages = EDITABLE_IMAGE_COLUMNS.filter((c) => c in body && !(
+    Array.isArray(body[c]) && (body[c] as unknown[]).every((p) => typeof p === "string" && IMAGE_PATH.test(p))
+  ));
+  if (badImages.length) return NextResponse.json({ error: `Ungültige Bildliste: ${badImages.join(", ")}` }, { status: 400 });
+
+  const textUpdates = EDITABLE_TEXT_COLUMNS.filter((c) => typeof body[c] === "string" && (body[c] as string).trim());
+  const imageUpdates = EDITABLE_IMAGE_COLUMNS.filter((c) => c in body);
+  const updates = [...textUpdates, ...imageUpdates];
   if (!updates.length) return NextResponse.json({ error: "Keine Felder zum Ändern" }, { status: 400 });
 
   const existing = await queryOne("SELECT slug FROM products WHERE slug = ?", [slug]);
@@ -71,7 +84,11 @@ export async function PATCH(
 
   await query(
     `UPDATE products SET ${updates.map((c) => `${c} = ?`).join(", ")} WHERE slug = ?`,
-    [...updates.map((c) => (body[c] as string).trim()), slug]
+    [
+      ...textUpdates.map((c) => (body[c] as string).trim()),
+      ...imageUpdates.map((c) => toJson(body[c])),
+      slug,
+    ]
   );
   revalidatePath("/", "layout");
 
