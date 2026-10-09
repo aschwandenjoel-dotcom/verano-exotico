@@ -56,15 +56,17 @@ export default function ProductGallery({ product, locale, activeColor, onSelectC
       {/* Hauptbild */}
       <div
         onClick={() => mainSrc && setZoomOpen(true)}
-        style={{ position: "relative", width: "100%", aspectRatio: "1/1", borderRadius: "16px", overflow: "hidden", background: "#EDE9E2", cursor: "zoom-in" }}
+        style={{ position: "relative", width: "100%", aspectRatio: "4/5", borderRadius: "16px", overflow: "hidden", background: "#EDE9E2", cursor: "zoom-in" }}
       >
+        {/* 4:5 wie die Produktkarten – das Bild füllt den Rahmen ganz, ohne Randstreifen.
+            Ältere quadratische Lieferantenbilder verlieren seitlich etwas; die Lupe zeigt sie ganz. */}
         <Image
           key={mainSrc}
           src={mainSrc}
           alt={mainAlt}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
-          style={{ objectFit: "contain" }}
+          style={{ objectFit: "cover" }}
           priority
         />
         {/* aktueller Farbname als Badge */}
