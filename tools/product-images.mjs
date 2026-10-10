@@ -3,7 +3,7 @@
  *
  * Schritt 1 – Bilder umwandeln (lokal, danach committen und deployen):
  *   node tools/product-images.mjs convert --slug <slug> [--packshot <datei>] [--model <datei>]
- *   → public/products/<slug>-packshot.jpg  (auf weisses 4:5 erweitert, nichts abgeschnitten)
+ *   → public/products/<slug>-packshot.jpg  (auf 4:5 erweitert, nichts abgeschnitten)
  *   → public/products/<slug>-model.jpg     (4:5 wie die Produktkarte, Kopf bis Fuss bleibt drin)
  *   Beide 1600×2000 mit IPTC-Kennzeichnung "KI-generiert" (Google Merchant Center verlangt sie).
  *
@@ -53,19 +53,25 @@ if (cmd === "convert") {
   if (!packshot && !model) throw new Error("--packshot und/oder --model angeben");
 
   if (packshot) {
-    // Auf weisses 4:5 erweitern statt zuschneiden – Träger und Bänder bleiben sichtbar,
-    // dazu etwas Weissraum rundherum
+    // Auf 4:5 erweitern statt zuschneiden – Träger und Bänder bleiben sichtbar,
+    // dazu etwas Raum rundherum
     const { width, height } = await sharp(packshot).metadata();
     const cw = Math.round(Math.max(width * 1.08, height * 1.08 * (W / H)));
     const ch = Math.round(cw * (H / W));
     const padX = Math.floor((cw - width) / 2), padY = Math.floor((ch - height) / 2);
+    // Rand in der Hintergrundfarbe des Bildes (Ecke oben links) – liefert Gemini hellgrau
+    // statt weiss, entstünde sonst ein sichtbarer Kasten
+    const { data: px } = await sharp(packshot).flatten({ background: "#ffffff" })
+      .extract({ left: 0, top: 0, width: 8, height: 8 }).raw().toBuffer({ resolveWithObject: true });
+    const avg = (o) => Math.round([...Array(64).keys()].reduce((s, i) => s + px[i * 3 + o], 0) / 64);
+    const bg = { r: avg(0), g: avg(1), b: avg(2) };
     // Zwei Durchgänge: sharp verkleinert sonst immer vor dem Erweitern
     const padded = await sharp(packshot)
       .flatten({ background: "#ffffff" })
-      .extend({ left: padX, right: cw - width - padX, top: padY, bottom: ch - height - padY, background: "#ffffff" })
+      .extend({ left: padX, right: cw - width - padX, top: padY, bottom: ch - height - padY, background: bg })
       .toBuffer();
     await sharp(padded)
-      .resize(W, H)
+      .resize(W, H, { withoutEnlargement: true }) // kleine Bilder nicht aufblasen
       .withXmp(AI_XMP)
       .jpeg({ quality: 88, mozjpeg: true })
       .toFile(`${ROOT}public${packshotPath}`);
