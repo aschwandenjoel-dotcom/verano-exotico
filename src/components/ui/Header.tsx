@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { DARK_BLUE } from "@/lib/theme";
+import { CATEGORIES } from "@/lib/categories";
 
 const CREAM = "#F8F3E8";
 
@@ -41,7 +42,7 @@ interface Props {
 const LOCALES: Locale[] = ["de", "en"];
 
 /** Umschalter DE | EN — tauscht das Locale-Segment im aktuellen Pfad. */
-function LanguageSwitch({ locale, onNavigate }: { locale: Locale; onNavigate?: () => void }) {
+function LanguageSwitch({ locale, onNavigate, onLight = false }: { locale: Locale; onNavigate?: () => void; onLight?: boolean }) {
   const pathname = usePathname() ?? `/${locale}`;
 
   const pathFor = (target: Locale) => {
@@ -58,13 +59,15 @@ function LanguageSwitch({ locale, onNavigate }: { locale: Locale; onNavigate?: (
     >
       {LOCALES.map((l, i) => (
         <span key={l} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          {i > 0 && <span aria-hidden="true" style={{ color: "rgba(248,243,232,0.3)" }}>/</span>}
+          {i > 0 && <span aria-hidden="true" style={{ color: onLight ? "rgba(26,48,64,0.3)" : "rgba(248,243,232,0.3)" }}>/</span>}
           <Link
             href={pathFor(l)}
             onClick={onNavigate}
             aria-current={l === locale ? "true" : undefined}
             style={{
-              color: l === locale ? CREAM : "rgba(248,243,232,0.55)",
+              color: onLight
+                ? (l === locale ? "#1A3040" : "rgba(26,48,64,0.45)")
+                : (l === locale ? CREAM : "rgba(248,243,232,0.55)"),
               fontWeight: l === locale ? 700 : 400,
               textDecoration: "none",
               textTransform: "uppercase",
@@ -81,6 +84,8 @@ function LanguageSwitch({ locale, onNavigate }: { locale: Locale; onNavigate?: (
 
 export default function Header({ locale, transparentAtTop = false }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  // stabil, sonst würde das Menü bei jedem Scroll-Render die Seitensperre neu setzen
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
   const scrolled = useSyncExternalStore(subscribeScroll, pastTitleImage, () => false);
   const solid = !transparentAtTop || scrolled || menuOpen;
   const { openCart, totalCount } = useCart();
@@ -119,10 +124,27 @@ export default function Header({ locale, transparentAtTop = false }: Props) {
           rechte Gruppe auf dem Handy in die mittlere Spalte, sobald die
           Navigation (hidden md:flex) ausgeblendet war - Warenkorb und Menue
           hingen dann bei 75 % statt am rechten Rand. */}
+      {/* Handy: Menü links wie bei Hunza G (Logo Mitte, Warenkorb rechts) */}
+      <button
+        className="md:hidden row-start-1 col-start-1 justify-self-start"
+        onClick={() => setMenuOpen(true)}
+        aria-label={t("menu_open")}
+        aria-expanded={menuOpen}
+        aria-controls="mobile-menu"
+        style={{
+          width: "40px", height: "40px", marginLeft: "-8px", background: "transparent", border: "none",
+          color: CREAM, cursor: "pointer", display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", gap: "6px",
+        }}
+      >
+        <span className="block bg-current" style={{ width: "20px", height: "1.2px" }} />
+        <span className="block bg-current" style={{ width: "20px", height: "1.2px" }} />
+      </button>
+
       <Link
         href={`/${locale}`}
-        className="text-[15px] md:text-[18px] whitespace-nowrap"
-        style={{ color: CREAM, textDecoration: "none", lineHeight: 1, gridColumn: 1 }}
+        className="text-[15px] md:text-[18px] whitespace-nowrap row-start-1 col-start-2 justify-self-center md:col-start-1 md:justify-self-start"
+        style={{ color: CREAM, textDecoration: "none", lineHeight: 1 }}
         aria-label="Verano Exótico — Startseite"
       >
         <span
@@ -144,7 +166,7 @@ export default function Header({ locale, transparentAtTop = false }: Props) {
         </span>
       </Link>
 
-      <nav className="hidden md:flex items-center gap-8" aria-label="Hauptnavigation" style={{ gridColumn: 2 }}>
+      <nav className="hidden md:flex items-center gap-8 row-start-1 col-start-2" aria-label="Hauptnavigation">
         {navLinks.map((link) => (
           <Link
             key={link.href}
@@ -159,7 +181,7 @@ export default function Header({ locale, transparentAtTop = false }: Props) {
         ))}
       </nav>
 
-      <div className="flex items-center gap-3" style={{ gridColumn: 3, justifySelf: "end" }}>
+      <div className="flex items-center gap-3 row-start-1 col-start-3 justify-self-end">
         <div className="hidden md:block">
           <LanguageSwitch locale={locale} />
         </div>
@@ -191,98 +213,148 @@ export default function Header({ locale, transparentAtTop = false }: Props) {
           </button>
         )}
 
-        {/* Vorher nur drei Striche ohne Rahmen: rund 24x14 px Trefferflaeche,
-            deutlich unter den empfohlenen 44 px. Jetzt 40 px wie der Warenkorb
-            daneben, und die Striche klappen im offenen Zustand zum X. */}
-        <button
-          className="md:hidden"
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label={menuOpen ? t("menu_close") : t("menu_open")}
-          aria-expanded={menuOpen}
-          aria-controls="mobile-menu"
-          style={{
-            position: "relative", width: "40px", height: "40px", flexShrink: 0,
-            border: "1px solid rgba(248,243,232,0.3)", borderRadius: "50%",
-            background: menuOpen ? "rgba(248,243,232,0.1)" : "transparent",
-            color: CREAM, cursor: "pointer",
-            display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center", gap: "4px",
-          }}
-        >
-          <span
-            className="block bg-current"
-            style={{
-              width: "16px", height: "1.5px", transition: "transform .25s ease",
-              transform: menuOpen ? "translateY(2.75px) rotate(45deg)" : "none",
-            }}
-          />
-          <span
-            className="block bg-current"
-            style={{
-              width: "16px", height: "1.5px", transition: "transform .25s ease, opacity .2s ease",
-              transform: menuOpen ? "translateY(-2.75px) rotate(-45deg)" : "none",
-            }}
-          />
-        </button>
       </div>
 
-      {menuOpen && (
-        <div
-          id="mobile-menu"
-          className="absolute top-full left-0 right-0 flex flex-col px-6 pt-2 pb-6 md:hidden"
-          style={{
-            background: DARK_BLUE,
-            borderTop: "1px solid rgba(248,243,232,0.1)",
-            boxShadow: "0 12px 24px -12px rgba(0,0,0,0.35)",
-          }}
-        >
-          {navLinks.map((link) => {
-            // Aktuelle Seite markieren - vorher sahen alle Eintraege gleich aus.
-            const active = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                aria-current={active ? "page" : undefined}
-                className="flex items-center justify-between text-base tracking-wide"
-                style={{
-                  color: CREAM,
-                  fontFamily: "var(--font-syne)",
-                  fontWeight: active ? 700 : 500,
-                  textDecoration: "none",
-                  minHeight: "52px", // bequeme Trefferflaeche statt 5px Zeilenabstand
-                  borderBottom: "1px solid rgba(248,243,232,0.1)",
-                }}
-              >
-                {link.label}
-                {active && <span aria-hidden="true" style={{ color: "#D4AF37" }}>•</span>}
-              </Link>
-            );
-          })}
-
-          {/* Auf dem Handy gab es bisher keinen Shop-Knopf: der Header-Button
-              ist hidden md:inline-flex und fehlte im Menue ersatzlos. */}
-          <Link
-            href={`/${locale}/collection`}
-            onClick={() => setMenuOpen(false)}
-            className="inline-flex items-center justify-center text-[11px] font-black tracking-[0.25em] uppercase mt-5"
-            style={{
-              fontFamily: "var(--font-archivo-black), sans-serif",
-              background: "#D4AF37",
-              color: "#1A3040",
-              minHeight: "48px",
-              textDecoration: "none",
-            }}
-          >
-            {t("cta")}
-          </Link>
-
-          <div className="mt-5 flex justify-center">
-            <LanguageSwitch locale={locale} onNavigate={() => setMenuOpen(false)} />
-          </div>
-        </div>
-      )}
+      {menuOpen && <MobileMenu locale={locale} pathname={pathname} onClose={closeMenu} />}
     </header>
+  );
+}
+
+/**
+ * Handy-Menü wie bei Hunza G: Fläche gleitet von links herein, grosse Einträge
+ * in Versalien, Unterpunkte klappen per Plus auf. Escape, Klick daneben oder
+ * ein Link schliessen es; die Seite dahinter scrollt nicht mit.
+ */
+function MobileMenu({ locale, pathname, onClose }: { locale: Locale; pathname: string; onClose: () => void }) {
+  const t = useTranslations("nav");
+  const tf = useTranslations("footer");
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+  }, [onClose]);
+
+  const groups: { id: string; label: string; links: { href: string; label: string }[] }[] = [
+    {
+      id: "shop",
+      label: t("collection"),
+      links: [
+        { href: `/${locale}/collection`, label: t("shop_all") },
+        ...CATEGORIES.map((c) => ({ href: `/${locale}/${c.slug}`, label: c[locale === "en" ? "en" : "de"].label })),
+      ],
+    },
+    {
+      id: "about",
+      label: t("about"),
+      links: [
+        { href: `/${locale}/about`, label: tf("our_story") },
+        { href: `/${locale}/philosophie`, label: tf("philosophy") },
+      ],
+    },
+    {
+      id: "service",
+      label: tf("col_service"),
+      links: [
+        { href: `/${locale}/versand`, label: tf("links_shipping") },
+        { href: `/${locale}/widerruf`, label: tf("links_withdrawal") },
+        { href: `/${locale}/faq`, label: tf("links_faq") },
+      ],
+    },
+  ];
+
+  const rowStyle: React.CSSProperties = {
+    display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%",
+    padding: "20px 0", background: "transparent", border: "none", cursor: "pointer",
+    color: "#1A3040", fontFamily: "var(--font-geist-mono)", fontSize: "13px",
+    letterSpacing: "0.2em", textTransform: "uppercase", textDecoration: "none", textAlign: "left",
+  };
+
+  return (
+    <div id="mobile-menu" className="md:hidden" style={{ position: "fixed", inset: 0, zIndex: 60 }}>
+      <style>{`@keyframes menuIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }`}</style>
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(5,25,35,0.45)" }} />
+      <nav
+        aria-label="Menü"
+        style={{
+          position: "absolute", top: 0, bottom: 0, left: 0, width: "min(420px, 88vw)",
+          background: "#F8F3E8", overflowY: "auto", padding: "0 24px 32px",
+          animation: "menuIn 0.35s cubic-bezier(0.22,1,0.36,1)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px", borderBottom: "1px solid rgba(26,48,64,0.1)" }}>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t("menu_close")}
+            style={{ width: 40, height: 40, marginLeft: -10, background: "transparent", border: "none", color: "#1A3040", fontSize: 26, lineHeight: 1, cursor: "pointer" }}
+          >
+            ×
+          </button>
+          <span className="text-[15px] whitespace-nowrap" style={{ color: "#1A3040", lineHeight: 1 }}>
+            <span className="font-black tracking-[0.2em] uppercase" style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}>Verano</span>{" "}
+            <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "#B8922A", fontSize: "1.15em" }}>Exótico</span>
+          </span>
+          <span style={{ width: 30 }} />
+        </div>
+
+        <Link
+          href={`/${locale}`}
+          onClick={onClose}
+          aria-current={pathname === `/${locale}` ? "page" : undefined}
+          style={{ ...rowStyle, borderBottom: "1px solid rgba(26,48,64,0.1)" }}
+        >
+          {t("home")}
+        </Link>
+
+        {groups.map((g) => {
+          const open = openGroup === g.id;
+          return (
+            <div key={g.id} style={{ borderBottom: "1px solid rgba(26,48,64,0.1)" }}>
+              <button type="button" onClick={() => setOpenGroup(open ? null : g.id)} aria-expanded={open} style={rowStyle}>
+                {g.label}
+                <span aria-hidden="true" style={{ fontSize: "20px", fontWeight: 300, letterSpacing: 0 }}>{open ? "−" : "+"}</span>
+              </button>
+              {open && (
+                <ul style={{ padding: "0 0 18px", margin: 0, listStyle: "none" }}>
+                  {g.links.map((l) => (
+                    <li key={l.href}>
+                      <Link
+                        href={l.href}
+                        onClick={onClose}
+                        aria-current={pathname === l.href ? "page" : undefined}
+                        style={{ display: "block", padding: "10px 0", fontFamily: "var(--font-syne)", fontSize: "15px", color: pathname === l.href ? "#B8922A" : "#1A3040", textDecoration: "none" }}
+                      >
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          );
+        })}
+
+        <div style={{ marginTop: "32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <LanguageSwitch locale={locale} onNavigate={onClose} onLight />
+          <a
+            href="https://www.instagram.com/veranoexotico/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(26,48,64,0.2)", color: "#1A3040", display: "flex", alignItems: "center", justifyContent: "center" }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+            </svg>
+          </a>
+        </div>
+      </nav>
+    </div>
   );
 }

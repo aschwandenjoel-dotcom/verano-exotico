@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { CATEGORIES } from "@/lib/categories";
 import { WELCOME_DISCOUNT_PERCENT } from "@/lib/newsletterOffer";
@@ -37,6 +38,8 @@ export default function Footer() {
   const t = useTranslations("footer");
   const tn = useTranslations("newsletter");
   const locale = useLocale();
+  // Handy: Link-Gruppen zum Aufklappen wie bei Hunza G
+  const [openCol, setOpenCol] = useState<string | null>(null);
 
   const columns: { title: string; links: { href: string; label: string }[] }[] = [
     {
@@ -103,7 +106,7 @@ export default function Footer() {
           </div>
 
           {columns.map((col) => (
-            <nav key={col.title} aria-label={col.title}>
+            <nav key={col.title} aria-label={col.title} className="hidden md:block">
               <p style={headingStyle}>{col.title}</p>
               <ul className="space-y-3">
                 {col.links.map((link) => (
@@ -121,6 +124,35 @@ export default function Footer() {
               </ul>
             </nav>
           ))}
+        </div>
+
+        {/* Handy: Gruppen als Klappzeilen */}
+        <div className="md:hidden mt-10" style={{ borderTop: "1px solid rgba(248,243,232,0.15)" }}>
+          {columns.map((col) => {
+            const open = openCol === col.title;
+            return (
+              <div key={col.title} style={{ borderBottom: "1px solid rgba(248,243,232,0.15)" }}>
+                <button
+                  type="button"
+                  onClick={() => setOpenCol(open ? null : col.title)}
+                  aria-expanded={open}
+                  style={{ ...headingStyle, marginBottom: 0, width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 0", background: "transparent", border: "none", cursor: "pointer" }}
+                >
+                  {col.title}
+                  <span aria-hidden="true" style={{ fontSize: "18px", fontWeight: 300, letterSpacing: 0 }}>{open ? "−" : "+"}</span>
+                </button>
+                {open && (
+                  <ul className="space-y-3" style={{ padding: "0 0 18px", margin: 0, listStyle: "none" }}>
+                    {col.links.map((link) => (
+                      <li key={link.href}>
+                        <a href={link.href} style={linkStyle}>{link.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Bleib in Verbindung */}

@@ -5,7 +5,8 @@
     "about": "Über uns",
     "cta": "Jetzt shoppen",
     "menu_open": "Menü öffnen",
-    "menu_close": "Menü schliessen"
+    "menu_close": "Menü schliessen",
+    "shop_all": "Alle Produkte"
   },
   "hero": {
     "eyebrow": "Neue Kollektion",
@@ -173,6 +174,8 @@
   "voices": {
     "label": "Echte Kommentare",
     "title": "Was Käuferinnen sagen",
+    "title_lead": "Was Käuferinnen",
+    "title_accent": "sagen.",
     "aria_prev": "Vorheriger Kommentar",
     "aria_next": "Nächster Kommentar",
     "source_note": "Kommentare von Käuferinnen dieser Modelle, gesammelt über unseren Produktionspartner und aus dem Original übersetzt."

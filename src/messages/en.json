@@ -5,7 +5,8 @@
     "about": "About us",
     "cta": "Shop now",
     "menu_open": "Open menu",
-    "menu_close": "Close menu"
+    "menu_close": "Close menu",
+    "shop_all": "Shop all"
   },
   "hero": {
     "eyebrow": "New collection",
@@ -173,6 +174,8 @@
   "voices": {
     "label": "Real comments",
     "title": "What buyers say",
+    "title_lead": "What buyers",
+    "title_accent": "say.",
     "aria_prev": "Previous comment",
     "aria_next": "Next comment",
     "source_note": "Comments from buyers of these styles, collected via our production partner and translated from the original."
