@@ -9,11 +9,12 @@ import Header from "@/components/ui/Header";
 import Footer from "@/components/ui/Footer";
 import CustomerVoices from "@/components/ui/CustomerVoices";
 import { ProductTile } from "@/components/sections/CollectionGrid";
+import { getCategory } from "@/lib/categories";
 // Frueher dynamisch ohne SSR geladen (WebGL). Jetzt reines Markup + CSS,
 // darf serverseitig gerendert werden - das Bild ist dann Teil des ersten HTML.
 import PanoramaIntro from "@/components/3d/PanoramaIntro";
 
-interface Props { locale: Locale; products: ShopProduct[]; }
+interface Props { locale: Locale; bikinis: ShopProduct[]; swimsuits: ShopProduct[]; }
 
 /* ─── Scroll reveal hook ─────────────────────────────────────────── */
 function useScrollReveal() {
@@ -49,8 +50,46 @@ function useScrollReveal() {
   }, []);
 }
 
+/* ─── Produktreihe: Titel, "Alle ansehen", Raster ─────────────────── */
+function ProductRow({
+  locale, products, title, href, linkLabel, heading,
+}: {
+  locale: Locale;
+  products: ShopProduct[];
+  title: string;
+  href: string;
+  linkLabel: string;
+  heading?: React.ReactNode;
+}) {
+  if (products.length === 0) return null;
+  return (
+    <section className="px-6 md:px-10 pt-16 md:pt-20 pb-16">
+      <div className="flex items-end justify-between mb-8 reveal">
+        <div>
+          {heading}
+          <h2 className="font-black uppercase text-2xl md:text-3xl" style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}>
+            {title}
+          </h2>
+        </div>
+        <Link
+          href={href}
+          className="text-[10px] tracking-[0.25em] uppercase whitespace-nowrap underline underline-offset-4"
+          style={{ color: "#1A3040", fontFamily: "var(--font-geist-mono)" }}
+        >
+          {linkLabel}
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: "clamp(8px, 2vw, 16px)" }}>
+        {products.map((product) => (
+          <ProductTile key={product.slug} product={product} locale={locale} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 /* ─── Main Landing ───────────────────────────────────────────────── */
-export default function VTLanding({ locale, products }: Props) {
+export default function VTLanding({ locale, bikinis, swimsuits }: Props) {
   useScrollReveal();
   const t = useTranslations("landing");
   const year = new Date().getFullYear();
@@ -61,44 +100,33 @@ export default function VTLanding({ locale, products }: Props) {
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <Header locale={locale} transparentAtTop />
 
-      {/* Aufbau nach Hunza G: Titelbild (Panorama) → Neuheiten → zwei Bildkacheln
-          → Kampagnenbild → Kundenstimmen → Markensatz → Footer */}
+      {/* Aufbau nach Hunza G: Titelbild (Panorama) → Bikinis → zwei Bildkacheln
+          → Badeanzüge → Kundenstimmen → Kampagnenbild → Footer */}
 
-      {/* ── NEU EINGETROFFEN ────────────────────────────────────── */}
-      <section className="px-6 md:px-10 pt-16 md:pt-20 pb-16">
-        <div className="flex items-end justify-between mb-8 reveal">
-          <div>
-            {/* h1 für Google – das Panorama hat keine Überschrift */}
-            <h1
-              className="text-[10px] tracking-[0.3em] uppercase mb-2"
-              style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", fontWeight: 400 }}
-            >
-              {t("seo_h1")}
-            </h1>
-            <h2 className="font-black uppercase text-2xl md:text-3xl" style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}>
-              {t("new_in")}
-            </h2>
-          </div>
-          <Link
-            href={`/${locale}/collection`}
-            className="text-[10px] tracking-[0.25em] uppercase whitespace-nowrap underline underline-offset-4"
-            style={{ color: "#1A3040", fontFamily: "var(--font-geist-mono)" }}
+      {/* ── BIKINIS ─────────────────────────────────────────────── */}
+      <ProductRow
+        locale={locale}
+        products={bikinis}
+        title={getCategory("bikinis")![locale].label}
+        href={`/${locale}/bikinis`}
+        linkLabel={t("view_all")}
+        heading={
+          // h1 für Google – das Panorama hat keine Überschrift
+          <h1
+            className="text-[10px] tracking-[0.3em] uppercase mb-2"
+            style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", fontWeight: 400 }}
           >
-            {t("all_pieces")}
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: "clamp(8px, 2vw, 16px)" }}>
-          {products.map((product) => (
-            <ProductTile key={product.slug} product={product} locale={locale} />
-          ))}
-        </div>
-      </section>
+            {t("seo_h1")}
+          </h1>
+        }
+      />
 
       {/* ── ZWEI BILDKACHELN ────────────────────────────────────── */}
       <section className="grid grid-cols-1 md:grid-cols-2">
         {[
-          { href: `/${locale}/bikinis`, label: t("tile_bikinis"), src: "/images/shop-hero-1.webp", pos: "38% center" },
-          { href: `/${locale}/badeanzuege`, label: t("tile_swimsuits"), src: "/images/shop-hero-3.webp", pos: "57% center" },
+          // Model-Bilder: eine im Bikini, eine im Badeanzug
+          { href: `/${locale}/bikinis`, label: t("tile_bikinis"), src: "/products/brisa-strappy-bikini-model.jpg", pos: "center top" },
+          { href: `/${locale}/badeanzuege`, label: t("tile_swimsuits"), src: "/products/roma-onepiece-swimsuit-model.jpg", pos: "center top" },
         ].map((tile) => (
           <Link key={tile.href} href={tile.href} className="group relative block overflow-hidden" style={{ aspectRatio: "4/5" }}>
             <Image
@@ -119,6 +147,20 @@ export default function VTLanding({ locale, products }: Props) {
           </Link>
         ))}
       </section>
+
+      {/* ── BADEANZÜGE ──────────────────────────────────────────── */}
+      <ProductRow
+        locale={locale}
+        products={swimsuits}
+        title={getCategory("badeanzuege")![locale].label}
+        href={`/${locale}/badeanzuege`}
+        linkLabel={t("view_all")}
+      />
+
+      {/* ── KUNDENSTIMMEN ───────────────────────────────────────── */}
+      {/* Laufende Kommentarboxen. Rendert nichts, solange
+          src/data/customer-voices.json leer ist (node tools/cj-reviews.mjs). */}
+      <CustomerVoices locale={locale} variant="marquee" />
 
       {/* ── KAMPAGNE ────────────────────────────────────────────── */}
       <section className="relative overflow-hidden" style={{ minHeight: "min(85vh, 760px)" }}>
@@ -147,24 +189,6 @@ export default function VTLanding({ locale, products }: Props) {
             {t("campaign_cta")}
           </Link>
         </div>
-      </section>
-
-      {/* ── KUNDENSTIMMEN ───────────────────────────────────────── */}
-      {/* Laufende Kommentarboxen. Rendert nichts, solange
-          src/data/customer-voices.json leer ist (node tools/cj-reviews.mjs). */}
-      <CustomerVoices locale={locale} variant="marquee" />
-
-      {/* ── MARKENSATZ (wie bei Hunza G zentriert vor dem Footer) ── */}
-      <section className="px-6 md:px-10 py-20 md:py-28">
-        <p
-          className="mx-auto max-w-3xl text-center text-base md:text-xl leading-relaxed reveal"
-          style={{ color: "rgba(26,48,64,0.8)", fontFamily: "var(--font-syne)" }}
-        >
-          <strong style={{ color: "#1A3040" }}>Golden Days</strong>
-          {t("phil_1")}
-          <strong style={{ color: "#1A3040" }}>Timeless Wear</strong>
-          {t("phil_2")}
-        </p>
       </section>
 
       {/* ── FOOTER (gemeinsam mit allen Seiten, inkl. Newsletter) ── */}

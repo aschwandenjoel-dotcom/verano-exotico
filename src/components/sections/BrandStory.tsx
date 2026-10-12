@@ -143,11 +143,6 @@ export default function BrandStory() {
         </p>
       </section>
 
-      {/* ── BILD (vollbreit, wie die Bildstrecken bei Hunza G) ───────── */}
-      <div style={{ position: "relative", height: "clamp(320px, 62vh, 680px)" }}>
-        <Image src="/images/shop-hero-1.webp" alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "center 40%" }} />
-      </div>
-
       {/* ── DIE VISION ────────────────────────────────────────────── */}
       <section
         style={{
@@ -347,7 +342,7 @@ export default function BrandStory() {
 
       {/* ── ZWEI BILDER NEBENEINANDER ─────────────────────────────── */}
       <div className="grid grid-cols-2" style={{ gap: "4px" }}>
-        {["/products/flora-floral-bikini-model.jpg", "/products/riviera-stripe-bikini-model.jpg"].map((src) => (
+        {["/products/flora-floral-bikini-model.jpg", "/products/sol-solid-bikini-model.jpg"].map((src) => (
           <div key={src} style={{ position: "relative", aspectRatio: "4/5" }}>
             <Image src={src} alt="" fill sizes="50vw" style={{ objectFit: "cover" }} />
           </div>

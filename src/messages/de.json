@@ -33,7 +33,8 @@
     "sort_newest": "Neuste",
     "sort_price_asc": "Preis aufsteigend",
     "sort_price_desc": "Preis absteigend",
-    "view_product": "Ansehen"
+    "view_product": "Ansehen",
+    "new_label": "Neu"
   },
   "product": {
     "add_to_cart": "In den Warenkorb",
@@ -239,7 +240,8 @@
     "col_service": "Kundenservice",
     "col_about": "Über uns",
     "col_legal": "Rechtliches",
-    "our_story": "Unsere Geschichte"
+    "our_story": "Unsere Geschichte",
+    "philosophy": "Philosophie"
   },
   "meta": {
     "home_title": "Bikinis & Bademode online kaufen | Verano Exotico",
@@ -259,7 +261,9 @@
     "impressum_title": "Impressum — Verano Exotico",
     "impressum_description": "Impressum und Kontakt von Verano Exotico.",
     "datenschutz_title": "Datenschutzerklärung — Verano Exotico",
-    "datenschutz_description": "Wie Verano Exotico deine Daten bei Bestellung, Zahlung und Newsletter verarbeitet."
+    "datenschutz_description": "Wie Verano Exotico deine Daten bei Bestellung, Zahlung und Newsletter verarbeitet.",
+    "philosophy_title": "Unsere Philosophie | Verano Exotico",
+    "philosophy_description": "Golden Days, Timeless Wear: Wofür Verano Exotico steht – Bademode, die sich wie Ferien anfühlt und nicht nach einer Saison verschwindet."
   },
   "landing": {
     "season": "Sommer {year}",
@@ -286,7 +290,8 @@
     "new_in": "Neu eingetroffen",
     "tile_bikinis": "Bikinis shoppen",
     "tile_swimsuits": "Badeanzüge shoppen",
-    "campaign_cta": "Unsere Geschichte"
+    "campaign_cta": "Unsere Geschichte",
+    "view_all": "Alle ansehen"
   },
   "consent": {
     "aria": "Hinweis zur Reichweitenmessung",
@@ -296,5 +301,8 @@
     "accept": "Einverstanden",
     "decline": "Nur notwendige",
     "reset": "Auswahl zurücksetzen"
+  },
+  "philosophy": {
+    "h1": "Unsere Philosophie"
   }
 }

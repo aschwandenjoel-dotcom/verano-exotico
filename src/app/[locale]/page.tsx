@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import VTLanding from "@/components/landing/VTLanding";
-import { fetchLatestProducts } from "@/lib/api";
+import { fetchProducts } from "@/lib/api";
+import { getCategory } from "@/lib/categories";
 import { organizationJsonLd, pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/types";
 
@@ -21,10 +22,13 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const HOMEPAGE_HIDDEN_SLUGS = ["safari-leopard"];
-  const fetched = await fetchLatestProducts(8 + HOMEPAGE_HIDDEN_SLUGS.length);
-  const products = fetched
+  // Neueste zuerst; oben Bikinis (ohne Sets mit Rock/Kleid), unter den Bildkacheln Badeanzüge
+  const all = (await fetchProducts())
     .filter((p) => !HOMEPAGE_HIDDEN_SLUGS.includes(p.slug))
-    .slice(0, 8);
+    .reverse();
+  const isSet = getCategory("bikini-sets")!.match;
+  const bikinis = all.filter((p) => getCategory("bikinis")!.match(p) && !isSet(p)).slice(0, 8);
+  const swimsuits = all.filter(getCategory("badeanzuege")!.match).slice(0, 4);
 
   return (
     <>
@@ -32,7 +36,7 @@ export default async function HomePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
       />
-      <VTLanding locale={locale as Locale} products={products} />
+      <VTLanding locale={locale as Locale} bikinis={bikinis} swimsuits={swimsuits} />
     </>
   );
 }

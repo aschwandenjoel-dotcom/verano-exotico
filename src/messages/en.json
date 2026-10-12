@@ -33,7 +33,8 @@
     "sort_newest": "Newest",
     "sort_price_asc": "Price: low to high",
     "sort_price_desc": "Price: high to low",
-    "view_product": "View"
+    "view_product": "View",
+    "new_label": "New"
   },
   "product": {
     "add_to_cart": "Add to cart",
@@ -239,7 +240,8 @@
     "col_service": "Customer care",
     "col_about": "About us",
     "col_legal": "Legal",
-    "our_story": "Our story"
+    "our_story": "Our story",
+    "philosophy": "Philosophy"
   },
   "meta": {
     "home_title": "Bikinis & Swimwear Online | Verano Exotico",
@@ -247,7 +249,9 @@
     "collection_title": "All Bikinis & Swimsuits — Shop | Verano Exotico",
     "about_title": "About us — Verano Exotico",
     "collection_description": "Browse all bikinis, swimsuits and beach sets by Verano Exotico. Many colours and sizes, TWINT or card, shipping to Switzerland from CHF 4.90.",
-    "about_description": "Who is behind Verano Exotico and how we choose our swimwear: a small Swiss online shop for bikinis and beach sets."
+    "about_description": "Who is behind Verano Exotico and how we choose our swimwear: a small Swiss online shop for bikinis and beach sets.",
+    "philosophy_title": "Our philosophy | Verano Exotico",
+    "philosophy_description": "Golden Days, Timeless Wear: what Verano Exotico stands for – swimwear that feels like a holiday and outlasts a single season."
   },
   "landing": {
     "season": "Summer {year}",
@@ -274,7 +278,8 @@
     "new_in": "New in",
     "tile_bikinis": "Shop bikinis",
     "tile_swimsuits": "Shop swimsuits",
-    "campaign_cta": "Our story"
+    "campaign_cta": "Our story",
+    "view_all": "View all"
   },
   "consent": {
     "aria": "Notice about analytics",
@@ -284,5 +289,8 @@
     "accept": "I agree",
     "decline": "Essential only",
     "reset": "Reset your choice"
+  },
+  "philosophy": {
+    "h1": "Our philosophy"
   }
 }

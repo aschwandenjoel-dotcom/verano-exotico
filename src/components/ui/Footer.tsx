@@ -53,7 +53,10 @@ export default function Footer() {
     },
     {
       title: t("col_about"),
-      links: [{ href: `/${locale}/about`, label: t("our_story") }],
+      links: [
+        { href: `/${locale}/about`, label: t("our_story") },
+        { href: `/${locale}/philosophie`, label: t("philosophy") },
+      ],
     },
     {
       title: t("col_legal"),
