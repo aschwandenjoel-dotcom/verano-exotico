@@ -73,7 +73,8 @@ for (const p of list) {
   const reference = [...colorImages];
   for (const src of images) {
     if (isProtected(src)) { kept.push(src); reference.push(src); continue; }
-    if (manual[p.slug]?.has(src)) { removed.push(`${src} (von Hand)`); continue; }
+    // Von Hand entfernte Bilder bleiben Vergleichsbasis – sonst überlebt eine Kopie davon
+    if (manual[p.slug]?.has(src)) { removed.push(`${src} (von Hand)`); reference.push(src); continue; }
     if (kept.includes(src) || colorImages.includes(src)) { removed.push(`${src} (gleicher Pfad)`); continue; }
     const t = await thumb(src);
     let dup = null;
