@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -41,15 +42,8 @@ export default function BrandStory() {
     <div style={{ background: "#F8F3E8", color: "#1A3040" }}>
 
       {/* ── HERO ──────────────────────────────────────────────────── */}
-      {/* Auf dem Desktop fuellt der Hero den Bildschirm und der Titel sitzt
-          unten - auf dem Handy liess das ueber "Ueber uns" eine halbe Seite
-          Leere. Dort ist er nur so hoch wie sein Inhalt (about-hero, CSS). */}
-      <style>{`
-        .about-hero { min-height: 100vh; min-height: 100svh; justify-content: flex-end; }
-        @media (max-width: 767px) {
-          .about-hero { min-height: 0; justify-content: flex-start; padding-top: 3.5rem; padding-bottom: 3.5rem; }
-        }
-      `}</style>
+      {/* Hero nur so hoch wie sein Inhalt – volle Bildschirmhöhe mit dem Titel
+          unten liess oben eine grosse Lücke (Joel, 12.10.) */}
       <section
         className="about-hero"
         style={{
@@ -57,7 +51,7 @@ export default function BrandStory() {
           background: "#EDE6DA",
           display: "flex",
           flexDirection: "column",
-          padding: "clamp(7rem, 12vw, 11rem) clamp(2rem, 6vw, 7rem) clamp(4rem, 7vw, 7rem)",
+          padding: "clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 6vw, 7rem) clamp(3rem, 6vw, 5.5rem)",
           position: "relative",
           overflow: "hidden",
         }}
@@ -148,6 +142,11 @@ export default function BrandStory() {
           {`SS${String(new Date().getFullYear()).slice(2)}`}
         </p>
       </section>
+
+      {/* ── BILD (vollbreit, wie die Bildstrecken bei Hunza G) ───────── */}
+      <div style={{ position: "relative", height: "clamp(320px, 62vh, 680px)" }}>
+        <Image src="/images/shop-hero-1.webp" alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "center 40%" }} />
+      </div>
 
       {/* ── DIE VISION ────────────────────────────────────────────── */}
       <section
@@ -243,17 +242,12 @@ export default function BrandStory() {
             overflow: "hidden",
           }}
         >
-          <img
-            src="/images/brand-logo.png"
-            alt="Verano Exotico Logo"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              objectPosition: "center",
-            }}
+          <Image
+            src="/images/shop-hero-3.webp"
+            alt=""
+            fill
+            sizes="(max-width: 900px) 100vw, 50vw"
+            style={{ objectFit: "cover", objectPosition: "60% center" }}
           />
         </div>
       </section>
@@ -350,6 +344,15 @@ export default function BrandStory() {
           </div>
         </div>
       </section>
+
+      {/* ── ZWEI BILDER NEBENEINANDER ─────────────────────────────── */}
+      <div className="grid grid-cols-2" style={{ gap: "4px" }}>
+        {["/products/flora-floral-bikini-model.jpg", "/products/riviera-stripe-bikini-model.jpg"].map((src) => (
+          <div key={src} style={{ position: "relative", aspectRatio: "4/5" }}>
+            <Image src={src} alt="" fill sizes="50vw" style={{ objectFit: "cover" }} />
+          </div>
+        ))}
+      </div>
 
       {/* ── QUALITÄT & HERKUNFT ───────────────────────────────────── */}
       <section

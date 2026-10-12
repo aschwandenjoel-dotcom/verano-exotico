@@ -8,10 +8,11 @@ import NewsletterInput from "./NewsletterInput";
 
 /** Nach so viel Zeit auf der Seite (über Seitenwechsel hinweg) erscheint das Popup. */
 const DELAY_MS = 2 * 60 * 1000;
-/** Nach Schliessen oder Anmelden so lange nicht mehr zeigen. */
-const SNOOZE_MS = 30 * 24 * 60 * 60 * 1000;
+// Wie H&M: Geschlossen gilt nur für diesen Besuch (sessionStorage) – beim nächsten
+// Besuch kommt das Popup wieder. Wer sich angemeldet hat, sieht es nie mehr (localStorage).
 const START_KEY = "ve_nl_popup_start"; // sessionStorage: Beginn des Besuchs
-const DONE_KEY = "ve_nl_popup_done"; // localStorage: Zeitpunkt Schliessen/Anmelden
+const CLOSED_KEY = "ve_nl_popup_closed"; // sessionStorage: in diesem Besuch geschlossen
+const SUBSCRIBED_KEY = "ve_nl_subscribed"; // localStorage: angemeldet
 const IMAGE = "/products/bahia-bandeau-bikini-model.jpg";
 
 /** Auf Kasse und Bestellbestätigung stört das Popup nur. */
@@ -36,8 +37,8 @@ export default function NewsletterPopup() {
 
   useEffect(() => {
     if (WELCOME_DISCOUNT_PERCENT <= 0) return;
-    const done = Number(read(() => localStorage, DONE_KEY) ?? 0);
-    if (done && Date.now() - done < SNOOZE_MS) return;
+    if (read(() => localStorage, SUBSCRIBED_KEY)) return;
+    if (read(() => sessionStorage, CLOSED_KEY)) return;
 
     let start = Number(read(() => sessionStorage, START_KEY) ?? 0);
     if (!start) {
@@ -55,7 +56,7 @@ export default function NewsletterPopup() {
   }, []);
 
   const close = () => {
-    write(() => localStorage, DONE_KEY, String(Date.now()));
+    write(() => sessionStorage, CLOSED_KEY, "1");
     setOpen(false);
   };
 
@@ -89,7 +90,7 @@ export default function NewsletterPopup() {
           <p style={{ fontSize: "15px", lineHeight: 1.6, color: "#1A3040", marginBottom: "28px" }}>
             {t("popup_text", { percent: WELCOME_DISCOUNT_PERCENT })}
           </p>
-          <NewsletterInput variant="light" onSuccess={() => write(() => localStorage, DONE_KEY, String(Date.now()))} />
+          <NewsletterInput variant="light" onSuccess={() => write(() => localStorage, SUBSCRIBED_KEY, String(Date.now()))} />
           <p style={{ fontSize: "11px", lineHeight: 1.6, color: "rgba(26,48,64,0.6)", marginTop: "22px" }}>
             {t.rich("popup_fine", {
               privacy: (chunks) => (

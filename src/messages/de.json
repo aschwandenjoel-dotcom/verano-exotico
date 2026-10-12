@@ -282,7 +282,11 @@
     "footer_tagline": "Der ewige Sommer. Zeitlose Qualität.",
     "aria_prev": "Zurück",
     "aria_next": "Weiter",
-    "seo_h1": "Bikinis & Bademode online kaufen"
+    "seo_h1": "Bikinis & Bademode online kaufen",
+    "new_in": "Neu eingetroffen",
+    "tile_bikinis": "Bikinis shoppen",
+    "tile_swimsuits": "Badeanzüge shoppen",
+    "campaign_cta": "Unsere Geschichte"
   },
   "consent": {
     "aria": "Hinweis zur Reichweitenmessung",

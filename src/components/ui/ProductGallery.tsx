@@ -39,8 +39,14 @@ export default function ProductGallery({ product, locale, activeColor }: Props) 
   const extra = colors.length <= 1
     ? general
     : activeColor === packshotColor && model ? [model] : [];
-  const images = colorImg ? [colorImg, ...extra] : general;
+  let images = colorImg ? [colorImg, ...extra] : general;
+  // Model-Bild vor dem Packshot – auf der Karte bleibt der Packshot Titelbild
+  const modelAt = images.findIndex((src) => src.includes("-model"));
+  if (modelAt > 0 && images[0].includes("-packshot")) {
+    images = [images[modelAt], ...images.filter((_, i) => i !== modelAt)];
+  }
   const isLarge = (src: string, i: number) => i === 0 || src.includes("-packshot") || src.includes("-model");
+  const firstIsColor = images[0] === colorImg;
   const colorAlt = colorNames[activeColor] ? `${name} – ${colorNames[activeColor]}` : name;
 
   // Neue Farbe gewählt: auf dem Handy wieder beim ersten Bild beginnen
@@ -72,7 +78,7 @@ export default function ProductGallery({ product, locale, activeColor }: Props) 
         style={{ scrollbarWidth: "none" }}
       >
         {images.map((src, i) => {
-          const alt = i === 0 && colorImg ? colorAlt : name;
+          const alt = src === colorImg && firstIsColor ? colorAlt : name;
           const large = isLarge(src, i);
           return (
             <button

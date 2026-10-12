@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import Image from "next/image";
 import type { Locale, Product as ShopProduct } from "@/types";
 import Header from "@/components/ui/Header";
 import Footer from "@/components/ui/Footer";
@@ -13,18 +14,6 @@ import { ProductTile } from "@/components/sections/CollectionGrid";
 import PanoramaIntro from "@/components/3d/PanoramaIntro";
 
 interface Props { locale: Locale; products: ShopProduct[]; }
-
-// Slogan bleibt in beiden Sprachen gleich; nur die Kategorien-Zeile wird übersetzt
-function tickerItems(categories: string) {
-  const block = [
-    { text: "Golden Days, Timeless Wear", accent: false },
-    { text: "★ Verano Exotico ★", accent: true },
-    { text: categories, accent: false },
-  ];
-  // duplicated for seamless loop
-  return [...block, ...block, ...block, ...block];
-}
-
 
 /* ─── Scroll reveal hook ─────────────────────────────────────────── */
 function useScrollReveal() {
@@ -72,172 +61,91 @@ export default function VTLanding({ locale, products }: Props) {
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <Header locale={locale} transparentAtTop />
 
-      {/* ── HERO ────────────────────────────────────────────────── */}
-      <section
-        className="pt-20 min-h-screen px-6 md:px-10 pb-12"
-        style={{ borderBottom: "1px solid rgba(26,48,64,0.1)", position: "relative", overflow: "hidden", display: "grid", gridTemplateRows: "auto 1fr auto" }}
-      >
-        {/* Meta row */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "clamp(3rem,8vw,5rem)" }}>
-          <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>
-            {t("season", { year })}
-          </span>
-          <h1 style={{ fontSize: "10px", fontWeight: 400, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", margin: 0 }}>
-            {t("seo_h1")}
-          </h1>
-        </div>
+      {/* Aufbau nach Hunza G: Titelbild (Panorama) → Neuheiten → zwei Bildkacheln
+          → Kampagnenbild → Kundenstimmen → Markensatz → Footer */}
 
-        {/* Headline */}
-        <div style={{ padding: "40px 0" }}>
-          <div style={{ marginBottom: "28px" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(26,48,64,0.06)", borderRadius: "9999px", padding: "6px 16px", fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(26,48,64,0.5)" }}>
-              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#D4AF37", display: "inline-block" }} />
-              {t("badge", { year })}
-            </span>
-          </div>
-          <p style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
-            <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.02em", color: "#1A3040" }}>
-              Golden Days,
-            </span>
-            <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", textTransform: "none", letterSpacing: "-0.02em" }}>
-              Timeless Wear.
-            </span>
-          </p>
-        </div>
-
-        {/* Bottom row */}
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
-          <p className="text-sm max-w-sm leading-relaxed md:max-w-xs" style={{ color: "rgba(26,48,64,0.65)", fontFamily: "var(--font-syne)" }}>
-            {t("hero_sub_1")}
-            <em style={{ color: "#D4AF37", fontFamily: "var(--font-dm-serif)" }}>Golden Days</em>
-            {t("hero_sub_2")}
-            <em style={{ color: "#D4AF37", fontFamily: "var(--font-dm-serif)" }}>Timeless Wear</em>
-            {t("hero_sub_3")}
-          </p>
-          <Link
-            href={`/${locale}/collection`}
-            className="btn-shimmer inline-flex items-center gap-3 text-[11px] font-black tracking-[0.25em] uppercase px-7 py-4 hover:opacity-80 transition-opacity"
-            style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px" }}
-          >
-            {t("cta_shop")}
-            <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-      </section>
-
-      {/* ── TICKER STRIP ────────────────────────────────────────── */}
-      <div className="overflow-hidden py-3" style={{ background: "#1A3040" }}>
-        <div
-          className="flex gap-12 whitespace-nowrap"
-          style={{ animation: "marquee 22s linear infinite" }}
-          aria-hidden="true"
-        >
-          {tickerItems(t("ticker_categories")).map((item, i) => (
-            <span
-              key={i}
-              className="text-[10px] tracking-[0.3em] uppercase shrink-0"
-              style={{ color: item.accent ? "#F8F3E8" : "rgba(248,243,232,0.7)", fontFamily: "var(--font-geist-mono)" }}
-            >
-              {item.text}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* ── PHILOSOPHY ──────────────────────────────────────────── */}
-      <section
-        className="px-6 md:px-10 py-24 md:py-36 relative overflow-hidden"
-        style={{ background: "#0A3D52", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
-      >
-        {/* Grain overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.035] pointer-events-none"
-          style={{
-            backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-            backgroundSize: "200px",
-            mixBlendMode: "overlay",
-          }}
-          aria-hidden="true"
-        />
-
-        <div className="max-w-3xl mx-auto text-center relative">
-          <p
-            className="tracking-[0.4em] uppercase mb-8"
-            style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)", fontSize: "13px" }}
-          >
-            {t("philosophy_eyebrow")}
-          </p>
-
-          <h2
-            className="font-black uppercase leading-tight mb-10 reveal reveal-delay-1"
-            style={{
-              fontSize: "clamp(2rem, 5vw, 4.5rem)",
-              color: "#F8F3E8",
-              fontFamily: "var(--font-archivo-black), sans-serif",
-            }}
-          >
-            {t("philosophy_title")}
-          </h2>
-
-          <div
-            className="mx-auto mb-10 reveal reveal-delay-2"
-            style={{ width: "40px", height: "2px", background: "#D4AF37" }}
-          />
-
-          <p
-            className="text-base md:text-lg leading-loose reveal reveal-delay-3"
-            style={{ color: "rgba(228,244,247,0.75)", fontFamily: "var(--font-syne)" }}
-          >
-            <strong style={{ color: "#E4F4F7" }}>Golden Days</strong>
-            {t("phil_1")}
-            <strong style={{ color: "#E4F4F7" }}>Timeless Wear</strong>
-            {t("phil_2")}
-          </p>
-        </div>
-      </section>
-
-      {/* ── PRODUCT GRID ────────────────────────────────────────── */}
-      <section
-        className="px-6 md:px-10 py-20"
-        style={{ borderBottom: "1px solid rgba(26,48,64,0.1)" }}
-      >
-        <div className="flex items-end justify-between mb-12 pb-4 reveal" style={{ borderBottom: "1px solid rgba(26,48,64,0.15)" }}>
+      {/* ── NEU EINGETROFFEN ────────────────────────────────────── */}
+      <section className="px-6 md:px-10 pt-16 md:pt-20 pb-16">
+        <div className="flex items-end justify-between mb-8 reveal">
           <div>
-            <p
-              className="text-[10px] tracking-[0.35em] uppercase mb-1"
-              style={{ color: "#00B4C5", fontFamily: "var(--font-geist-mono)" }}
+            {/* h1 für Google – das Panorama hat keine Überschrift */}
+            <h1
+              className="text-[10px] tracking-[0.3em] uppercase mb-2"
+              style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", fontWeight: 400 }}
             >
-              {t("new_collection")}
-            </p>
-            <h2
-              className="font-black uppercase text-3xl md:text-4xl"
-              style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}
-            >
-              Shop
+              {t("seo_h1")}
+            </h1>
+            <h2 className="font-black uppercase text-2xl md:text-3xl" style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}>
+              {t("new_in")}
             </h2>
           </div>
           <Link
             href={`/${locale}/collection`}
-            className="block text-[10px] tracking-[0.25em] uppercase transition-colors pb-px whitespace-nowrap"
-            style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", borderBottom: "1px solid transparent" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#1A3040";
-              e.currentTarget.style.borderBottomColor = "#1A3040";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "rgba(26,48,64,0.5)";
-              e.currentTarget.style.borderBottomColor = "transparent";
-            }}
+            className="text-[10px] tracking-[0.25em] uppercase whitespace-nowrap underline underline-offset-4"
+            style={{ color: "#1A3040", fontFamily: "var(--font-geist-mono)" }}
           >
             {t("all_pieces")}
           </Link>
         </div>
-
-        {/* Raster wie im Shop (H&M-Stil) statt seitlichem Karussell */}
-        <div className="grid grid-cols-2 md:grid-cols-3" style={{ gap: "clamp(8px, 2vw, 16px)" }}>
+        <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: "clamp(8px, 2vw, 16px)" }}>
           {products.map((product) => (
             <ProductTile key={product.slug} product={product} locale={locale} />
           ))}
+        </div>
+      </section>
+
+      {/* ── ZWEI BILDKACHELN ────────────────────────────────────── */}
+      <section className="grid grid-cols-1 md:grid-cols-2">
+        {[
+          { href: `/${locale}/bikinis`, label: t("tile_bikinis"), src: "/images/shop-hero-1.webp", pos: "38% center" },
+          { href: `/${locale}/badeanzuege`, label: t("tile_swimsuits"), src: "/images/shop-hero-3.webp", pos: "57% center" },
+        ].map((tile) => (
+          <Link key={tile.href} href={tile.href} className="group relative block overflow-hidden" style={{ aspectRatio: "4/5" }}>
+            <Image
+              src={tile.src}
+              alt=""
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="transition-transform duration-700 group-hover:scale-[1.03]"
+              style={{ objectFit: "cover", objectPosition: tile.pos }}
+            />
+            <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,25,35,0.45), rgba(5,25,35,0) 45%)" }} />
+            <span
+              className="absolute left-6 md:left-10 bottom-8 md:bottom-10 text-[13px] tracking-[0.2em] uppercase underline underline-offset-[6px]"
+              style={{ color: "#F8F3E8", fontFamily: "var(--font-archivo-black), sans-serif" }}
+            >
+              {tile.label}
+            </span>
+          </Link>
+        ))}
+      </section>
+
+      {/* ── KAMPAGNE ────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden" style={{ minHeight: "min(85vh, 760px)" }}>
+        <Image src="/images/shop-hero-4.webp" alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "center" }} />
+        <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(5,25,35,0.6), rgba(5,25,35,0.1) 60%)" }} />
+        <div className="relative px-6 md:px-16 flex flex-col justify-center reveal" style={{ minHeight: "min(85vh, 760px)", maxWidth: "720px" }}>
+          <p className="text-[10px] tracking-[0.35em] uppercase mb-5" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
+            {t("season", { year })}
+          </p>
+          <p style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
+            <span style={{ display: "block", fontSize: "clamp(2.4rem, 6vw, 5.5rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.02em", color: "#F8F3E8" }}>
+              Golden Days,
+            </span>
+            <span style={{ display: "block", fontSize: "clamp(2.4rem, 6vw, 5.5rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", letterSpacing: "-0.02em" }}>
+              Timeless Wear.
+            </span>
+          </p>
+          <p className="mt-6 text-sm md:text-base max-w-md" style={{ color: "rgba(248,243,232,0.85)", fontFamily: "var(--font-syne)" }}>
+            {t("hero_sub_1")}
+          </p>
+          <Link
+            href={`/${locale}/about`}
+            className="mt-8 self-start inline-flex items-center text-[11px] font-black tracking-[0.25em] uppercase px-7 py-4 transition-colors"
+            style={{ fontFamily: "var(--font-archivo-black), sans-serif", border: "1.5px solid #F8F3E8", color: "#F8F3E8", minHeight: "44px" }}
+          >
+            {t("campaign_cta")}
+          </Link>
         </div>
       </section>
 
@@ -246,32 +154,17 @@ export default function VTLanding({ locale, products }: Props) {
           src/data/customer-voices.json leer ist (node tools/cj-reviews.mjs). */}
       <CustomerVoices locale={locale} variant="marquee" />
 
-      {/* ── EDITORIAL STATEMENT ─────────────────────────────────── */}
-      <section
-        className="px-6 md:px-10 py-20 md:py-28"
-        style={{ borderBottom: "1px solid rgba(26,48,64,0.1)" }}
-      >
-        <div className="max-w-4xl reveal">
-          <span
-            className="text-[10px] tracking-[0.35em] uppercase block mb-6"
-            style={{ color: "#00B4C5", fontFamily: "var(--font-geist-mono)" }}
-          >
-            {t("manifest_eyebrow")}
-          </span>
-          <blockquote
-            className="font-black uppercase leading-none tracking-tight"
-            style={{ fontSize: "clamp(2rem, 6vw, 6rem)", fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.05 }}
-          >
-            <span className="block">Trends are</span>
-            <span
-              className="block"
-              style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#00B4C5", textTransform: "none" }}
-            >
-              temporary.
-            </span>
-            <span className="block">We are not.</span>
-          </blockquote>
-        </div>
+      {/* ── MARKENSATZ (wie bei Hunza G zentriert vor dem Footer) ── */}
+      <section className="px-6 md:px-10 py-20 md:py-28">
+        <p
+          className="mx-auto max-w-3xl text-center text-base md:text-xl leading-relaxed reveal"
+          style={{ color: "rgba(26,48,64,0.8)", fontFamily: "var(--font-syne)" }}
+        >
+          <strong style={{ color: "#1A3040" }}>Golden Days</strong>
+          {t("phil_1")}
+          <strong style={{ color: "#1A3040" }}>Timeless Wear</strong>
+          {t("phil_2")}
+        </p>
       </section>
 
       {/* ── FOOTER (gemeinsam mit allen Seiten, inkl. Newsletter) ── */}

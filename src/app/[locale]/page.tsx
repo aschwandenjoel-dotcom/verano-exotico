@@ -21,10 +21,10 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const HOMEPAGE_HIDDEN_SLUGS = ["safari-leopard"];
-  const fetched = await fetchLatestProducts(6 + HOMEPAGE_HIDDEN_SLUGS.length);
+  const fetched = await fetchLatestProducts(8 + HOMEPAGE_HIDDEN_SLUGS.length);
   const products = fetched
     .filter((p) => !HOMEPAGE_HIDDEN_SLUGS.includes(p.slug))
-    .slice(0, 6);
+    .slice(0, 8);
 
   return (
     <>
