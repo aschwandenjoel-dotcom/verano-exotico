@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import AiBadge from "@/components/ui/AiBadge";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -245,6 +246,7 @@ export default function BrandStory() {
             sizes="(max-width: 900px) 100vw, 50vw"
             style={{ objectFit: "cover", objectPosition: "center top" }}
           />
+          <AiBadge inset={14} />
         </div>
       </section>
 
@@ -346,6 +348,7 @@ export default function BrandStory() {
         {["/images/about/stoff-detail.jpg", "/images/about/flatlay.jpg"].map((src) => (
           <div key={src} style={{ position: "relative", aspectRatio: "4/5" }}>
             <Image src={src} alt="" fill sizes="50vw" style={{ objectFit: "cover" }} />
+            <AiBadge inset={14} />
           </div>
         ))}
       </div>

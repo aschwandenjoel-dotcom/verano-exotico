@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import type { Locale, Product } from "@/types";
-import { cardImages } from "@/lib/productImages";
+import { cardImages, isAiImage } from "@/lib/productImages";
+import AiBadge from "@/components/ui/AiBadge";
 import { DARK_BLUE } from "@/lib/theme";
 
 /** Höhe des fixen Headers – darunter klebt die Filterleiste. */
@@ -91,6 +92,7 @@ export function ProductTile({
                 style={{ opacity: hovered ? 1 : 0, transition: "opacity 0.35s ease" }}
               />
             )}
+            {isAiImage(hovered && hoverImg ? hoverImg : title) && <AiBadge />}
           </>
         ) : (
           <div

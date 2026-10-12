@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { WELCOME_DISCOUNT_PERCENT } from "@/lib/newsletterOffer";
 import NewsletterInput from "./NewsletterInput";
+import AiBadge from "./AiBadge";
 
 /** Nach so viel Zeit auf der Seite (über Seitenwechsel hinweg) erscheint das Popup. */
 const DELAY_MS = 2 * 60 * 1000;
@@ -81,6 +82,7 @@ export default function NewsletterPopup() {
       >
         <div className="relative hidden md:block" style={{ minHeight: "560px" }}>
           <Image src={IMAGE} alt="" fill sizes="490px" style={{ objectFit: "cover", objectPosition: "top" }} />
+          <AiBadge inset={12} />
         </div>
 
         <div className="flex flex-col justify-center text-center" style={{ padding: "56px clamp(24px, 5vw, 48px)" }}>

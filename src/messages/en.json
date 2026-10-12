@@ -292,5 +292,8 @@
   },
   "philosophy": {
     "h1": "Our philosophy"
+  },
+  "ai": {
+    "label": "AI-generated"
   }
 }

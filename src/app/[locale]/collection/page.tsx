@@ -32,7 +32,7 @@ export default async function CollectionPage({
       <div style={{ position: "relative" }}>
 
         {/* ── COVER — Kampagnenbild, ohne Schrift; Übergang siehe ShopHero ── */}
-        <ShopHero src="/images/shop-hero-rot.jpg" alt="Verano Exotico – roter Bikini an der Mittelmeerküste" />
+        <ShopHero src="/images/shop-hero-blond.jpg" alt="Verano Exotico – roter Bikini an der Mittelmeerküste" />
         {/* Überschrift für Google und Screenreader – im Bild bewusst ohne Schrift */}
         <h1 className="sr-only">Shop – Verano Exotico</h1>
 

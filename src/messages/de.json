@@ -304,5 +304,8 @@
   },
   "philosophy": {
     "h1": "Unsere Philosophie"
+  },
+  "ai": {
+    "label": "KI-generiert"
   }
 }

@@ -10,7 +10,8 @@ import Footer from "@/components/ui/Footer";
 import CustomerVoices from "@/components/ui/CustomerVoices";
 import { ProductTile } from "@/components/sections/CollectionGrid";
 import { getCategory } from "@/lib/categories";
-import { cardImages } from "@/lib/productImages";
+import { cardImages, isAiImage } from "@/lib/productImages";
+import AiBadge from "@/components/ui/AiBadge";
 
 interface Props { locale: Locale; bestsellers: ShopProduct[]; bikinis: ShopProduct[]; swimsuits: ShopProduct[]; }
 
@@ -103,6 +104,7 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
           sizes="100vw"
           style={{ objectFit: "cover", objectPosition: "center 25%" }}
         />
+        <AiBadge inset={16} />
         <div
           aria-hidden="true"
           style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(5,25,35,0.35) 0%, rgba(5,25,35,0) 22%, rgba(5,25,35,0) 58%, rgba(5,25,35,0.5) 100%)" }}
@@ -168,6 +170,7 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
                     />
                   )}
                   <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,25,35,0.45), rgba(5,25,35,0) 40%)" }} />
+                  {isAiImage(src) && <AiBadge inset={16} />}
                   <span className="absolute left-6 md:left-10 bottom-8 md:bottom-10" style={{ color: "#F8F3E8" }}>
                     <span
                       className="block text-[13px] tracking-[0.2em] uppercase underline underline-offset-[6px]"
@@ -221,6 +224,7 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
               style={{ objectFit: "cover", objectPosition: tile.pos }}
             />
             <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,25,35,0.45), rgba(5,25,35,0) 45%)" }} />
+            {isAiImage(tile.src) && <AiBadge inset={16} />}
             <span
               className="absolute left-6 md:left-10 bottom-8 md:bottom-10 text-[13px] tracking-[0.2em] uppercase underline underline-offset-[6px]"
               style={{ color: "#F8F3E8", fontFamily: "var(--font-archivo-black), sans-serif" }}
@@ -249,6 +253,7 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
       <section className="relative overflow-hidden" style={{ minHeight: "min(85vh, 760px)" }}>
         {/* Model rechts, links freier Himmel für den Text */}
         <Image src="/images/about/meer.jpg" alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "70% center" }} />
+        <AiBadge inset={16} />
         <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(5,25,35,0.6), rgba(5,25,35,0.1) 60%)" }} />
         <div className="relative px-6 md:px-16 flex flex-col justify-center reveal" style={{ minHeight: "min(85vh, 760px)", maxWidth: "720px" }}>
           <p className="text-[10px] tracking-[0.35em] uppercase mb-5" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>

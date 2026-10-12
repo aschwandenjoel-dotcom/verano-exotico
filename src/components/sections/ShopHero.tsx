@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import AiBadge from "@/components/ui/AiBadge";
 
 /**
  * Titelbild des Shops: bleibt kleben, die Produkte gleiten darüber. Beim Scrollen
@@ -52,6 +53,10 @@ export default function ShopHero({ src, alt }: { src: string; alt: string }) {
       />
       {/* wird beim Scrollen dichter, während die Produkte darübergleiten */}
       <div ref={shadeRef} aria-hidden="true" style={{ position: "absolute", inset: 0, background: "#051923", opacity: 0 }} />
+      {/* über dem Rand des Produktrasters, damit sie sichtbar bleibt */}
+      <div style={{ position: "absolute", right: 0, bottom: "48px", left: 0, height: 0 }}>
+        <AiBadge inset={16} />
+      </div>
     </div>
   );
 }

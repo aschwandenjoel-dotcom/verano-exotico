@@ -17,3 +17,13 @@ export function cardImages(product: Product): { title?: string; hover?: string }
   const hover = all.find((s) => s.includes("-model")) ?? (packshot ? undefined : all.find((s) => s !== title));
   return { title, hover: hover !== title ? hover : undefined };
 }
+
+/**
+ * KI-generiertes Bild? Packshots und Model-Bilder (tools/product-images.mjs) sowie die
+ * Kampagnen- und Stimmungsbilder unter /images/ (Titelbilder, Über uns). Lieferantenfotos
+ * von CJ sind echte Fotos und bleiben ohne Kennzeichnung.
+ */
+export function isAiImage(src: string | undefined): boolean {
+  if (!src) return false;
+  return /-packshot\.|-model\.|\/images\/(about\/|home-hero|shop-hero)/.test(src);
+}
