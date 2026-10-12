@@ -11,9 +11,6 @@ import CustomerVoices from "@/components/ui/CustomerVoices";
 import { ProductTile } from "@/components/sections/CollectionGrid";
 import { getCategory } from "@/lib/categories";
 import { cardImages } from "@/lib/productImages";
-// Frueher dynamisch ohne SSR geladen (WebGL). Jetzt reines Markup + CSS,
-// darf serverseitig gerendert werden - das Bild ist dann Teil des ersten HTML.
-import PanoramaIntro from "@/components/3d/PanoramaIntro";
 
 interface Props { locale: Locale; bestsellers: ShopProduct[]; bikinis: ShopProduct[]; swimsuits: ShopProduct[]; }
 
@@ -96,12 +93,49 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
   const year = new Date().getFullYear();
   return (
     <div className="min-h-screen" style={{ background: "#F8F3E8", color: "#1A3040" }}>
-      <PanoramaIntro />
+      {/* ── TITELBILD (bildschirmhoch, Header darüber durchsichtig) ── */}
+      <section className="relative overflow-hidden" style={{ height: "100svh", minHeight: "520px" }}>
+        <Image
+          src="/images/home-hero-leopard.jpg"
+          alt="Verano Exotico – Bikini mit Animal-Print vor blauer Wand"
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: "cover", objectPosition: "center 25%" }}
+        />
+        <div
+          aria-hidden="true"
+          style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(5,25,35,0.35) 0%, rgba(5,25,35,0) 22%, rgba(5,25,35,0) 58%, rgba(5,25,35,0.5) 100%)" }}
+        />
+        {/* dezent unten links, damit das Model in der Mitte frei bleibt */}
+        <div className="absolute left-6 md:left-10 bottom-10 md:bottom-14" style={{ color: "#F8F3E8", maxWidth: "520px" }}>
+          <p className="text-[10px] tracking-[0.35em] uppercase mb-3" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
+            {t("season", { year })}
+          </p>
+          <p style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
+            <span style={{ display: "block", fontSize: "clamp(1.8rem, 4vw, 3.4rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.01em" }}>
+              Golden Days,
+            </span>
+            <span style={{ display: "block", fontSize: "clamp(1.8rem, 4vw, 3.4rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37" }}>
+              Timeless Wear.
+            </span>
+          </p>
+          <Link
+            href={`/${locale}/collection`}
+            className="mt-6 inline-flex items-center text-[11px] font-black tracking-[0.25em] uppercase px-7 py-4"
+            style={{ fontFamily: "var(--font-archivo-black), sans-serif", border: "1.5px solid #F8F3E8", color: "#F8F3E8", minHeight: "44px" }}
+          >
+            {t("cta_shop")}
+          </Link>
+        </div>
+      </section>
+      {/* Ab hier ist das Titelbild vorbei – der Header wird dunkelblau */}
+      <div data-header-solid-from aria-hidden="true" />
 
       {/* ── HEADER ──────────────────────────────────────────────── */}
       <Header locale={locale} transparentAtTop />
 
-      {/* Aufbau nach Hunza G: Titelbild (Panorama) → Bikinis → zwei Bildkacheln
+      {/* Aufbau nach Hunza G: Titelbild → Bestseller → Bikinis → zwei Bildkacheln
           → Badeanzüge → Kundenstimmen → Kampagnenbild → Footer */}
 
       {/* ── BESTSELLER: zwei grosse Kacheln mit Model-Bildern ───── */}
@@ -213,7 +247,8 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
 
       {/* ── KAMPAGNE ────────────────────────────────────────────── */}
       <section className="relative overflow-hidden" style={{ minHeight: "min(85vh, 760px)" }}>
-        <Image src="/images/shop-hero-4.webp" alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "center" }} />
+        {/* Model rechts, links freier Himmel für den Text */}
+        <Image src="/images/about/meer.jpg" alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "70% center" }} />
         <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(5,25,35,0.6), rgba(5,25,35,0.1) 60%)" }} />
         <div className="relative px-6 md:px-16 flex flex-col justify-center reveal" style={{ minHeight: "min(85vh, 760px)", maxWidth: "720px" }}>
           <p className="text-[10px] tracking-[0.35em] uppercase mb-5" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>

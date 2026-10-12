@@ -248,12 +248,6 @@ export default function BrandStory() {
         </div>
       </section>
 
-      {/* ── BILD: Meer (vollbreit) ────────────────────────────────── */}
-      {/* Im Seitenverhältnis des Bildes, damit das Model nicht angeschnitten wird */}
-      <div style={{ position: "relative", aspectRatio: "2400 / 1340" }}>
-        <Image src="/images/about/meer.jpg" alt="" fill sizes="100vw" style={{ objectFit: "cover" }} />
-      </div>
-
       {/* ── DAS VERSPRECHEN ───────────────────────────────────────── */}
       <section
         style={{

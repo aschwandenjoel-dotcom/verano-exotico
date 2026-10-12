@@ -10,15 +10,31 @@ import { DARK_BLUE } from "@/lib/theme";
 
 const CREAM = "#F8F3E8";
 
-/** Seite gescrollt? Für den anfangs durchsichtigen Header der Startseite. */
+const HEADER_H = 72;
+
+/** Für den anfangs durchsichtigen Header: neu prüfen bei Scrollen und Grössenänderung. */
 const subscribeScroll = (cb: () => void) => {
   window.addEventListener("scroll", cb, { passive: true });
-  return () => window.removeEventListener("scroll", cb);
+  window.addEventListener("resize", cb);
+  return () => {
+    window.removeEventListener("scroll", cb);
+    window.removeEventListener("resize", cb);
+  };
+};
+
+/**
+ * Dunkelblau, sobald das Titelbild unter dem Header vorbei ist: Die Seite markiert
+ * den ersten Inhalt nach dem Bild mit `data-header-solid-from`. Ohne Markierung
+ * genügen 40 px Scrollen.
+ */
+const pastTitleImage = () => {
+  const marker = document.querySelector("[data-header-solid-from]");
+  return marker ? marker.getBoundingClientRect().top <= HEADER_H : window.scrollY > 40;
 };
 
 interface Props {
   locale: Locale;
-  /** Oben durchsichtig über dem Titelbild, ab dem ersten Scrollen dunkelblau (Startseite). */
+  /** Über dem Titelbild durchsichtig, danach dunkelblau (Startseite, Shop). */
   transparentAtTop?: boolean;
 }
 
@@ -65,7 +81,7 @@ function LanguageSwitch({ locale, onNavigate }: { locale: Locale; onNavigate?: (
 
 export default function Header({ locale, transparentAtTop = false }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const scrolled = useSyncExternalStore(subscribeScroll, () => window.scrollY > 40, () => false);
+  const scrolled = useSyncExternalStore(subscribeScroll, pastTitleImage, () => false);
   const solid = !transparentAtTop || scrolled || menuOpen;
   const { openCart, totalCount } = useCart();
   const t = useTranslations("nav");
