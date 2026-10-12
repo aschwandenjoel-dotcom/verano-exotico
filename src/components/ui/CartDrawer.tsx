@@ -83,9 +83,9 @@ export default function CartDrawer() {
                   style={{ display: "flex", gap: "14px", padding: "16px", background: "#FFFFFF", borderRadius: "16px" }}
                 >
                   {/* Image */}
-                  <div style={{ position: "relative", width: "80px", height: "80px", flexShrink: 0, borderRadius: "10px", overflow: "hidden", background: "#EDE9E2" }}>
+                  <div style={{ position: "relative", width: "80px", height: "100px", flexShrink: 0, borderRadius: "10px", overflow: "hidden", background: "#EDE9E2" }}>
                     {item.image && (
-                      <Image src={item.image} alt={item.name} fill sizes="80px" style={{ objectFit: "contain" }} />
+                      <Image src={item.image} alt={item.name} fill sizes="80px" style={{ objectFit: "cover" }} />
                     )}
                   </div>
 

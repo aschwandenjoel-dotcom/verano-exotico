@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import type { Locale, Product } from "@/types";
+import { cardImages } from "@/lib/productImages";
 
 const FILTERS = ["all", "new", "bikini", "onepiece", "set"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -39,16 +40,7 @@ function BershkaCard({
 }) {
   const t = useTranslations("collection");
   const [hovered, setHovered] = useState(false);
-  // Farb-Bilder zuerst, dann allgemeine Bilder – ohne Duplikate
-  const colorImgs = (product.colorImages ?? []).filter(Boolean);
-  const all = [...colorImgs, ...(product.images ?? []).filter((s) => s && !colorImgs.includes(s))];
-  // Wie bei H&M: Packshot auf Weiss als Titelbild, beim Überfahren das Model-Bild
-  // (Dateinamen <slug>-packshot / <slug>-model, siehe tools/product-images.mjs)
-  const packshot = all.find((s) => s.includes("-packshot"));
-  const title = packshot ?? all[0];
-  // Hat das Produkt schon einen Packshot, aber noch kein Model-Bild, bleibt der Packshot
-  // stehen – sonst käme ein altes Lieferantenfoto, oft in einer anderen Farbe
-  const hoverImg = all.find((s) => s.includes("-model")) ?? (packshot ? undefined : all.find((s) => s !== title));
+  const { title, hover: hoverImg } = cardImages(product);
   const name = product.name[locale];
 
   return (

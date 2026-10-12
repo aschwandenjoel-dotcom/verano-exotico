@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import type { Locale, Product as ShopProduct } from "@/types";
+import { cardImages } from "@/lib/productImages";
 import Header from "@/components/ui/Header";
 import CustomerVoices from "@/components/ui/CustomerVoices";
 import { WELCOME_DISCOUNT_PERCENT } from "@/lib/newsletterOffer";
@@ -63,7 +64,7 @@ function useScrollReveal() {
 /* ─── Shop Card (horizontal scroll) ─────────────────────────────── */
 function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; locale: Locale; index: number; badgeNew: string }) {
   const [hovered, setHovered] = useState(false);
-  const image = product.colorImages?.[0] ?? product.images?.[0];
+  const { title: image, hover: hoverImage } = cardImages(product);
   const name = product.name[locale];
 
   return (
@@ -80,9 +81,21 @@ function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; 
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={{ position: "relative", aspectRatio: "1/1", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
+      {/* 4:5 und randlos wie die Kollektionsseite; beim Überfahren das Model-Bild */}
+      <div style={{ position: "relative", aspectRatio: "4/5", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
         {image ? (
-          <Image src={image} alt={name} fill sizes="(max-width: 768px) 70vw, 520px" style={{ objectFit: "contain" }} priority={index < 2} />
+          <>
+            <Image src={image} alt={name} fill sizes="(max-width: 768px) 70vw, 520px" style={{ objectFit: "cover" }} priority={index < 2} />
+            {hoverImage && (
+              <Image
+                src={hoverImage}
+                alt=""
+                fill
+                sizes="(max-width: 768px) 70vw, 520px"
+                style={{ objectFit: "cover", opacity: hovered ? 1 : 0, transition: "opacity 0.35s ease" }}
+              />
+            )}
+          </>
         ) : (
           <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
             {product.colors.slice(0, 3).map((c, i) => (

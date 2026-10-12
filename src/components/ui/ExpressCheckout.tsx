@@ -300,8 +300,8 @@ export function ExpressCheckoutPage({ locale, canceled }: { locale: Locale; canc
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
           {items.map((item) => (
             <div key={item.id} style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-              <div style={{ position: "relative", width: "52px", height: "52px", flexShrink: 0, borderRadius: "8px", overflow: "hidden", background: "#EDE9E2" }}>
-                {item.image && <Image src={item.image} alt={item.name} fill sizes="52px" style={{ objectFit: "contain" }} />}
+              <div style={{ position: "relative", width: "52px", height: "65px", flexShrink: 0, borderRadius: "8px", overflow: "hidden", background: "#EDE9E2" }}>
+                {item.image && <Image src={item.image} alt={item.name} fill sizes="52px" style={{ objectFit: "cover" }} />}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: "11px", fontWeight: 700, color: "#1A3040", margin: 0, textTransform: "uppercase", lineHeight: 1.3 }}>{item.name}</p>
