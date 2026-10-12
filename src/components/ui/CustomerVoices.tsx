@@ -118,6 +118,42 @@ function VoiceCard({ voice, locale, copy = false }: { voice: Voice; locale: Loca
   );
 }
 
+/**
+ * Titel im Stil der Über-uns-Seite ("WO DIE SONNE nie untergeht."): fette
+ * Grossbuchstaben, darunter die Pointe in Serif kursiv und Gold; darunter die
+ * goldene Haarlinie wie bei "Gemacht, um zu bleiben."
+ */
+function VoicesHeading({ label, lead, accent }: { label: string; lead: string; accent: string }) {
+  return (
+    <div className="text-center reveal" style={{ marginBottom: "clamp(3rem, 6vw, 5rem)" }}>
+      <p
+        style={{ color: "rgba(26,48,64,0.5)", fontSize: "10px", letterSpacing: "0.45em", textTransform: "uppercase", fontFamily: "var(--font-geist-mono)", marginBottom: "1.5rem" }}
+      >
+        {label}
+      </p>
+      <h2
+        style={{
+          fontFamily: "var(--font-archivo-black), sans-serif",
+          fontWeight: 900,
+          // 1.9rem: "WAS KÄUFERINNEN" passt auch auf 360 px breiten Handys in eine Zeile
+          fontSize: "clamp(1.9rem, 4.6vw, 4rem)",
+          lineHeight: 1.0,
+          letterSpacing: "-0.03em",
+          textTransform: "uppercase",
+          color: "#1A3040",
+        }}
+      >
+        {lead}
+        <br />
+        <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", textTransform: "none", letterSpacing: "-0.02em" }}>
+          {accent}
+        </span>
+      </h2>
+      <div style={{ width: "40px", height: "1px", background: "#D4AF37", margin: "2rem auto 0" }} />
+    </div>
+  );
+}
+
 export default function CustomerVoices({
   locale,
   slug,
@@ -173,23 +209,11 @@ export default function CustomerVoices({
     const seconds = Math.max(20, voices.length * 5);
     return (
       <section
-        className="py-20"
-        style={{ borderBottom: "1px solid rgba(26,48,64,0.1)" }}
+        style={{ background: "#FFFFFF", padding: "clamp(5rem, 9vw, 9rem) 0" }}
         aria-label={t("title")}
       >
-        <div className="px-6 md:px-10 reveal">
-          <p
-            className="text-[10px] tracking-[0.35em] uppercase mb-3 text-center"
-            style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)" }}
-          >
-            {t("label")}
-          </p>
-          <h2
-            className="text-center mb-14"
-            style={{ fontFamily: "var(--font-dm-serif)", fontWeight: 400, fontSize: "clamp(1.9rem, 3.6vw, 2.8rem)", lineHeight: 1.15, color: "#1A3040" }}
-          >
-            {t("title")}
-          </h2>
+        <div className="px-6 md:px-10">
+          <VoicesHeading label={t("label")} lead={t("title_lead")} accent={t("title_accent")} />
         </div>
 
         <div className="voice-marquee">
@@ -221,23 +245,12 @@ export default function CustomerVoices({
 
   return (
     <section
-      className="px-6 md:px-10 py-20"
-      style={{ borderBottom: "1px solid rgba(26,48,64,0.1)" }}
+      className="px-6 md:px-10"
+      style={{ background: "#FFFFFF", padding: "clamp(5rem, 9vw, 9rem) clamp(1.5rem, 5vw, 5rem)" }}
       aria-label={t("title")}
     >
-      <div className="max-w-4xl mx-auto reveal">
-        <p
-          className="text-[10px] tracking-[0.35em] uppercase mb-3 text-center"
-          style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)" }}
-        >
-          {t("label")}
-        </p>
-        <h2
-          className="text-center mb-10"
-          style={{ fontFamily: "var(--font-dm-serif)", fontWeight: 400, fontSize: "clamp(1.9rem, 3.6vw, 2.8rem)", lineHeight: 1.15, color: "#1A3040" }}
-        >
-          {t("title")}
-        </h2>
+      <div className="max-w-4xl mx-auto">
+        <VoicesHeading label={t("label")} lead={t("title_lead")} accent={t("title_accent")} />
 
         <div
           onMouseEnter={() => setPaused(true)}
