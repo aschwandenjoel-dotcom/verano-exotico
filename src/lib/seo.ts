@@ -77,7 +77,25 @@ export function plainText(text: string | undefined): string {
     .join(" ");
 }
 
-/** Shop als Organisation + Website — einmal auf der Startseite. */
+/** Kurzbeschreibung der Marke – identisch in JSON-LD und llms.txt-Sinn, nur Fakten. */
+export const BRAND_DESCRIPTION =
+  "Verano Exotico ist ein Schweizer Online-Shop für Bademode – Bikinis, Badeanzüge und Bikini-Sets mit Rock oder Kleid. Einzelunternehmen mit Sitz in Altdorf (UR). Bezahlung mit TWINT oder Karte, Versand in die Schweiz ab CHF 4.90.";
+
+/** Kontaktdaten wie im Impressum. */
+export const CONTACT = {
+  email: "veranoexotico@gmail.com",
+  telephone: "+41 79 389 66 59",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Gotthardstrasse 59",
+    postalCode: "6460",
+    addressLocality: "Altdorf",
+    addressRegion: "UR",
+    addressCountry: "CH",
+  },
+};
+
+/** Shop als Organisation + Website — auf der Startseite und auf „Über uns“. */
 export function organizationJsonLd() {
   return [
     {
@@ -89,9 +107,24 @@ export function organizationJsonLd() {
       logo: `${SITE_URL}/images/brand-logo.png`,
       image: `${SITE_URL}${OG_IMAGE.url}`,
       sameAs: SOCIAL_PROFILES,
-      areaServed: "CH",
+      // Nur belegte Fakten (Impressum, FAQ) – für Suchmaschinen und KI-Assistenten
+      description: BRAND_DESCRIPTION,
+      slogan: "Golden Days, Timeless Wear.",
+      email: CONTACT.email,
+      telephone: CONTACT.telephone,
+      address: CONTACT.address,
+      founder: { "@type": "Person", name: "Joel Aschwanden" },
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer service",
+        email: CONTACT.email,
+        telephone: CONTACT.telephone,
+        availableLanguage: ["German", "English"],
+      },
+      knowsAbout: ["Bademode", "Bikinis", "Badeanzüge", "Bikini-Sets"],
+      areaServed: ["CH", "LI"],
       currenciesAccepted: "CHF",
-      paymentAccepted: "TWINT, Kreditkarte",
+      paymentAccepted: "TWINT, Kreditkarte, Debitkarte",
     },
     {
       "@context": "https://schema.org",
@@ -190,4 +223,30 @@ export function categoryJsonLd(locale: Locale, slug: string, name: string, produ
       ],
     },
   ];
+}
+
+/** Über-uns-Seite: verweist auf die Organisation, damit die Marke als Einheit erkannt wird. */
+export function aboutPageJsonLd(locale: Locale) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    url: `${SITE_URL}/${locale}/about`,
+    name: locale === "en" ? "About Verano Exotico" : "Über Verano Exotico",
+    inLanguage: locale === "en" ? "en" : "de-CH",
+    about: { "@id": `${SITE_URL}/#organization` },
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+  };
+}
+
+/** FAQ als strukturierte Fragen und Antworten – Text identisch mit der sichtbaren Seite. */
+export function faqJsonLd(items: { q: string; a: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((i) => ({
+      "@type": "Question",
+      name: i.q,
+      acceptedAnswer: { "@type": "Answer", text: i.a },
+    })),
+  };
 }
