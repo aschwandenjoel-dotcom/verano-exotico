@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import AiBadge from "@/components/ui/AiBadge";
@@ -37,131 +37,54 @@ export default function BrandStory() {
   const params = useParams();
   const locale = (params?.locale as string) ?? "de";
   const t = useTranslations("about");
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   return (
     <div style={{ background: "#F8F3E8", color: "#1A3040" }}>
 
-      {/* ── HERO ──────────────────────────────────────────────────── */}
-      {/* Hero nur so hoch wie sein Inhalt – volle Bildschirmhöhe mit dem Titel
-          unten liess oben eine grosse Lücke (Joel, 12.10.) */}
-      <section
-        className="about-hero"
-        style={{
-          // Sand statt Blau: Header und Footer sind dunkelblau, sonst flössen sie ineinander
-          background: "#EDE6DA",
-          display: "flex",
-          flexDirection: "column",
-          padding: "clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 6vw, 7rem) clamp(3rem, 6vw, 5.5rem)",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        {/* Subtle gold radial glow bottom-left */}
-        <div aria-hidden="true" style={{
-          position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse at 10% 90%, rgba(212,175,55,0.08) 0%, transparent 55%)",
-          pointerEvents: "none",
-        }}/>
+      {/* ── EINSTIEG + VISION: Text links, Bild rechts (bleibt beim Scrollen stehen) ── */}
+      <section className="grid grid-cols-1 md:grid-cols-2 items-start">
+        <div style={{ padding: "clamp(3rem, 6vw, 6rem) clamp(1.5rem, 5vw, 5rem)" }}>
+          {/* Wo die Sonne nie untergeht */}
+          <p
+            className="about-reveal"
+            style={{
+              color: "#B8922A",
+              fontSize: "10px",
+              letterSpacing: "0.5em",
+              textTransform: "uppercase",
+              fontFamily: "var(--font-geist-mono)",
+              marginBottom: "2rem",
+            }}
+          >
+            {t("eyebrow")}
+          </p>
+          <h1
+            className="about-reveal"
+            style={{
+              fontFamily: "var(--font-archivo-black), sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(2.6rem, 5.2vw, 5rem)",
+              lineHeight: 1.0,
+              letterSpacing: "-0.03em",
+              textTransform: "uppercase",
+              color: "#1A3040",
+              marginBottom: "2rem",
+            }}
+          >
+            {t("hero_l1")}<br />{t("hero_l2")}<br />
+            <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", textTransform: "none", letterSpacing: "-0.02em" }}>
+              {t("hero_accent")}
+            </span>
+          </h1>
+          <div className="about-reveal" style={{ width: "48px", height: "1px", background: "linear-gradient(to right, #D4AF37, transparent)", marginBottom: "1.75rem" }} />
+          <p
+            className="about-reveal"
+            style={{ color: "rgba(26,48,64,0.7)", fontSize: "0.95rem", fontFamily: "var(--font-syne)", maxWidth: "460px", lineHeight: 1.85 }}
+          >
+            {t("hero_body")}
+          </p>
 
-        {/* ÜBER UNS — large eyebrow */}
-        <p
-          className="about-reveal"
-          style={{
-            color: "#D4AF37",
-            fontSize: "clamp(0.65rem, 1.1vw, 0.85rem)",
-            letterSpacing: "0.55em",
-            textTransform: "uppercase",
-            fontFamily: "var(--font-geist-mono)",
-            marginBottom: "clamp(2rem, 4vw, 3.5rem)",
-          }}
-        >
-          {t("eyebrow")}
-        </p>
-
-        <h1
-          className="about-reveal"
-          style={{
-            fontFamily: "var(--font-archivo-black), sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(3.5rem, 9vw, 10rem)",
-            lineHeight: 1.0,
-            letterSpacing: "-0.03em",
-            textTransform: "uppercase",
-            color: "#1A3040",
-            marginBottom: "clamp(2rem, 4vw, 3.5rem)",
-            transitionDelay: "0.1s",
-          }}
-        >
-          {t("hero_l1")}<br />{t("hero_l2")}<br />
-          <span style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
-            fontWeight: 400,
-            color: "#D4AF37",
-            textTransform: "none",
-            letterSpacing: "-0.02em",
-          }}>
-            {t("hero_accent")}
-          </span>
-        </h1>
-
-        {/* Gold rule */}
-        <div className="about-reveal" style={{
-          width: "48px", height: "1px",
-          background: "linear-gradient(to right, #D4AF37, transparent)",
-          marginBottom: "clamp(1.5rem, 3vw, 2.5rem)",
-          transitionDelay: "0.2s",
-        }}/>
-
-        <p
-          className="about-reveal"
-          style={{
-            color: "rgba(26,48,64,0.65)",
-            fontSize: "clamp(0.8rem, 1.1vw, 0.95rem)",
-            letterSpacing: "0.04em",
-            fontFamily: "var(--font-syne)",
-            maxWidth: "440px",
-            lineHeight: 1.85,
-            transitionDelay: "0.3s",
-          }}
-        >
-          {t("hero_body")}
-        </p>
-
-        {/* Bottom-right: SS25 index */}
-        <p aria-hidden="true" style={{
-          position: "absolute",
-          bottom: "clamp(2rem, 4vw, 3.5rem)",
-          right: "clamp(2rem, 6vw, 7rem)",
-          color: "rgba(26,48,64,0.2)",
-          fontSize: "9px",
-          letterSpacing: "0.45em",
-          fontFamily: "var(--font-geist-mono)",
-          textTransform: "uppercase",
-        }}>
-          {`SS${String(new Date().getFullYear()).slice(2)}`}
-        </p>
-      </section>
-
-      {/* ── DIE VISION ────────────────────────────────────────────── */}
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))",
-          minHeight: "clamp(500px, 60vh, 700px)",
-        }}
-      >
-        {/* Text column */}
-        <div
-          style={{
-            padding: "clamp(3rem, 7vw, 7rem) clamp(1.5rem, 5vw, 5rem)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            background: "#F8F3E8",
-          }}
-        >
+          {/* Ein Moment. Eine Idee. */}
           <p
             className="about-reveal"
             style={{
@@ -170,82 +93,45 @@ export default function BrandStory() {
               letterSpacing: "0.4em",
               textTransform: "uppercase",
               fontFamily: "var(--font-geist-mono)",
-              marginBottom: "2rem",
+              margin: "clamp(3.5rem, 7vw, 5.5rem) 0 1.5rem",
             }}
           >
             {t("vision_eyebrow")}
           </p>
-
           <h2
             className="about-reveal"
             style={{
               fontFamily: "var(--font-archivo-black), sans-serif",
               fontWeight: 900,
-              fontSize: "clamp(1.8rem, 4vw, 3.5rem)",
+              fontSize: "clamp(1.8rem, 3.6vw, 3.2rem)",
               lineHeight: 1.05,
               textTransform: "uppercase",
               color: "#1A3040",
-              marginBottom: "2rem",
-              transitionDelay: "0.1s",
+              marginBottom: "1.75rem",
             }}
           >
             {t("vision_title")}<br />
-            <span
-              style={{
-                fontFamily: "var(--font-dm-serif)",
-                fontStyle: "italic",
-                fontWeight: 400,
-                color: "#00B4C5",
-                textTransform: "none",
-              }}
-            >
+            <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#00B4C5", textTransform: "none" }}>
               {t("vision_accent")}
             </span>
           </h2>
-
           <div
             className="about-reveal"
-            style={{
-              fontFamily: "var(--font-syne)",
-              fontSize: "clamp(0.85rem, 1.1vw, 0.95rem)",
-              lineHeight: 1.9,
-              color: "rgba(26,48,64,0.7)",
-              maxWidth: "480px",
-              transitionDelay: "0.2s",
-            }}
+            style={{ fontFamily: "var(--font-syne)", fontSize: "0.95rem", lineHeight: 1.9, color: "rgba(26,48,64,0.7)", maxWidth: "480px" }}
           >
-            <p style={{ marginBottom: "1.25rem" }}>
-              {t("vision_p1")}
-            </p>
-            <p style={{ marginBottom: "1.25rem" }}>
-              {t("vision_p2")}
-            </p>
+            <p style={{ marginBottom: "1.25rem" }}>{t("vision_p1")}</p>
+            <p style={{ marginBottom: "1.25rem" }}>{t("vision_p2")}</p>
             <p>
               {t("vision_p3_pre")}
-              <em style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "#1A3040" }}>
-                {t("vision_p3_em")}
-              </em>
+              <em style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "#1A3040" }}>{t("vision_p3_em")}</em>
               {t("vision_p3_post")}
             </p>
           </div>
         </div>
 
-        {/* Visual column – im Seitenverhältnis des Bildes (4:5), damit nichts abgeschnitten wird */}
-        <div
-          style={{
-            position: "relative",
-            aspectRatio: "1856 / 2304",
-            alignSelf: "center",
-            overflow: "hidden",
-          }}
-        >
-          <Image
-            src="/images/about/vision.jpg"
-            alt=""
-            fill
-            sizes="(max-width: 900px) 100vw, 50vw"
-            style={{ objectFit: "cover", objectPosition: "center top" }}
-          />
+        {/* Bild im eigenen Seitenverhältnis; auf dem Desktop bleibt es unter dem Header stehen */}
+        <div className="relative md:sticky md:top-[72px]" style={{ aspectRatio: "1856 / 2304", overflow: "hidden" }}>
+          <Image src="/images/about/vision.jpg" alt="" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: "cover", objectPosition: "center top" }} priority />
           <AiBadge inset={14} />
         </div>
       </section>
@@ -353,150 +239,54 @@ export default function BrandStory() {
         ))}
       </div>
 
-      {/* ── QUALITÄT & HERKUNFT ───────────────────────────────────── */}
-      <section
-        style={{
-          background: "#F8F3E8",
-          padding: "clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem)",
-        }}
-      >
+      {/* ── QUALITÄT & HERKUNFT: ruhig und luxuriös – Serifentitel, drei Spalten mit Haarlinien ── */}
+      <section style={{ background: "#FFFFFF", padding: "clamp(5rem, 9vw, 9rem) clamp(1.5rem, 5vw, 5rem)" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{ marginBottom: "clamp(2.5rem, 5vw, 5rem)" }}>
+          <div className="text-center" style={{ marginBottom: "clamp(3.5rem, 6vw, 6rem)" }}>
             <p
               className="about-reveal"
-              style={{
-                color: "#00B4C5",
-                fontSize: "10px",
-                letterSpacing: "0.45em",
-                textTransform: "uppercase",
-                fontFamily: "var(--font-geist-mono)",
-                marginBottom: "1rem",
-              }}
+              style={{ color: "rgba(26,48,64,0.5)", fontSize: "10px", letterSpacing: "0.45em", textTransform: "uppercase", fontFamily: "var(--font-geist-mono)", marginBottom: "1.5rem" }}
             >
               {t("quality_eyebrow")}
             </p>
             <h2
               className="about-reveal"
-              style={{
-                fontFamily: "var(--font-archivo-black), sans-serif",
-                fontWeight: 900,
-                fontSize: "clamp(1.8rem, 4vw, 3.5rem)",
-                textTransform: "uppercase",
-                lineHeight: 1.05,
-                color: "#1A3040",
-                transitionDelay: "0.1s",
-              }}
+              style={{ fontFamily: "var(--font-dm-serif)", fontWeight: 400, fontSize: "clamp(2.2rem, 4.6vw, 4rem)", lineHeight: 1.1, color: "#1A3040" }}
             >
               {t("quality_title")}{" "}
-              <span
-                style={{
-                  fontFamily: "var(--font-dm-serif)",
-                  fontStyle: "italic",
-                  fontWeight: 400,
-                  color: "#00B4C5",
-                  textTransform: "none",
-                }}
-              >
-                {t("quality_accent")}
-              </span>
+              <em style={{ fontStyle: "italic", color: "#B8922A" }}>{t("quality_accent")}</em>
             </h2>
+            <div className="about-reveal" style={{ width: "40px", height: "1px", background: "#D4AF37", margin: "2rem auto 0" }} />
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))",
-              gap: "1px",
-              background: "rgba(26,48,64,0.1)",
-            }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-3">
             {[
-              {
-                eyebrow: "01",
-                title: t("card1_title"),
-                body: t("card1_body"),
-                delay: "0s",
-              },
-              {
-                eyebrow: "02",
-                title: t("card2_title"),
-                body: t("card2_body"),
-                delay: "0.12s",
-              },
-              {
-                eyebrow: "03",
-                title: t("card3_title"),
-                body: t("card3_body"),
-                delay: "0.24s",
-              },
-            ].map((item) => {
-              const isHovered = hoveredCard === item.eyebrow;
-              return (
+              { n: "I", title: t("card1_title"), body: t("card1_body") },
+              { n: "II", title: t("card2_title"), body: t("card2_body") },
+              { n: "III", title: t("card3_title"), body: t("card3_body") },
+            ].map((item, i) => (
               <div
-                key={item.eyebrow}
-                className="about-reveal"
-                onMouseEnter={() => setHoveredCard(item.eyebrow)}
-                onMouseLeave={() => setHoveredCard(null)}
+                key={item.n}
+                className="about-reveal text-center"
                 style={{
-                  background: "#F8F3E8",
-                  padding: "clamp(2rem, 4vw, 3.5rem)",
-                  transitionDelay: item.delay,
-                  cursor: "default",
-                  transition: "transform 0.35s cubic-bezier(0.23,1,0.32,1), box-shadow 0.35s cubic-bezier(0.23,1,0.32,1)",
-                  transform: isHovered
-                    ? "perspective(600px) translateY(-10px) translateZ(18px) scale(1.025)"
-                    : "perspective(600px) translateY(0) translateZ(0) scale(1)",
-                  boxShadow: isHovered
-                    ? "0 20px 50px rgba(26,48,64,0.15), 0 6px 16px rgba(26,48,64,0.08)"
-                    : "none",
-                  position: "relative",
-                  zIndex: isHovered ? 2 : 0,
+                  padding: "clamp(1.5rem, 3vw, 2.5rem) clamp(1.25rem, 3vw, 2.75rem)",
+                  borderLeft: i > 0 ? "1px solid rgba(26,48,64,0.12)" : "none",
+                  transitionDelay: `${i * 0.12}s`,
                 }}
               >
-                <div
-                  style={{
-                    width: "32px",
-                    height: "2px",
-                    background: "#00B4C5",
-                    marginBottom: "2rem",
-                  }}
-                />
-                <p
-                  style={{
-                    color: "rgba(26,48,64,0.3)",
-                    fontSize: "10px",
-                    letterSpacing: "0.3em",
-                    fontFamily: "var(--font-geist-mono)",
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  {item.eyebrow}
+                <p style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontSize: "1.6rem", color: "#B8922A", marginBottom: "1.25rem" }}>
+                  {item.n}.
                 </p>
                 <h3
-                  style={{
-                    fontFamily: "var(--font-archivo-black), sans-serif",
-                    fontWeight: 900,
-                    fontSize: "clamp(0.95rem, 1.3vw, 1.1rem)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.04em",
-                    color: "#1A3040",
-                    marginBottom: "1rem",
-                  }}
+                  style={{ fontFamily: "var(--font-geist-mono)", fontSize: "11px", letterSpacing: "0.28em", textTransform: "uppercase", color: "#1A3040", marginBottom: "1.25rem" }}
                 >
                   {item.title}
                 </h3>
-                <p
-                  style={{
-                    fontFamily: "var(--font-syne)",
-                    fontSize: "0.85rem",
-                    lineHeight: 1.85,
-                    color: "rgba(26,48,64,0.65)",
-                  }}
-                >
+                <p style={{ fontFamily: "var(--font-syne)", fontSize: "0.9rem", lineHeight: 1.9, color: "rgba(26,48,64,0.65)", maxWidth: "300px", margin: "0 auto" }}>
                   {item.body}
                 </p>
               </div>
-            );})}
+            ))}
           </div>
         </div>
       </section>

@@ -62,7 +62,8 @@ function ProductRow({
 }) {
   if (products.length === 0) return null;
   return (
-    <section className="px-6 md:px-10 pt-16 md:pt-20 pb-16">
+    // Weisser Hintergrund für die Produktreihen (Joel, 12.10.)
+    <section className="px-6 md:px-10 pt-16 md:pt-20 pb-16" style={{ background: "#FFFFFF" }}>
       <div className="flex items-end justify-between mb-8 reveal">
         <div>
           {heading}
@@ -250,12 +251,13 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
       <CustomerVoices locale={locale} variant="marquee" />
 
       {/* ── KAMPAGNE ────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden" style={{ minHeight: "min(85vh, 760px)" }}>
+      {/* Desktop im Seitenverhältnis des Bildes – die ganze Person bleibt sichtbar */}
+      <section className="relative overflow-hidden min-h-[600px] md:min-h-0 md:aspect-[2400/1340]">
         {/* Model rechts, links freier Himmel für den Text */}
         <Image src="/images/about/meer.jpg" alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "70% center" }} />
         <AiBadge inset={16} />
         <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(5,25,35,0.6), rgba(5,25,35,0.1) 60%)" }} />
-        <div className="relative px-6 md:px-16 flex flex-col justify-center reveal" style={{ minHeight: "min(85vh, 760px)", maxWidth: "720px" }}>
+        <div className="relative px-6 md:px-16 flex flex-col justify-center min-h-[600px] md:min-h-0 md:h-full reveal" style={{ maxWidth: "720px" }}>
           <p className="text-[10px] tracking-[0.35em] uppercase mb-5" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
             {t("season", { year })}
           </p>
