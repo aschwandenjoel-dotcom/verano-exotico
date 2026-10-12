@@ -36,6 +36,8 @@ interface Props {
   locale: Locale;
   /** Typ-Filter ausblenden (Kategorieseiten sind schon gefiltert). */
   showFilters?: boolean;
+  /** Ganze Leiste mit Filtern, Sortierung und Anzahl ausblenden (Shop-Seite). */
+  showToolbar?: boolean;
 }
 
 /* ─── Single card ────────────────────────────────────────────── */
@@ -92,7 +94,6 @@ export function ProductTile({
                 style={{ opacity: hovered ? 1 : 0, transition: "opacity 0.35s ease" }}
               />
             )}
-            {isAiImage(hovered && hoverImg ? hoverImg : title) && <AiBadge />}
           </>
         ) : (
           <div
@@ -189,13 +190,15 @@ export function ProductTile({
         >
           CHF {product.price.toFixed(2)}
         </p>
+        {/* KI-Kennzeichnung unter dem Bild statt darin */}
+        {isAiImage(title) && <AiBadge variant="inline" />}
       </div>
     </Link>
   );
 }
 
 /* ─── Main grid ──────────────────────────────────────────────── */
-export default function CollectionGrid({ products, locale, showFilters = true }: Props) {
+export default function CollectionGrid({ products, locale, showFilters = true, showToolbar = true }: Props) {
   const t = useTranslations("collection");
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("default");
@@ -222,96 +225,98 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
   return (
     <>
       {/* ── Filter strip ─────────────────────────────────────── */}
-      <div
-        ref={barRef}
-        style={{
-          position: "sticky",
-          top: `${HEADER_H}px`,
-          zIndex: 40,
-          background: stuck ? DARK_BLUE : "#F8F3E8",
-          borderBottom: `1px solid ${stuck ? "rgba(248,243,232,0.08)" : "rgba(26,48,64,0.08)"}`,
-          transition: "background 0.25s ease",
-          padding: "0 clamp(1.5rem, 5vw, 2.5rem)",
-        }}
-      >
+      {showToolbar && (
         <div
+          ref={barRef}
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "8px",
-            overflowX: "auto",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-            paddingBottom: "1px",
+            position: "sticky",
+            top: `${HEADER_H}px`,
+            zIndex: 40,
+            background: stuck ? DARK_BLUE : "#F8F3E8",
+            borderBottom: `1px solid ${stuck ? "rgba(248,243,232,0.08)" : "rgba(26,48,64,0.08)"}`,
+            transition: "background 0.25s ease",
+            padding: "0 clamp(1.5rem, 5vw, 2.5rem)",
           }}
         >
-          {/* Filter pills */}
-          {showFilters && (
-          <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
-            {FILTERS.map((f) => (
-              <button
-                key={f}
-                type="button"
-                onClick={() => setFilter(f)}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "8px",
+              overflowX: "auto",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              paddingBottom: "1px",
+            }}
+          >
+            {/* Filter pills */}
+            {showFilters && (
+            <div style={{ display: "flex", gap: "4px", flexShrink: 0 }}>
+              {FILTERS.map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFilter(f)}
+                  style={{
+                    padding: "10px 18px",
+                    fontSize: "10px",
+                    fontFamily: "var(--font-geist-mono)",
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    background: filter === f ? (stuck ? "#F8F3E8" : "#1A3040") : "transparent",
+                    color: filter === f
+                      ? (stuck ? "#1A3040" : "#F8F3E8")
+                      : (stuck ? "rgba(248,243,232,0.65)" : "rgba(26,48,64,0.5)"),
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {t(`filter_${f}`)}
+                </button>
+              ))}
+            </div>
+            )}
+
+            {/* Sort + item count */}
+            <div style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }}>
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value as Sort)}
+                aria-label="Sortierung"
                 style={{
-                  padding: "10px 18px",
                   fontSize: "10px",
                   fontFamily: "var(--font-geist-mono)",
-                  letterSpacing: "0.15em",
+                  letterSpacing: "0.1em",
                   textTransform: "uppercase",
-                  background: filter === f ? (stuck ? "#F8F3E8" : "#1A3040") : "transparent",
-                  color: filter === f
-                    ? (stuck ? "#1A3040" : "#F8F3E8")
-                    : (stuck ? "rgba(248,243,232,0.65)" : "rgba(26,48,64,0.5)"),
+                  color: stuck ? "rgba(248,243,232,0.85)" : "rgba(26,48,64,0.6)",
+                  background: "transparent",
                   border: "none",
                   cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  whiteSpace: "nowrap",
+                  outline: "none",
                 }}
               >
-                {t(`filter_${f}`)}
-              </button>
-            ))}
-          </div>
-          )}
-
-          {/* Sort + item count */}
-          <div style={{ display: "flex", alignItems: "center", gap: "16px", flexShrink: 0 }}>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as Sort)}
-              aria-label="Sortierung"
-              style={{
-                fontSize: "10px",
-                fontFamily: "var(--font-geist-mono)",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: stuck ? "rgba(248,243,232,0.85)" : "rgba(26,48,64,0.6)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                outline: "none",
-              }}
-            >
-              {SORTS.map((s) => (
-                <option key={s} value={s} style={{ color: "#1A3040" }}>{t(`sort_${s}`)}</option>
-              ))}
-            </select>
-            <span
-              style={{
-                fontSize: "10px",
-                fontFamily: "var(--font-geist-mono)",
-                color: stuck ? "rgba(248,243,232,0.5)" : "rgba(26,48,64,0.35)",
-                letterSpacing: "0.1em",
-                paddingRight: "4px",
-              }}
-            >
-              {filtered.length} {t("pieces")}
-            </span>
+                {SORTS.map((s) => (
+                  <option key={s} value={s} style={{ color: "#1A3040" }}>{t(`sort_${s}`)}</option>
+                ))}
+              </select>
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontFamily: "var(--font-geist-mono)",
+                  color: stuck ? "rgba(248,243,232,0.5)" : "rgba(26,48,64,0.35)",
+                  letterSpacing: "0.1em",
+                  paddingRight: "4px",
+                }}
+              >
+                {filtered.length} {t("pieces")}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ── Product grid ─────────────────────────────────────── */}
       <div style={{ padding: "clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 5vw, 2.5rem) 4rem" }}>

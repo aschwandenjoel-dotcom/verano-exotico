@@ -97,7 +97,7 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
       {/* ── TITELBILD (bildschirmhoch, Header darüber durchsichtig) ── */}
       <section className="relative overflow-hidden" style={{ height: "100svh", minHeight: "520px" }}>
         <Image
-          src="/images/home-hero-leopard.jpg"
+          src="/images/home-hero-leopard-2.jpg"
           alt="Verano Exotico – Bikini mit Animal-Print vor blauer Wand"
           fill
           priority

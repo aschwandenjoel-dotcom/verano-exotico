@@ -7,8 +7,25 @@ import { useTranslations } from "next-intl";
  * Versalien in der Mono-Schrift, halbtransparent mit leichter Unschärfe, unten rechts.
  * Der Eltern-Container muss positioniert sein (relative/absolute/sticky).
  */
-export default function AiBadge({ inset = 10 }: { inset?: number }) {
+export default function AiBadge({ inset = 10, variant = "overlay" }: { inset?: number; variant?: "overlay" | "inline" }) {
   const t = useTranslations("ai");
+  // Als schlichte Zeile unter dem Bild (Produktkarten)
+  if (variant === "inline") {
+    return (
+      <p
+        style={{
+          marginTop: "6px",
+          fontFamily: "var(--font-geist-mono)",
+          fontSize: "8.5px",
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: "rgba(26,48,64,0.45)",
+        }}
+      >
+        {t("label")}
+      </p>
+    );
+  }
   return (
     <span
       style={{

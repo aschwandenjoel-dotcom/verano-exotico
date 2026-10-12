@@ -64,7 +64,7 @@ export default async function CollectionPage({
               </Link>
             ))}
           </nav>
-          <CollectionGrid products={products} locale={locale as Locale} />
+          <CollectionGrid products={products} locale={locale as Locale} showToolbar={false} />
         </div>
 
       </div>
