@@ -229,11 +229,12 @@ export default function BrandStory() {
           </div>
         </div>
 
-        {/* Visual column */}
+        {/* Visual column – im Seitenverhältnis des Bildes (4:5), damit nichts abgeschnitten wird */}
         <div
           style={{
             position: "relative",
-            minHeight: "360px",
+            aspectRatio: "1856 / 2304",
+            alignSelf: "center",
             overflow: "hidden",
           }}
         >
@@ -248,8 +249,9 @@ export default function BrandStory() {
       </section>
 
       {/* ── BILD: Meer (vollbreit) ────────────────────────────────── */}
-      <div style={{ position: "relative", height: "clamp(260px, 48vh, 540px)" }}>
-        <Image src="/images/about/meer.jpg" alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "center 40%" }} />
+      {/* Im Seitenverhältnis des Bildes, damit das Model nicht angeschnitten wird */}
+      <div style={{ position: "relative", aspectRatio: "2400 / 1340" }}>
+        <Image src="/images/about/meer.jpg" alt="" fill sizes="100vw" style={{ objectFit: "cover" }} />
       </div>
 
       {/* ── DAS VERSPRECHEN ───────────────────────────────────────── */}
