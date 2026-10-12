@@ -38,9 +38,11 @@ export default function ProductGallery({ product, locale, activeColor }: Props) 
   const colorImg = colorImages[activeColor];
   const packshotColor = colorImages.findIndex((src) => src?.includes("-packshot"));
   const model = general.find((src) => src.includes("-model"));
+  // Das Model-Bild gehört zur Farbe mit Packshot – gibt es keinen, zur ersten Farbe
+  const modelColor = packshotColor >= 0 ? packshotColor : 0;
   const extra = colors.length <= 1
     ? general
-    : activeColor === packshotColor && model ? [model] : [];
+    : activeColor === modelColor && model ? [model] : [];
   let images = colorImg ? [colorImg, ...extra] : general;
   // Model-Bild vor dem Packshot – auf der Karte bleibt der Packshot Titelbild
   const modelAt = images.findIndex((src) => src.includes("-model"));
