@@ -291,7 +291,7 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
     const open = formOpen || !!token || submitted;
     return (
       <section id="reviews" style={{ background: "#F8F3E8", borderTop: "1px solid rgba(26,48,64,0.08)", scrollMarginTop: "80px" }}>
-        <div style={{ maxWidth: "1152px", margin: "0 auto", padding: "40px clamp(1.5rem, 5vw, 2.5rem) 48px" }}>
+        <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "40px clamp(1.5rem, 5vw, 2.5rem) 56px" }}>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: "16px" }}>
             <div>
               <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "#00B4C5", marginBottom: "8px" }}>
@@ -334,7 +334,7 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
 
   return (
     <section id="reviews" style={{ background: "#F8F3E8", borderTop: "1px solid rgba(26,48,64,0.08)", scrollMarginTop: "80px" }}>
-      <div style={{ maxWidth: "1152px", margin: "0 auto", padding: "64px clamp(1.5rem, 5vw, 2.5rem) 80px" }}>
+      <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "64px clamp(1.5rem, 5vw, 2.5rem) 80px" }}>
 
         {/* Header */}
         <div style={{ marginBottom: "48px" }}>

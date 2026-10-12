@@ -89,7 +89,6 @@ export default async function ProductPage({
       <Suspense fallback={null}>
         <ReviewSection productSlug={product.slug} />
       </Suspense>
-      <div className="pb-20" style={{ background: "#F8F3E8" }} />
     </ShopShell>
   );
 }
