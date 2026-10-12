@@ -6,10 +6,11 @@ import Image from "next/image";
 // Each slide is cropped edge-to-edge (object-fit: cover). objectPositionY
 // controls which horizontal band of the image stays in frame — lower values
 // keep heads in, higher values keep feet/ground in.
+// shop-hero-4 kommt bewusst zuerst – Joels Wunsch als Titelbild beim Öffnen des Shops.
 const SLIDES: { src: string; objectPositionY: string }[] = [
+  { src: "/images/shop-hero-4.webp", objectPositionY: "36%" },
   { src: "/images/shop-hero-1.webp", objectPositionY: "36%" },
   { src: "/images/shop-hero-3.webp", objectPositionY: "12%" },
-  { src: "/images/shop-hero-4.webp", objectPositionY: "36%" },
 ];
 
 const INTERVAL_MS = 10000;
