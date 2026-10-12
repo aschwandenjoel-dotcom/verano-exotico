@@ -347,9 +347,9 @@ export default function BrandStory() {
         </div>
       </section>
 
-      {/* ── ZWEI BILDER NEBENEINANDER ─────────────────────────────── */}
+      {/* ── ZWEI BILDER: Stoff-Detail und Flatlay ─────────────────── */}
       <div className="grid grid-cols-2" style={{ gap: "4px" }}>
-        {["/products/flora-floral-bikini-model.jpg", "/products/sol-solid-bikini-model.jpg"].map((src) => (
+        {["/images/about/stoff-detail.jpg", "/images/about/flatlay.jpg"].map((src) => (
           <div key={src} style={{ position: "relative", aspectRatio: "4/5" }}>
             <Image src={src} alt="" fill sizes="50vw" style={{ objectFit: "cover" }} />
           </div>
@@ -503,15 +503,6 @@ export default function BrandStory() {
           </div>
         </div>
       </section>
-
-      {/* ── ZWEI BILDER: Stoff-Detail und Flatlay ─────────────────── */}
-      <div className="grid grid-cols-2" style={{ gap: "4px" }}>
-        {["/images/about/stoff-detail.jpg", "/images/about/flatlay.jpg"].map((src) => (
-          <div key={src} style={{ position: "relative", aspectRatio: "4/5" }}>
-            <Image src={src} alt="" fill sizes="50vw" style={{ objectFit: "cover" }} />
-          </div>
-        ))}
-      </div>
 
       {/* ── CLOSING ───────────────────────────────────────────────── */}
       <section
