@@ -103,28 +103,90 @@ export function ProductTile({
           </div>
         )}
 
+        {/* NEW badge */}
+        {product.isNew && (
+          <span
+            style={{
+              position: "absolute",
+              top: "12px",
+              left: "12px",
+              background: "#D4AF37",
+              color: "#1A3040",
+              fontSize: "9px",
+              fontFamily: "var(--font-archivo-black), sans-serif",
+              fontWeight: 900,
+              letterSpacing: "0.25em",
+              textTransform: "uppercase",
+              padding: "4px 8px",
+              zIndex: 10,
+            }}
+          >
+            NEU
+          </span>
+        )}
       </div>
 
-      {/* Produktinfo wie bei H&M: schlicht, Name – Preis – Farbpunkte */}
-      <div style={{ padding: "10px 2px 0", fontFamily: "var(--font-syne)", color: "#1A3040" }}>
-        {product.isNew && (
-          <p style={{ fontSize: "11px", color: "#B8862B", marginBottom: "2px" }}>{t("new_label")}</p>
-        )}
-        <p style={{ fontSize: "13px", lineHeight: 1.35, marginBottom: "2px" }}>{name}</p>
-        <p style={{ fontSize: "13px", fontWeight: 600 }}>CHF {product.price.toFixed(2)}</p>
-        {product.colors.length > 1 && (
-          <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "8px" }}>
-            {product.colors.slice(0, 5).map((color) => (
-              <span
+      {/* Product info */}
+      <div style={{ padding: "12px 2px 0" }}>
+        {/* Color swatches */}
+        {product.colors.length > 0 && (
+          <div style={{ display: "flex", gap: "5px", marginBottom: "8px", flexWrap: "wrap" }}>
+            {product.colors.slice(0, 6).map((color) => (
+              <div
                 key={color}
-                style={{ width: "10px", height: "10px", borderRadius: "50%", background: color, border: "1px solid rgba(26,48,64,0.2)" }}
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "50%",
+                  background: color,
+                  border: "1px solid rgba(26,48,64,0.15)",
+                }}
               />
             ))}
-            {product.colors.length > 5 && (
-              <span style={{ fontSize: "11px", color: "rgba(26,48,64,0.55)", marginLeft: "2px" }}>+{product.colors.length - 5}</span>
+            {product.colors.length > 6 && (
+              <span style={{ fontSize: "9px", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", lineHeight: "12px" }}>
+                +{product.colors.length - 6}
+              </span>
             )}
           </div>
         )}
+
+        <p
+          style={{
+            fontSize: "9px",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: "#D4AF37",
+            fontFamily: "var(--font-geist-mono)",
+            marginBottom: "3px",
+          }}
+        >
+          {swimType(product) === "onepiece" ? t("type_onepiece") : swimType(product) === "set" ? t("type_set") : t("type_bikini")}
+        </p>
+        <p
+          style={{
+            fontSize: featured ? "14px" : "12px",
+            fontFamily: "var(--font-archivo-black), sans-serif",
+            fontWeight: 900,
+            textTransform: "uppercase",
+            letterSpacing: "0.03em",
+            color: "#1A3040",
+            marginBottom: "4px",
+            lineHeight: 1.2,
+          }}
+        >
+          {name}
+        </p>
+        <p
+          style={{
+            fontSize: "13px",
+            fontFamily: "var(--font-geist-mono)",
+            color: "#1A3040",
+            fontWeight: featured ? 700 : 400,
+          }}
+        >
+          CHF {product.price.toFixed(2)}
+        </p>
       </div>
     </Link>
   );
@@ -167,7 +229,7 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
           background: stuck ? DARK_BLUE : "#F8F3E8",
           borderBottom: `1px solid ${stuck ? "rgba(248,243,232,0.08)" : "rgba(26,48,64,0.08)"}`,
           transition: "background 0.25s ease",
-          padding: "0 clamp(0.5rem, 1.5vw, 1rem)",
+          padding: "0 clamp(1.5rem, 5vw, 2.5rem)",
         }}
       >
         <div
@@ -191,9 +253,11 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
                 type="button"
                 onClick={() => setFilter(f)}
                 style={{
-                  padding: "10px 16px",
-                  fontSize: "13px",
-                  fontFamily: "var(--font-syne)",
+                  padding: "10px 18px",
+                  fontSize: "10px",
+                  fontFamily: "var(--font-geist-mono)",
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
                   background: filter === f ? (stuck ? "#F8F3E8" : "#1A3040") : "transparent",
                   color: filter === f
                     ? (stuck ? "#1A3040" : "#F8F3E8")
@@ -217,8 +281,10 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
               onChange={(e) => setSort(e.target.value as Sort)}
               aria-label="Sortierung"
               style={{
-                fontSize: "13px",
-                fontFamily: "var(--font-syne)",
+                fontSize: "10px",
+                fontFamily: "var(--font-geist-mono)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
                 color: stuck ? "rgba(248,243,232,0.85)" : "rgba(26,48,64,0.6)",
                 background: "transparent",
                 border: "none",
@@ -232,9 +298,10 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
             </select>
             <span
               style={{
-                fontSize: "13px",
-                fontFamily: "var(--font-syne)",
-                color: stuck ? "rgba(248,243,232,0.6)" : "rgba(26,48,64,0.5)",
+                fontSize: "10px",
+                fontFamily: "var(--font-geist-mono)",
+                color: stuck ? "rgba(248,243,232,0.5)" : "rgba(26,48,64,0.35)",
+                letterSpacing: "0.1em",
                 paddingRight: "4px",
               }}
             >
@@ -245,14 +312,14 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
       </div>
 
       {/* ── Product grid ─────────────────────────────────────── */}
-      <div style={{ padding: "clamp(1rem, 2vw, 1.5rem) clamp(0.5rem, 1.5vw, 1rem) 4rem" }}>
+      <div style={{ padding: "clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 5vw, 2.5rem) 4rem" }}>
         {sorted.length === 0 ? (
           <div style={{ textAlign: "center", padding: "5rem 0", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", fontSize: "12px", letterSpacing: "0.15em", textTransform: "uppercase" }}>
             {t("empty")}
           </div>
         ) : (
           <div
-            style={{ display: "grid", columnGap: "4px", rowGap: "28px" }}
+            style={{ display: "grid", gap: "clamp(8px, 2vw, 16px)" }}
             className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           >
             {sorted.map((product) => (

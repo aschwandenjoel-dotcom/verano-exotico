@@ -29,6 +29,11 @@ export default async function HomePage({
   const isSet = getCategory("bikini-sets")!.match;
   const bikinis = all.filter((p) => getCategory("bikinis")!.match(p) && !isSet(p)).slice(0, 8);
   const swimsuits = all.filter(getCategory("badeanzuege")!.match).slice(0, 4);
+  // Bestseller unter dem Panorama – von Joel ausgewählt (Model-Bilder als grosse Kacheln)
+  const BESTSELLER_SLUGS = ["coral-lace-up-bikini", "micro-pushup-sand-leopard"];
+  const bestsellers = BESTSELLER_SLUGS
+    .map((slug) => all.find((p) => p.slug === slug))
+    .filter((p): p is NonNullable<typeof p> => !!p);
 
   return (
     <>
@@ -36,7 +41,7 @@ export default async function HomePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
       />
-      <VTLanding locale={locale as Locale} bikinis={bikinis} swimsuits={swimsuits} />
+      <VTLanding locale={locale as Locale} bestsellers={bestsellers} bikinis={bikinis} swimsuits={swimsuits} />
     </>
   );
 }

@@ -33,8 +33,7 @@
     "sort_newest": "Neuste",
     "sort_price_asc": "Preis aufsteigend",
     "sort_price_desc": "Preis absteigend",
-    "view_product": "Ansehen",
-    "new_label": "Neu"
+    "view_product": "Ansehen"
   },
   "product": {
     "add_to_cart": "In den Warenkorb",
@@ -291,7 +290,8 @@
     "tile_bikinis": "Bikinis shoppen",
     "tile_swimsuits": "Badeanzüge shoppen",
     "campaign_cta": "Unsere Geschichte",
-    "view_all": "Alle ansehen"
+    "view_all": "Alle ansehen",
+    "bestsellers": "Bestseller"
   },
   "consent": {
     "aria": "Hinweis zur Reichweitenmessung",

@@ -10,11 +10,12 @@ import Footer from "@/components/ui/Footer";
 import CustomerVoices from "@/components/ui/CustomerVoices";
 import { ProductTile } from "@/components/sections/CollectionGrid";
 import { getCategory } from "@/lib/categories";
+import { cardImages } from "@/lib/productImages";
 // Frueher dynamisch ohne SSR geladen (WebGL). Jetzt reines Markup + CSS,
 // darf serverseitig gerendert werden - das Bild ist dann Teil des ersten HTML.
 import PanoramaIntro from "@/components/3d/PanoramaIntro";
 
-interface Props { locale: Locale; bikinis: ShopProduct[]; swimsuits: ShopProduct[]; }
+interface Props { locale: Locale; bestsellers: ShopProduct[]; bikinis: ShopProduct[]; swimsuits: ShopProduct[]; }
 
 /* ─── Scroll reveal hook ─────────────────────────────────────────── */
 function useScrollReveal() {
@@ -89,7 +90,7 @@ function ProductRow({
 }
 
 /* ─── Main Landing ───────────────────────────────────────────────── */
-export default function VTLanding({ locale, bikinis, swimsuits }: Props) {
+export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: Props) {
   useScrollReveal();
   const t = useTranslations("landing");
   const year = new Date().getFullYear();
@@ -102,6 +103,54 @@ export default function VTLanding({ locale, bikinis, swimsuits }: Props) {
 
       {/* Aufbau nach Hunza G: Titelbild (Panorama) → Bikinis → zwei Bildkacheln
           → Badeanzüge → Kundenstimmen → Kampagnenbild → Footer */}
+
+      {/* ── BESTSELLER: zwei grosse Kacheln mit Model-Bildern ───── */}
+      {bestsellers.length > 0 && (
+        <section className="pt-16 md:pt-20">
+          <h2
+            className="px-6 md:px-10 mb-8 font-black uppercase text-2xl md:text-3xl reveal"
+            style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}
+          >
+            {t("bestsellers")}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            {bestsellers.map((product) => {
+              const src = (product.images ?? []).find((s) => s.includes("-model")) ?? cardImages(product).title;
+              return (
+                <Link
+                  key={product.slug}
+                  href={`/${locale}/product/${product.slug}`}
+                  className="group relative block overflow-hidden"
+                  style={{ aspectRatio: "4/5", background: "#EDE9E2" }}
+                >
+                  {src && (
+                    <Image
+                      src={src}
+                      alt={product.name[locale]}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="transition-transform duration-700 group-hover:scale-[1.03]"
+                      style={{ objectFit: "cover", objectPosition: "center top" }}
+                    />
+                  )}
+                  <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,25,35,0.45), rgba(5,25,35,0) 40%)" }} />
+                  <span className="absolute left-6 md:left-10 bottom-8 md:bottom-10" style={{ color: "#F8F3E8" }}>
+                    <span
+                      className="block text-[13px] tracking-[0.2em] uppercase underline underline-offset-[6px]"
+                      style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}
+                    >
+                      {product.name[locale]}
+                    </span>
+                    <span className="block mt-3 text-sm" style={{ fontFamily: "var(--font-geist-mono)" }}>
+                      CHF {product.price.toFixed(2)}
+                    </span>
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ── BIKINIS ─────────────────────────────────────────────── */}
       <ProductRow

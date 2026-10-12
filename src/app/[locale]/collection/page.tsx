@@ -205,26 +205,29 @@ export default async function CollectionPage({
           </div>
         </div>
 
-        {/* ── PRODUCT GRID — flach wie bei H&M, schiebt sich über das Cover ── */}
+        {/* ── PRODUCT GRID — schiebt sich über das Cover ────────── */}
         <div
           style={{
             position: "relative",
             zIndex: 1,
             background: "#F8F3E8",
+            borderRadius: "16px 16px 0 0",
+            marginTop: "-24px",
+            boxShadow: "0 -8px 40px rgba(10,61,82,0.18)",
           }}
         >
           {/* Kategorien — interne Links für Google und schnelle Navigation */}
           <nav
             aria-label={locale === "en" ? "Categories" : "Kategorien"}
-            className="flex gap-2 overflow-x-auto px-2 md:px-4 pt-5 pb-3"
+            className="flex gap-2 overflow-x-auto px-6 md:px-10 pt-6 pb-2"
             style={{ scrollbarWidth: "none" }}
           >
             {CATEGORIES.map((c) => (
               <Link
                 key={c.slug}
                 href={`/${locale}/${c.slug}`}
-                className="px-4 py-2 text-[13px] whitespace-nowrap"
-                style={{ border: "1px solid rgba(26,48,64,0.25)", color: "#1A3040", fontFamily: "var(--font-syne)" }}
+                className="px-4 py-2 text-[11px] font-mono rounded-full whitespace-nowrap"
+                style={{ border: "1px solid rgba(26,48,64,0.2)", color: "#1A3040" }}
               >
                 {c[locale as Locale].label}
               </Link>
