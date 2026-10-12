@@ -51,7 +51,13 @@
     "shipping": "Lieferung in 5–14 Werktagen",
     "trust_shipping": "Versand ab CHF 4.90",
     "trust_returns": "Reklamation innert 14 Tagen",
-    "trust_payment": "Sicher zahlen mit Karte & TWINT"
+    "trust_payment": "Sicher zahlen mit Karte & TWINT",
+    "acc_description": "Beschreibung",
+    "acc_size_fit": "Grösse und Passform",
+    "acc_material": "Material",
+    "acc_care": "Pflegehinweise",
+    "acc_delivery": "Versand und Rückgabe",
+    "delivery_more": "Alle Infos zu Versand und Rückgabe"
   },
   "cart": {
     "title": "Warenkorb",

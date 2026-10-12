@@ -3,32 +3,37 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import type { Locale, Product } from "@/types";
 import { useCart } from "@/context/CartContext";
 
 const SizeGuide = dynamic(() => import("./SizeGuide"), { ssr: false });
+
+export interface ProductLabels {
+  color: string;
+  size: string;
+  selectSize: string;
+  addToCart: string;
+  added: string;
+  sizeGuide: string;
+  shipping: string;
+  trustShipping: string;
+  trustReturns: string;
+  trustPayment: string;
+  accDescription: string;
+  accSizeFit: string;
+  accMaterial: string;
+  accCare: string;
+  accDelivery: string;
+  deliveryMore: string;
+}
 
 interface Props {
   product: Product;
   locale: Locale;
   activeColor: number;
   onSelectColor: (i: number) => void;
-  labels: {
-    color: string;
-    size: string;
-    selectSize: string;
-    addToCart: string;
-    added: string;
-    sizeGuide: string;
-    details: string;
-    material: string;
-    care: string;
-    measurements: string;
-    shipping: string;
-    trustShipping: string;
-    trustReturns: string;
-    trustPayment: string;
-  };
+  labels: ProductLabels;
 }
 
 export default function ProductDetail({ product, locale: loc, labels: t, activeColor, onSelectColor }: Props) {
@@ -232,27 +237,47 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         ))}
       </div>
 
-      {/* Details */}
-      <div className="space-y-6 pt-8" style={{ borderTop: "1px solid rgba(26,48,64,0.1)" }}>
-        {[
-          { label: t.details, content: product.description[loc] },
-          { label: t.material, content: product.material[loc] },
-          { label: t.care, content: product.care[loc] },
-          ...(product.measurements
-            ? [{ label: t.measurements, content: product.measurements[loc] }]
+      {/* Infos als Klappboxen wie bei H&M – alle zu, Text bleibt für Google im HTML */}
+      <Accordion
+        items={[
+          { id: "description", label: t.accDescription, content: <DetailText text={product.description[loc]} /> },
+          ...(product.measurements || product.sizeChart
+            ? [{
+                id: "size-fit",
+                label: t.accSizeFit,
+                content: (
+                  <div className="space-y-3">
+                    {product.measurements && <DetailText text={product.measurements[loc]} />}
+                    {product.sizeChart && (
+                      <button
+                        type="button"
+                        onClick={() => setSizeGuideOpen(true)}
+                        className="text-sm underline underline-offset-4"
+                        style={{ color: "#1A3040" }}
+                      >
+                        {t.sizeGuide}
+                      </button>
+                    )}
+                  </div>
+                ),
+              }]
             : []),
-        ].map(({ label, content }) => (
-          <div key={label}>
-            <h3
-              className="text-sm font-mono font-bold uppercase tracking-widest mb-2"
-              style={{ color: "#5E7A8A" }}
-            >
-              {label}
-            </h3>
-            <DetailText text={content} />
-          </div>
-        ))}
-      </div>
+          { id: "material", label: t.accMaterial, content: <DetailText text={product.material[loc]} /> },
+          { id: "care", label: t.accCare, content: <DetailText text={product.care[loc]} /> },
+          {
+            id: "delivery",
+            label: t.accDelivery,
+            content: (
+              <div className="space-y-3">
+                <DetailText text={[`– ${t.shipping}`, `– ${t.trustShipping}`, `– ${t.trustReturns}`].join("\n")} />
+                <Link href={`/${loc}/versand`} className="text-sm underline underline-offset-4" style={{ color: "#1A3040" }}>
+                  {t.deliveryMore}
+                </Link>
+              </div>
+            ),
+          },
+        ]}
+      />
 
     </div>
   );
@@ -279,6 +304,59 @@ function DetailText({ text }: { text: string }) {
           <p key={i} className="text-sm leading-relaxed" style={{ color }}>
             {lines.join(" ")}
           </p>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Klappboxen: Titel links, Pfeil rechts, Inhalt gleitet auf. Mehrere dürfen offen sein. */
+function Accordion({ items }: { items: { id: string; label: string; content: React.ReactNode }[] }) {
+  const [open, setOpen] = useState<Set<string>>(new Set());
+  const toggle = (id: string) =>
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  return (
+    <div style={{ borderTop: "1px solid rgba(26,48,64,0.15)" }}>
+      {items.map(({ id, label, content }) => {
+        const isOpen = open.has(id);
+        return (
+          <div key={id} style={{ borderBottom: "1px solid rgba(26,48,64,0.15)" }}>
+            <button
+              type="button"
+              id={`acc-${id}`}
+              aria-expanded={isOpen}
+              aria-controls={`acc-${id}-panel`}
+              onClick={() => toggle(id)}
+              className="w-full flex items-center justify-between py-5 text-left"
+              style={{ color: "#1A3040", background: "transparent", cursor: "pointer" }}
+            >
+              <span className="text-base">{label}</span>
+              <svg
+                width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden
+                style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.25s ease", flexShrink: 0 }}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {/* grid 0fr → 1fr: weiches Aufklappen ohne feste Höhe */}
+            <div
+              id={`acc-${id}-panel`}
+              role="region"
+              aria-labelledby={`acc-${id}`}
+              style={{ display: "grid", gridTemplateRows: isOpen ? "1fr" : "0fr", transition: "grid-template-rows 0.3s ease" }}
+            >
+              <div style={{ overflow: "hidden" }}>
+                <div className="pb-6">{content}</div>
+              </div>
+            </div>
+          </div>
         );
       })}
     </div>

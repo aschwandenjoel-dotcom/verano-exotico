@@ -68,14 +68,16 @@ export default async function ProductPage({
             addToCart: t("add_to_cart"),
             added: t("added"),
             sizeGuide: t("size_guide"),
-            details: t("details"),
-            material: t("material"),
-            care: t("care"),
-            measurements: t("measurements"),
             shipping: t("shipping"),
             trustShipping: t("trust_shipping"),
             trustReturns: t("trust_returns"),
             trustPayment: t("trust_payment"),
+            accDescription: t("acc_description"),
+            accSizeFit: t("acc_size_fit"),
+            accMaterial: t("acc_material"),
+            accCare: t("acc_care"),
+            accDelivery: t("acc_delivery"),
+            deliveryMore: t("delivery_more"),
           }}
         />
       </div>

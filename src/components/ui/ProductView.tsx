@@ -2,28 +2,13 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import ProductGallery from "./ProductGallery";
-import ProductDetail from "./ProductDetail";
+import ProductDetail, { type ProductLabels } from "./ProductDetail";
 import type { Locale, Product } from "@/types";
 
 interface Props {
   product: Product;
   locale: Locale;
-  labels: {
-    color: string;
-    size: string;
-    selectSize: string;
-    addToCart: string;
-    added: string;
-    sizeGuide: string;
-    details: string;
-    material: string;
-    care: string;
-    measurements: string;
-    shipping: string;
-    trustShipping: string;
-    trustReturns: string;
-    trustPayment: string;
-  };
+  labels: ProductLabels;
 }
 
 const noopSubscribe = () => () => {};

@@ -51,7 +51,13 @@
     "shipping": "Delivery in 5–14 business days",
     "trust_shipping": "Shipping from CHF 4.90",
     "trust_returns": "14 days to report defects",
-    "trust_payment": "Secure payment by card & TWINT"
+    "trust_payment": "Secure payment by card & TWINT",
+    "acc_description": "Description",
+    "acc_size_fit": "Size and fit",
+    "acc_material": "Material",
+    "acc_care": "Care instructions",
+    "acc_delivery": "Delivery and returns",
+    "delivery_more": "All about delivery and returns"
   },
   "cart": {
     "title": "Cart",
