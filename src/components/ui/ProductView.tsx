@@ -39,7 +39,7 @@ export default function ProductView({ product, locale, labels }: Props) {
 
   return (
     // Wie bei H&M: links die Bilder gross untereinander, rechts die Infos
-    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-8 md:gap-12 items-start">
+    <div className="grid grid-cols-1 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] items-start">
       <ProductGallery product={product} locale={locale} activeColor={activeColor} />
       <StickyPanel>
         <ProductDetail
@@ -85,7 +85,7 @@ function StickyPanel({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div ref={ref} className="md:sticky" style={{ top: STICKY_TOP }}>
+    <div ref={ref} className="md:sticky px-6 md:px-10 lg:px-16" style={{ top: STICKY_TOP }}>
       {children}
     </div>
   );

@@ -22,7 +22,7 @@ export default async function AboutPage({
   const { locale } = await params;
   return (
     <ShopShell locale={locale as Locale}>
-      <div className="pt-16">
+      <div className="pt-[72px]">
         <BrandStory />
       </div>
     </ShopShell>

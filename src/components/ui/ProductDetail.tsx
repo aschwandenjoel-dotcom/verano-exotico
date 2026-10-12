@@ -281,15 +281,13 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         id="reviews"
         onClick={() => setDrawerState(true)}
         className="w-full flex items-center justify-between py-5 text-left"
-        style={{ color: "#1A3040", background: "transparent", cursor: "pointer", borderBottom: "1px solid rgba(26,48,64,0.15)", scrollMarginTop: "120px" }}
+        style={{ color: "#1A3040", background: "transparent", cursor: "pointer", scrollMarginTop: "120px" }}
       >
-        <span className="text-base">
+        <span className="text-[15px] uppercase tracking-[0.04em]">
           {tr("count_many")}
           {reviews.length > 0 && <span style={{ color: "rgba(26,48,64,0.55)" }}> ({reviews.length})</span>}
         </span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <polyline points="9 6 15 12 9 18" />
-        </svg>
+        <PlusIcon open={false} />
       </button>
 
       <ReviewDrawer
@@ -333,7 +331,17 @@ function DetailText({ text }: { text: string }) {
   );
 }
 
-/** Klappboxen: Titel links, Pfeil rechts, Inhalt gleitet auf. Mehrere dürfen offen sein. */
+/** Dünnes Plus, das beim Aufklappen zum Minus wird. */
+function PlusIcon({ open }: { open: boolean }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" aria-hidden style={{ flexShrink: 0 }}>
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="12" y1="4" x2="12" y2="20" style={{ transform: open ? "scaleY(0)" : "none", transformOrigin: "center", transition: "transform 0.25s ease" }} />
+    </svg>
+  );
+}
+
+/** Klappboxen: Titel in Versalien links, Plus rechts, Inhalt gleitet auf. Mehrere dürfen offen sein. */
 function Accordion({ items }: { items: { id: string; label: string; content: React.ReactNode }[] }) {
   const [open, setOpen] = useState<Set<string>>(new Set());
   const toggle = (id: string) =>
@@ -345,11 +353,11 @@ function Accordion({ items }: { items: { id: string; label: string; content: Rea
     });
 
   return (
-    <div style={{ borderTop: "1px solid rgba(26,48,64,0.15)" }}>
+    <div>
       {items.map(({ id, label, content }) => {
         const isOpen = open.has(id);
         return (
-          <div key={id} style={{ borderBottom: "1px solid rgba(26,48,64,0.15)" }}>
+          <div key={id}>
             <button
               type="button"
               id={`acc-${id}`}
@@ -359,14 +367,8 @@ function Accordion({ items }: { items: { id: string; label: string; content: Rea
               className="w-full flex items-center justify-between py-5 text-left"
               style={{ color: "#1A3040", background: "transparent", cursor: "pointer" }}
             >
-              <span className="text-base">{label}</span>
-              <svg
-                width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden
-                style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.25s ease", flexShrink: 0 }}
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
+              <span className="text-[15px] uppercase tracking-[0.04em]">{label}</span>
+              <PlusIcon open={isOpen} />
             </button>
             {/* grid 0fr → 1fr: weiches Aufklappen ohne feste Höhe */}
             <div

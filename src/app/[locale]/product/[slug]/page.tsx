@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import ShopShell from "@/components/ui/ShopShell";
-import BackButton from "@/components/ui/BackButton";
 import ProductView from "@/components/ui/ProductView";
 import CustomerVoices from "@/components/ui/CustomerVoices";
 import { fetchProductBySlug, fetchProducts } from "@/lib/api";
@@ -52,10 +51,8 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="pt-24 pb-20 px-6 md:px-10" style={{ background: "#F8F3E8" }}>
-        <div className="max-w-6xl mx-auto">
-          <BackButton />
-        </div>
+      {/* Wie bei H&M: Bilder direkt unter dem Header (72 px) und bündig am linken Rand */}
+      <div className="pt-[72px] pb-20" style={{ background: "#F8F3E8" }}>
         <ProductView
           product={product}
           locale={loc}

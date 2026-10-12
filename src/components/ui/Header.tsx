@@ -1,14 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { Locale } from "@/types";
 import { useCart } from "@/context/CartContext";
+import { DARK_BLUE } from "@/lib/theme";
+
+const CREAM = "#F8F3E8";
+
+/** Seite gescrollt? Für den anfangs durchsichtigen Header der Startseite. */
+const subscribeScroll = (cb: () => void) => {
+  window.addEventListener("scroll", cb, { passive: true });
+  return () => window.removeEventListener("scroll", cb);
+};
 
 interface Props {
   locale: Locale;
+  /** Oben durchsichtig über dem Titelbild, ab dem ersten Scrollen dunkelblau (Startseite). */
+  transparentAtTop?: boolean;
 }
 
 const LOCALES: Locale[] = ["de", "en"];
@@ -31,13 +42,13 @@ function LanguageSwitch({ locale, onNavigate }: { locale: Locale; onNavigate?: (
     >
       {LOCALES.map((l, i) => (
         <span key={l} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          {i > 0 && <span aria-hidden="true" style={{ color: "rgba(26,48,64,0.25)" }}>/</span>}
+          {i > 0 && <span aria-hidden="true" style={{ color: "rgba(248,243,232,0.3)" }}>/</span>}
           <Link
             href={pathFor(l)}
             onClick={onNavigate}
             aria-current={l === locale ? "true" : undefined}
             style={{
-              color: l === locale ? "#1A3040" : "rgba(26,48,64,0.4)",
+              color: l === locale ? CREAM : "rgba(248,243,232,0.55)",
               fontWeight: l === locale ? 700 : 400,
               textDecoration: "none",
               textTransform: "uppercase",
@@ -52,8 +63,10 @@ function LanguageSwitch({ locale, onNavigate }: { locale: Locale; onNavigate?: (
   );
 }
 
-export default function Header({ locale }: Props) {
+export default function Header({ locale, transparentAtTop = false }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const scrolled = useSyncExternalStore(subscribeScroll, () => window.scrollY > 40, () => false);
+  const solid = !transparentAtTop || scrolled || menuOpen;
   const { openCart, totalCount } = useCart();
   const t = useTranslations("nav");
   const tc = useTranslations("cart");
@@ -70,10 +83,12 @@ export default function Header({ locale }: Props) {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-4"
+      className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 h-[72px]"
       style={{
-        background: "#F8F3E8",
-        borderBottom: "1px solid rgba(26,48,64,0.1)",
+        // Durchsichtig: leichter Verlauf, damit Logo und Navigation auf hellen Bildstellen lesbar bleiben
+        background: solid ? DARK_BLUE : "linear-gradient(to bottom, rgba(5,25,35,0.45), rgba(5,25,35,0))",
+        borderBottom: `1px solid ${solid ? "rgba(248,243,232,0.08)" : "transparent"}`,
+        transition: "background 0.3s ease, border-color 0.3s ease",
         display: "grid",
         gridTemplateColumns: "1fr auto 1fr",
         alignItems: "center",
@@ -89,7 +104,7 @@ export default function Header({ locale }: Props) {
       <Link
         href={`/${locale}`}
         className="text-[15px] md:text-[18px] whitespace-nowrap"
-        style={{ color: "#1A3040", textDecoration: "none", lineHeight: 1, gridColumn: 1 }}
+        style={{ color: CREAM, textDecoration: "none", lineHeight: 1, gridColumn: 1 }}
         aria-label="Verano Exótico — Startseite"
       >
         <span
@@ -117,9 +132,9 @@ export default function Header({ locale }: Props) {
             key={link.href}
             href={link.href}
             className="text-[10px] tracking-[0.25em] uppercase transition-colors"
-            style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.5)")}
+            style={{ color: "rgba(248,243,232,0.7)", fontFamily: "var(--font-geist-mono)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = CREAM)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(248,243,232,0.7)")}
           >
             {link.label}
           </Link>
@@ -143,7 +158,7 @@ export default function Header({ locale }: Props) {
           <button
             onClick={openCart}
             aria-label={tc("title")}
-            style={{ position: "relative", width: "40px", height: "40px", border: "1px solid rgba(26,48,64,0.15)", borderRadius: "50%", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#1A3040", flexShrink: 0 }}
+            style={{ position: "relative", width: "40px", height: "40px", border: "1px solid rgba(248,243,232,0.3)", borderRadius: "50%", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: CREAM, flexShrink: 0 }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
@@ -169,9 +184,9 @@ export default function Header({ locale }: Props) {
           aria-controls="mobile-menu"
           style={{
             position: "relative", width: "40px", height: "40px", flexShrink: 0,
-            border: "1px solid rgba(26,48,64,0.15)", borderRadius: "50%",
-            background: menuOpen ? "rgba(26,48,64,0.06)" : "transparent",
-            color: "#1A3040", cursor: "pointer",
+            border: "1px solid rgba(248,243,232,0.3)", borderRadius: "50%",
+            background: menuOpen ? "rgba(248,243,232,0.1)" : "transparent",
+            color: CREAM, cursor: "pointer",
             display: "flex", flexDirection: "column",
             alignItems: "center", justifyContent: "center", gap: "4px",
           }}
@@ -198,9 +213,9 @@ export default function Header({ locale }: Props) {
           id="mobile-menu"
           className="absolute top-full left-0 right-0 flex flex-col px-6 pt-2 pb-6 md:hidden"
           style={{
-            background: "#F8F3E8",
-            borderTop: "1px solid rgba(26,48,64,0.1)",
-            boxShadow: "0 12px 24px -12px rgba(26,48,64,0.25)",
+            background: DARK_BLUE,
+            borderTop: "1px solid rgba(248,243,232,0.1)",
+            boxShadow: "0 12px 24px -12px rgba(0,0,0,0.35)",
           }}
         >
           {navLinks.map((link) => {
@@ -214,12 +229,12 @@ export default function Header({ locale }: Props) {
                 aria-current={active ? "page" : undefined}
                 className="flex items-center justify-between text-base tracking-wide"
                 style={{
-                  color: "#1A3040",
+                  color: CREAM,
                   fontFamily: "var(--font-syne)",
                   fontWeight: active ? 700 : 500,
                   textDecoration: "none",
                   minHeight: "52px", // bequeme Trefferflaeche statt 5px Zeilenabstand
-                  borderBottom: "1px solid rgba(26,48,64,0.08)",
+                  borderBottom: "1px solid rgba(248,243,232,0.1)",
                 }}
               >
                 {link.label}

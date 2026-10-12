@@ -53,7 +53,8 @@ export default function BrandStory() {
       <section
         className="about-hero"
         style={{
-          background: "#243d52",
+          // Sand statt Blau: Header und Footer sind dunkelblau, sonst flössen sie ineinander
+          background: "#EDE6DA",
           display: "flex",
           flexDirection: "column",
           padding: "clamp(7rem, 12vw, 11rem) clamp(2rem, 6vw, 7rem) clamp(4rem, 7vw, 7rem)",
@@ -92,7 +93,7 @@ export default function BrandStory() {
             lineHeight: 1.0,
             letterSpacing: "-0.03em",
             textTransform: "uppercase",
-            color: "#F8F3E8",
+            color: "#1A3040",
             marginBottom: "clamp(2rem, 4vw, 3.5rem)",
             transitionDelay: "0.1s",
           }}
@@ -121,7 +122,7 @@ export default function BrandStory() {
         <p
           className="about-reveal"
           style={{
-            color: "rgba(248,243,232,0.45)",
+            color: "rgba(26,48,64,0.65)",
             fontSize: "clamp(0.8rem, 1.1vw, 0.95rem)",
             letterSpacing: "0.04em",
             fontFamily: "var(--font-syne)",
@@ -138,7 +139,7 @@ export default function BrandStory() {
           position: "absolute",
           bottom: "clamp(2rem, 4vw, 3.5rem)",
           right: "clamp(2rem, 6vw, 7rem)",
-          color: "rgba(248,243,232,0.12)",
+          color: "rgba(26,48,64,0.2)",
           fontSize: "9px",
           letterSpacing: "0.45em",
           fontFamily: "var(--font-geist-mono)",
@@ -501,7 +502,7 @@ export default function BrandStory() {
       {/* ── CLOSING ───────────────────────────────────────────────── */}
       <section
         style={{
-          background: "#243d52",
+          background: "#EDE6DA",
           padding: "clamp(5rem, 10vw, 10rem) clamp(1.5rem, 5vw, 5rem)",
           textAlign: "center",
           position: "relative",
@@ -530,7 +531,7 @@ export default function BrandStory() {
               fontSize: "clamp(1.8rem, 5vw, 4.5rem)",
               lineHeight: 1.1,
               textTransform: "uppercase",
-              color: "#F8F3E8",
+              color: "#1A3040",
               marginBottom: "clamp(1.5rem, 3vw, 2.5rem)",
             }}
           >

@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import type { Locale, Product as ShopProduct } from "@/types";
 import { cardImages } from "@/lib/productImages";
 import Header from "@/components/ui/Header";
+import Footer from "@/components/ui/Footer";
 import CustomerVoices from "@/components/ui/CustomerVoices";
-import { WELCOME_DISCOUNT_PERCENT } from "@/lib/newsletterOffer";
 // Frueher dynamisch ohne SSR geladen (WebGL). Jetzt reines Markup + CSS,
 // darf serverseitig gerendert werden - das Bild ist dann Teil des ersten HTML.
 import PanoramaIntro from "@/components/3d/PanoramaIntro";
@@ -116,87 +116,10 @@ function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; 
   );
 }
 
-/* ─── Newsletter ─────────────────────────────────────────────────── */
-function NewsletterInput() {
-  const t = useTranslations("newsletter");
-  const locale = useLocale();
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [sending, setSending] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!email.trim() || sending) return;
-    setSending(true);
-    setFailed(false);
-    try {
-      const res = await fetch("/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), locale }),
-      });
-      if (res.ok) setSubmitted(true);
-      else setFailed(true);
-    } catch {
-      setFailed(true);
-    } finally {
-      setSending(false);
-    }
-  }
-
-  if (submitted) {
-    return (
-      <p className="text-sm tracking-widest uppercase" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
-        ✓ {t("success")}
-      </p>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-0 w-full max-w-md">
-      <label htmlFor="newsletter-email" className="sr-only">{t("placeholder")}</label>
-      <input
-        id="newsletter-email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder={t("placeholder")}
-        required
-        className="flex-1 bg-transparent px-4 py-3 text-sm outline-none transition-colors"
-        style={{
-          border: "1px solid rgba(248,243,232,0.3)",
-          color: "#F8F3E8",
-          fontFamily: "var(--font-geist-mono)",
-          minHeight: "44px",
-        }}
-        onFocus={(e) => (e.target.style.borderColor = "#D4AF37")}
-        onBlur={(e) => (e.target.style.borderColor = "rgba(248,243,232,0.3)")}
-      />
-      <button
-        type="submit"
-        disabled={sending}
-        className="px-6 py-3 text-[10px] font-black tracking-[0.25em] uppercase transition-colors hover:opacity-80"
-        style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px", opacity: sending ? 0.7 : 1 }}
-      >
-        {sending ? "…" : t("submit")}
-      </button>
-      {failed && (
-        <p className="text-[11px] sm:self-center sm:ml-3 mt-2 sm:mt-0" style={{ color: "#E8A0A0", fontFamily: "var(--font-geist-mono)" }}>
-          {t("error")}
-        </p>
-      )}
-    </form>
-  );
-}
-
 /* ─── Main Landing ───────────────────────────────────────────────── */
 export default function VTLanding({ locale, products }: Props) {
   useScrollReveal();
   const t = useTranslations("landing");
-  const tf = useTranslations("footer");
-  const tn = useTranslations("nav");
-  const tNews = useTranslations("newsletter");
   const year = new Date().getFullYear();
   const shopScrollRef = useRef<HTMLDivElement>(null);
   // Welche Karte gerade links anliegt - fuer die Punkte unter der Reihe.
@@ -227,7 +150,7 @@ export default function VTLanding({ locale, products }: Props) {
       <PanoramaIntro />
 
       {/* ── HEADER ──────────────────────────────────────────────── */}
-      <Header locale={locale} />
+      <Header locale={locale} transparentAtTop />
 
       {/* ── HERO ────────────────────────────────────────────────── */}
       <section
@@ -497,102 +420,8 @@ export default function VTLanding({ locale, products }: Props) {
         </div>
       </section>
 
-      {/* ── NEWSLETTER / FOOTER ─────────────────────────────────── */}
-      <footer style={{ background: "#0A3D52" }}>
-        <div
-          className="px-6 md:px-10 py-20 border-b relative overflow-hidden"
-          style={{ borderColor: "rgba(255,255,255,0.08)" }}
-        >
-          <div
-            className="absolute inset-0 opacity-[0.03] pointer-events-none"
-            style={{
-              backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-              backgroundSize: "200px",
-            }}
-            aria-hidden="true"
-          />
-          <div className="max-w-2xl relative reveal">
-            <p
-              className="text-[10px] tracking-[0.35em] uppercase mb-4"
-              style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}
-            >
-              Newsletter
-            </p>
-            <h2
-              className="font-black uppercase leading-tight mb-8"
-              style={{ fontSize: "clamp(2.5rem, 8vw, 6rem)", color: "#F8F3E8", fontFamily: "var(--font-archivo-black), sans-serif" }}
-            >
-              {t("newsletter_title_1")}<br />
-              <span style={{ color: "#D4AF37" }}>{t("newsletter_title_2")}</span>
-            </h2>
-            {WELCOME_DISCOUNT_PERCENT > 0 && (
-              <p
-                className="text-sm mb-6 -mt-4"
-                style={{ color: "rgba(248,243,232,0.75)", fontFamily: "var(--font-geist-mono)" }}
-              >
-                {tNews("offer", { percent: WELCOME_DISCOUNT_PERCENT })}
-              </p>
-            )}
-            <NewsletterInput />
-          </div>
-        </div>
-
-        <div className="px-6 md:px-10 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 md:gap-4">
-          <div>
-            <p
-              className="text-xs font-black tracking-[0.2em] uppercase mb-1"
-              style={{ color: "#F8F3E8", fontFamily: "var(--font-archivo-black), sans-serif" }}
-            >
-              VERANO EXOTICO
-            </p>
-            <p className="text-[10px]" style={{ color: "rgba(248,243,232,0.35)", fontFamily: "var(--font-geist-mono)" }}>
-              {t("footer_tagline")}
-            </p>
-            <a
-              href="https://www.instagram.com/veranoexotico/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="inline-flex items-center gap-2.5 mt-5 text-[11px] tracking-[0.2em] uppercase transition-colors"
-              style={{ color: "rgba(248,243,232,0.6)", fontFamily: "var(--font-geist-mono)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#D4AF37")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(248,243,232,0.6)")}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <rect x="2" y="2" width="20" height="20" rx="5" />
-                <circle cx="12" cy="12" r="4" />
-                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-              </svg>
-              @veranoexotico
-            </a>
-          </div>
-
-          <nav className="flex items-center gap-x-6 gap-y-3 flex-wrap" aria-label="Footer-Navigation">
-            {[
-              { label: tn("collection"), href: `/${locale}/collection` },
-              { label: tf("links_shipping"), href: `/${locale}/versand` },
-              { label: tf("links_terms"), href: `/${locale}/agb` },
-              { label: tf("links_legal"), href: `/${locale}/impressum` },
-              { label: tf("links_privacy"), href: `/${locale}/datenschutz` },
-            ].map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="text-[10px] tracking-[0.2em] uppercase transition-colors"
-                style={{ color: "rgba(248,243,232,0.35)", fontFamily: "var(--font-geist-mono)" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#D4AF37")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(248,243,232,0.35)")}
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
-
-          <p className="text-[10px]" style={{ color: "rgba(248,243,232,0.2)", fontFamily: "var(--font-geist-mono)" }}>
-            © {new Date().getFullYear()} Verano Exotico
-          </p>
-        </div>
-      </footer>
+      {/* ── FOOTER (gemeinsam mit allen Seiten, inkl. Newsletter) ── */}
+      <Footer />
     </div>
   );
 }

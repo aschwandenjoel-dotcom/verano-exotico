@@ -68,7 +68,7 @@ export default function ProductGallery({ product, locale, activeColor }: Props) 
           const el = e.currentTarget;
           if (el.clientWidth) setCurrent(Math.round(el.scrollLeft / el.clientWidth));
         }}
-        className="flex gap-2 overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-2 md:overflow-visible md:snap-none"
+        className="flex gap-1 overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-2 md:overflow-visible md:snap-none"
         style={{ scrollbarWidth: "none" }}
       >
         {images.map((src, i) => {
