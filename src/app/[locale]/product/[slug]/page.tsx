@@ -1,10 +1,8 @@
-import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import ShopShell from "@/components/ui/ShopShell";
 import BackButton from "@/components/ui/BackButton";
 import ProductView from "@/components/ui/ProductView";
-import ReviewSection from "@/components/ui/ReviewSection";
 import CustomerVoices from "@/components/ui/CustomerVoices";
 import { fetchProductBySlug, fetchProducts } from "@/lib/api";
 import { firstParagraph, pageMetadata, productJsonLd } from "@/lib/seo";
@@ -86,11 +84,6 @@ export default async function ProductPage({
           für den Slug keine Kommentare gibt — Import: node tools/cj-reviews.mjs */}
       <CustomerVoices locale={loc} slug={product.slug} />
 
-      {/* Suspense: ReviewSection liest den Bewertungs-Token aus ?r= — ohne die
-          Grenze müsste Next.js die ganze Produktseite dynamisch rendern. */}
-      <Suspense fallback={null}>
-        <ReviewSection productSlug={product.slug} />
-      </Suspense>
     </ShopShell>
   );
 }

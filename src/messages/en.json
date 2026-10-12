@@ -167,7 +167,8 @@
     "error_duplicate": "There's already a review for this item from your order.",
     "verified": "Verified purchase",
     "verified_hint": "You ordered this piece — your review will be shown as a verified purchase.",
-    "rating_stars": "out of 5 stars"
+    "rating_stars": "out of 5 stars",
+    "close": "Close"
   },
   "voices": {
     "label": "Real comments",

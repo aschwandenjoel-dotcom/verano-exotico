@@ -167,7 +167,8 @@
     "error_duplicate": "Für diesen Artikel liegt aus deiner Bestellung bereits eine Bewertung vor.",
     "verified": "Verifizierter Kauf",
     "verified_hint": "Du hast dieses Stück bestellt — deine Bewertung wird als verifizierter Kauf angezeigt.",
-    "rating_stars": "von 5 Sternen"
+    "rating_stars": "von 5 Sternen",
+    "close": "Schliessen"
   },
   "voices": {
     "label": "Echte Kommentare",

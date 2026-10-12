@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import type { Locale, Product } from "@/types";
 import { useCart } from "@/context/CartContext";
+import { useProductReviews, RatingSummary, ReviewDrawer } from "./ReviewSection";
 
 const SizeGuide = dynamic(() => import("./SizeGuide"), { ssr: false });
 
@@ -45,6 +47,12 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
   // das die Kundin noch gar nicht falsch gemacht hat.
   const [sizeHint, setSizeHint] = useState(false);
   const { addItem } = useCart();
+  const tr = useTranslations("reviews");
+  // Bewertungen wie bei H&M: Seitenleiste; über den Link aus der Bewertungs-Mail gleich offen
+  const { reviews, avg, token, addReview } = useProductReviews(product.slug);
+  const [drawerState, setDrawerState] = useState<boolean | null>(null);
+  const drawerOpen = drawerState ?? !!token;
+  const closeDrawer = useCallback(() => setDrawerState(false), []);
 
   // Produkte mit Grössenauswahl dürfen nicht ohne Grösse in den Warenkorb:
   // die CJ-Variante wird über "Farbe|Grösse" aufgelöst (src/lib/cjMapping.ts),
@@ -97,6 +105,12 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
       <p className="text-3xl font-bold mb-8" style={{ color: "#D4AF37" }}>
         CHF {product.price.toFixed(2)}
       </p>
+
+      {reviews.length > 0 && (
+        <div className="-mt-5 mb-8">
+          <RatingSummary avg={avg} count={reviews.length} onClick={() => setDrawerState(true)} />
+        </div>
+      )}
 
       {/* Color swatches */}
       {product.colors.length > 0 && (
@@ -200,11 +214,6 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         </p>
       )}
 
-      {/* Versand-Hinweis direkt bei der Kaufentscheidung */}
-      <p className="text-xs font-mono text-center mb-4" style={{ color: "rgba(26,48,64,0.5)" }}>
-        {t.shipping}
-      </p>
-
       {product.sizeChart && (
         <button
           onClick={() => setSizeGuideOpen(true)}
@@ -223,19 +232,6 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
       {sizeGuideOpen && (
         <SizeGuide product={product} onClose={() => setSizeGuideOpen(false)} />
       )}
-
-      {/* Trust bar */}
-      <div className="flex items-center justify-center gap-5 flex-wrap mb-10">
-        {[t.trustShipping, t.trustReturns, t.trustPayment].map((item) => (
-          <span
-            key={item}
-            className="text-[10px] font-mono tracking-widest uppercase"
-            style={{ color: "rgba(26,48,64,0.55)" }}
-          >
-            ✓ {item}
-          </span>
-        ))}
-      </div>
 
       {/* Infos als Klappboxen wie bei H&M – alle zu, Text bleibt für Google im HTML */}
       <Accordion
@@ -269,7 +265,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
             label: t.accDelivery,
             content: (
               <div className="space-y-3">
-                <DetailText text={[`– ${t.shipping}`, `– ${t.trustShipping}`, `– ${t.trustReturns}`].join("\n")} />
+                <DetailText text={[`– ${t.shipping}`, `– ${t.trustShipping}`, `– ${t.trustReturns}`, `– ${t.trustPayment}`].join("\n")} />
                 <Link href={`/${loc}/versand`} className="text-sm underline underline-offset-4" style={{ color: "#1A3040" }}>
                   {t.deliveryMore}
                 </Link>
@@ -277,6 +273,33 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
             ),
           },
         ]}
+      />
+
+      {/* Bewertungen als letzte Zeile, öffnet die Seitenleiste (Anker für den Mail-Link) */}
+      <button
+        type="button"
+        id="reviews"
+        onClick={() => setDrawerState(true)}
+        className="w-full flex items-center justify-between py-5 text-left"
+        style={{ color: "#1A3040", background: "transparent", cursor: "pointer", borderBottom: "1px solid rgba(26,48,64,0.15)", scrollMarginTop: "120px" }}
+      >
+        <span className="text-base">
+          {tr("count_many")}
+          {reviews.length > 0 && <span style={{ color: "rgba(26,48,64,0.55)" }}> ({reviews.length})</span>}
+        </span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <polyline points="9 6 15 12 9 18" />
+        </svg>
+      </button>
+
+      <ReviewDrawer
+        open={drawerOpen}
+        onClose={closeDrawer}
+        productSlug={product.slug}
+        reviews={reviews}
+        avg={avg}
+        token={token}
+        onAdded={addReview}
       />
 
     </div>

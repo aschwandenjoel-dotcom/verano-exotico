@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
 import { useTranslations, useLocale } from "next-intl";
 
-interface Review {
+export interface Review {
   id: string;
   name: string;
   rating: number;
@@ -114,22 +113,20 @@ const labelStyle: React.CSSProperties = {
   marginBottom: "8px",
 };
 
-export default function ReviewSection({ productSlug }: { productSlug: string }) {
-  const t = useTranslations("reviews");
-  const locale = useLocale();
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [name, setName] = useState("");
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [formOpen, setFormOpen] = useState(false);
+const noopSubscribe = () => () => {};
 
-  // Token aus der Bewertungs-Mail (…/product/slug?r=<token>). Die Produktseite
-  // bleibt statisch — deshalb steht die Sektion in page.tsx in einer Suspense-
-  // Grenze, wie es Next.js für useSearchParams verlangt.
-  const token = useSearchParams().get("r") ?? "";
+/**
+ * Bewertungen eines Produkts laden. Der Token aus der Bewertungs-Mail
+ * (…/product/slug?r=<token>#reviews) wird erst im Browser gelesen – so bleibt die
+ * Produktseite statisch und braucht keine Suspense-Grenze für useSearchParams.
+ */
+export function useProductReviews(productSlug: string) {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const token = useSyncExternalStore(
+    noopSubscribe,
+    () => new URLSearchParams(window.location.search).get("r") ?? "",
+    () => "",
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -139,6 +136,75 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
       .catch(() => {});
     return () => { cancelled = true; };
   }, [productSlug]);
+
+  const avg = reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
+  const addReview = useCallback((r: Review) => setReviews((prev) => [r, ...prev]), []);
+  return { reviews, avg, token, addReview };
+}
+
+/** Kleine Sterne mit Schnitt und Anzahl, z. B. unter dem Preis. Ohne Bewertungen nichts. */
+export function RatingSummary({ avg, count, onClick }: { avg: number; count: number; onClick: () => void }) {
+  if (count === 0) return null;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-2"
+      style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "#1A3040" }}
+    >
+      <StaticStars value={avg} size={14} />
+      <span className="text-sm underline underline-offset-4">{avg.toFixed(1)} ({count})</span>
+    </button>
+  );
+}
+
+/** Sterne für Anzeige, auch halbe Werte (Schnitt) – gefüllter Anteil per Breite. */
+function StaticStars({ value, size }: { value: number; size: number }) {
+  return (
+    <span style={{ position: "relative", display: "inline-block", fontSize: size, lineHeight: 1, letterSpacing: "1px" }} aria-hidden>
+      <span style={{ color: "rgba(26,48,64,0.2)" }}>★★★★★</span>
+      <span style={{ position: "absolute", inset: 0, width: `${(value / 5) * 100}%`, overflow: "hidden", whiteSpace: "nowrap", color: "#1A3040" }}>
+        ★★★★★
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Bewertungen wie bei H&M: Seitenleiste von rechts mit Schnitt, Liste und Formular.
+ * Ohne Bewertungen (oder über den Mail-Link) ist das Formular gleich offen.
+ */
+export function ReviewDrawer({
+  open, onClose, productSlug, reviews, avg, token, onAdded,
+}: {
+  open: boolean;
+  onClose: () => void;
+  productSlug: string;
+  reviews: Review[];
+  avg: number;
+  token: string;
+  onAdded: (r: Review) => void;
+}) {
+  const t = useTranslations("reviews");
+  const locale = useLocale();
+  const [name, setName] = useState("");
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [formWanted, setFormWanted] = useState(false);
+  const showForm = formWanted || reviews.length === 0 || !!token;
+
+  // Escape schliesst, Seite dahinter scrollt nicht mit
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+  }, [open, onClose]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,216 +221,154 @@ export default function ReviewSection({ productSlug }: { productSlug: string }) 
       });
       if (res.status === 409) { setError("duplicate"); return; }
       if (!res.ok) { setError("submit"); return; }
-      const review: Review = await res.json();
-      setReviews((prev) => [review, ...prev]);
+      onAdded(await res.json());
       setSubmitted(true);
+      setFormWanted(false);
       setName(""); setRating(0); setComment("");
     } catch {
       setError("submit");
     } finally {
       setSubmitting(false);
     }
-  }, [productSlug, name, rating, comment, token]);
+  }, [productSlug, name, rating, comment, token, onAdded]);
 
-  const avg = reviews.length > 0
-    ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
-    : null;
-
-  // Formular (bzw. Dank nach dem Absenden) – in beiden Layouts dasselbe
-  const formCard = (
-    submitted ? (
-      <div style={{ border: "1px solid rgba(26,48,64,0.1)", borderRadius: "12px", padding: "40px", textAlign: "center", background: "#FFFFFF" }}>
-        <div style={{ fontSize: "28px", color: "#D4AF37", marginBottom: "12px" }}>★</div>
-        <p style={{ fontSize: "14px", color: "#1A3040", fontWeight: 600, marginBottom: "6px" }}>{t("thanks")}</p>
-        <p style={{ fontSize: "12px", color: "rgba(26,48,64,0.5)" }}>{t("submitted")}</p>
-        <button
-          onClick={() => setSubmitted(false)}
-          style={{ marginTop: "24px", fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.5)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: "3px", letterSpacing: "0.1em" }}
-        >
-          {t("another")}
-        </button>
-      </div>
-    ) : (
-      <div style={{ background: "#FFFFFF", borderRadius: "12px", padding: "32px", border: "1px solid rgba(26,48,64,0.08)" }}>
-        <h3 style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: "rgba(26,48,64,0.5)", textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: token ? "16px" : "28px" }}>
-          {t("form_title")}
-        </h3>
-
-        {/* Über den Link aus der Bewertungs-Mail gekommen */}
-        {token && (
-          <p style={{
-            fontSize: "12px",
-            lineHeight: 1.6,
-            color: "#1A3040",
-            background: "rgba(0,180,197,0.08)",
-            border: "1px solid rgba(0,180,197,0.25)",
-            borderRadius: "8px",
-            padding: "12px 14px",
-            marginBottom: "28px",
-          }}>
-            ✓ {t("verified_hint")}
-          </p>
-        )}
-
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div>
-            <label style={labelStyle}>
-              {t("name_label")}
-              <span style={{ marginLeft: "6px", fontSize: "9px", color: "rgba(26,48,64,0.35)", letterSpacing: "0.1em" }}>— {t("name_optional")}</span>
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t("name_placeholder")}
-              style={inputStyle(false)}
-              onFocus={(e) => (e.target.style.borderColor = "#1A3040")}
-              onBlur={(e) => (e.target.style.borderColor = "rgba(26,48,64,0.15)")}
-            />
-          </div>
-
-          <div>
-            <label style={labelStyle}>{t("rating_label")}</label>
-            <Stars value={rating} onChange={setRating} />
-            {error === "rating" && (
-              <p style={{ fontSize: "11px", color: "#C0392B", marginTop: "6px" }}>{t("error_rating")}</p>
-            )}
-          </div>
-
-          <div>
-            <label style={labelStyle}>{t("comment_label")}</label>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder={t("comment_placeholder")}
-              rows={4}
-              style={{ ...inputStyle(error === "comment"), resize: "none" }}
-              onFocus={(e) => (e.target.style.borderColor = "#1A3040")}
-              onBlur={(e) => (e.target.style.borderColor = error === "comment" ? "#C0392B" : "rgba(26,48,64,0.15)")}
-            />
-            {error === "comment" && (
-              <p style={{ fontSize: "11px", color: "#C0392B", marginTop: "6px" }}>{t("error_comment")}</p>
-            )}
-          </div>
-
-          {error === "submit" && (
-            <p style={{ fontSize: "11px", color: "#C0392B" }}>{t("error_submit")}</p>
-          )}
-
-          {error === "duplicate" && (
-            <p style={{ fontSize: "11px", color: "#C0392B" }}>{t("error_duplicate")}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              width: "100%",
-              padding: "14px",
-              background: "#1A3040",
-              color: "#F8F3E8",
-              border: "none",
-              borderRadius: "9999px",
-              fontSize: "12px",
-              fontFamily: "var(--font-geist-mono)",
-              fontWeight: 700,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              cursor: submitting ? "wait" : "pointer",
-              opacity: submitting ? 0.7 : 1,
-              transition: "opacity 0.2s",
-            }}
-            onMouseEnter={(e) => { if (!submitting) e.currentTarget.style.opacity = "0.8"; }}
-            onMouseLeave={(e) => { if (!submitting) e.currentTarget.style.opacity = "1"; }}
-          >
-            {submitting ? t("submitting") : t("submit")}
-          </button>
-        </form>
-      </div>
-    )
-  );
-
-  // Noch keine Bewertung: kompakte Leiste mit Knopf statt leerer Spalte. Das
-  // Formular klappt erst auf Wunsch auf (über den Link aus der Bewertungs-Mail
-  // sofort). Mit der ersten Bewertung kommt das zweispaltige Layout.
-  if (reviews.length === 0) {
-    const open = formOpen || !!token || submitted;
-    return (
-      <section id="reviews" style={{ background: "#F8F3E8", borderTop: "1px solid rgba(26,48,64,0.08)", scrollMarginTop: "80px" }}>
-        <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "40px clamp(1.5rem, 5vw, 2.5rem) 56px" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: "16px" }}>
-            <div>
-              <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "#00B4C5", marginBottom: "8px" }}>
-                {t("label")}
-              </p>
-              <h2 style={{ fontSize: "28px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, color: "#1A3040", textTransform: "uppercase", letterSpacing: "-0.01em", margin: 0 }}>
-                {t("title")}
-              </h2>
-            </div>
-            {!open && (
-              <button
-                type="button"
-                onClick={() => setFormOpen(true)}
-                style={{
-                  padding: "12px 28px",
-                  background: "transparent",
-                  color: "#1A3040",
-                  border: "1.5px solid #1A3040",
-                  borderRadius: "9999px",
-                  fontSize: "11px",
-                  fontFamily: "var(--font-geist-mono)",
-                  fontWeight: 700,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  cursor: "pointer",
-                  transition: "background 0.2s, color 0.2s",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "#1A3040"; e.currentTarget.style.color = "#F8F3E8"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#1A3040"; }}
-              >
-                {t("form_title")}
-              </button>
-            )}
-          </div>
-          {open && <div style={{ maxWidth: "560px", marginTop: "28px" }}>{formCard}</div>}
-        </div>
-      </section>
-    );
-  }
+  if (!open) return null;
 
   return (
-    <section id="reviews" style={{ background: "#F8F3E8", borderTop: "1px solid rgba(26,48,64,0.08)", scrollMarginTop: "80px" }}>
-      <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "64px clamp(1.5rem, 5vw, 2.5rem) 80px" }}>
-
-        {/* Header */}
-        <div style={{ marginBottom: "48px" }}>
-          <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "#00B4C5", marginBottom: "8px" }}>
-            {t("label")}
-          </p>
-          <div style={{ display: "flex", alignItems: "baseline", gap: "16px" }}>
-            <h2 style={{ fontSize: "28px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, color: "#1A3040", textTransform: "uppercase", letterSpacing: "-0.01em", margin: 0 }}>
-              {t("title")}
-            </h2>
-            {avg && (
-              <span style={{ fontSize: "13px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)" }}>
-                ★ {avg} · {reviews.length} {reviews.length === 1 ? t("count_one") : t("count_many")}
-              </span>
-            )}
-          </div>
+    <div style={{ position: "fixed", inset: 0, zIndex: 60 }} role="dialog" aria-modal="true" aria-labelledby="reviews-title">
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(26,48,64,0.35)" }} />
+      <div
+        style={{
+          position: "absolute", top: 0, right: 0, bottom: 0, width: "min(480px, 100vw)",
+          background: "#F8F3E8", overflowY: "auto", padding: "28px clamp(20px, 5vw, 32px) 40px",
+          boxShadow: "-12px 0 40px rgba(26,48,64,0.15)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+          <h2 id="reviews-title" style={{ fontSize: "18px", fontWeight: 600, color: "#1A3040", margin: 0 }}>
+            {t("count_many")}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t("close")}
+            style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(26,48,64,0.15)", background: "transparent", color: "#1A3040", fontSize: 22, lineHeight: 1, cursor: "pointer" }}
+          >
+            ×
+          </button>
         </div>
 
-        <div style={{ display: "grid", gap: "64px" }} className="grid-cols-1 lg:grid-cols-2">
-          {/* Review list */}
-          <div>
-            {reviews.map((r) => (
-              <ReviewCard key={r.id} review={r} locale={locale} verifiedLabel={t("verified")} />
-            ))}
+        {/* Schnitt */}
+        {reviews.length > 0 && (
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", paddingBottom: "24px", borderBottom: "1px solid rgba(26,48,64,0.12)" }}>
+            <span style={{ fontSize: "40px", fontWeight: 700, color: "#1A3040", lineHeight: 1 }}>{avg.toFixed(1)}</span>
+            <div>
+              <StaticStars value={avg} size={18} />
+              <p style={{ fontSize: "12px", color: "rgba(26,48,64,0.55)", marginTop: "6px" }}>
+                {reviews.length} {reviews.length === 1 ? t("count_one") : t("count_many")}
+              </p>
+            </div>
           </div>
+        )}
 
-          {/* Form */}
-          <div>{formCard}</div>
+        {/* Dank / Formular / Knopf */}
+        <div style={{ padding: "24px 0" }}>
+          {submitted ? (
+            <div style={{ border: "1px solid rgba(26,48,64,0.1)", borderRadius: "12px", padding: "28px", textAlign: "center", background: "#FFFFFF" }}>
+              <div style={{ fontSize: "28px", color: "#D4AF37", marginBottom: "12px" }}>★</div>
+              <p style={{ fontSize: "14px", color: "#1A3040", fontWeight: 600, marginBottom: "6px" }}>{t("thanks")}</p>
+              <p style={{ fontSize: "12px", color: "rgba(26,48,64,0.5)" }}>{t("submitted")}</p>
+            </div>
+          ) : showForm ? (
+            <div style={{ background: "#FFFFFF", borderRadius: "12px", padding: "24px", border: "1px solid rgba(26,48,64,0.08)" }}>
+              <h3 style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: "rgba(26,48,64,0.5)", textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: token ? "16px" : "24px" }}>
+                {t("form_title")}
+              </h3>
+
+              {/* Über den Link aus der Bewertungs-Mail gekommen */}
+              {token && (
+                <p style={{ fontSize: "12px", lineHeight: 1.6, color: "#1A3040", background: "rgba(0,180,197,0.08)", border: "1px solid rgba(0,180,197,0.25)", borderRadius: "8px", padding: "12px 14px", marginBottom: "24px" }}>
+                  ✓ {t("verified_hint")}
+                </p>
+              )}
+
+              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <div>
+                  <label style={labelStyle}>
+                    {t("name_label")}
+                    <span style={{ marginLeft: "6px", fontSize: "9px", color: "rgba(26,48,64,0.35)", letterSpacing: "0.1em" }}>— {t("name_optional")}</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder={t("name_placeholder")}
+                    style={inputStyle(false)}
+                    onFocus={(e) => (e.target.style.borderColor = "#1A3040")}
+                    onBlur={(e) => (e.target.style.borderColor = "rgba(26,48,64,0.15)")}
+                  />
+                </div>
+
+                <div>
+                  <label style={labelStyle}>{t("rating_label")}</label>
+                  <Stars value={rating} onChange={setRating} />
+                  {error === "rating" && <p style={{ fontSize: "11px", color: "#C0392B", marginTop: "6px" }}>{t("error_rating")}</p>}
+                </div>
+
+                <div>
+                  <label style={labelStyle}>{t("comment_label")}</label>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder={t("comment_placeholder")}
+                    rows={4}
+                    style={{ ...inputStyle(error === "comment"), resize: "none" }}
+                    onFocus={(e) => (e.target.style.borderColor = "#1A3040")}
+                    onBlur={(e) => (e.target.style.borderColor = error === "comment" ? "#C0392B" : "rgba(26,48,64,0.15)")}
+                  />
+                  {error === "comment" && <p style={{ fontSize: "11px", color: "#C0392B", marginTop: "6px" }}>{t("error_comment")}</p>}
+                </div>
+
+                {error === "submit" && <p style={{ fontSize: "11px", color: "#C0392B" }}>{t("error_submit")}</p>}
+                {error === "duplicate" && <p style={{ fontSize: "11px", color: "#C0392B" }}>{t("error_duplicate")}</p>}
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  style={{
+                    width: "100%", padding: "14px", background: "#1A3040", color: "#F8F3E8", border: "none",
+                    borderRadius: "9999px", fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700,
+                    letterSpacing: "0.12em", textTransform: "uppercase",
+                    cursor: submitting ? "wait" : "pointer", opacity: submitting ? 0.7 : 1,
+                  }}
+                >
+                  {submitting ? t("submitting") : t("submit")}
+                </button>
+              </form>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setFormWanted(true)}
+              style={{
+                width: "100%", padding: "14px", background: "transparent", color: "#1A3040",
+                border: "1.5px solid #1A3040", borderRadius: "9999px", fontSize: "12px",
+                fontFamily: "var(--font-geist-mono)", fontWeight: 700, letterSpacing: "0.12em",
+                textTransform: "uppercase", cursor: "pointer",
+              }}
+            >
+              {t("form_title")}
+            </button>
+          )}
+        </div>
+
+        {/* Liste */}
+        <div>
+          {reviews.map((r) => (
+            <ReviewCard key={r.id} review={r} locale={locale} verifiedLabel={t("verified")} />
+          ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }
