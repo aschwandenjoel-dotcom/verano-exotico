@@ -41,42 +41,48 @@ export default function BrandStory() {
   return (
     <div style={{ background: "#F8F3E8", color: "#1A3040" }}>
 
+      {/* ── TITEL: über die ganze Breite, zentriert ──────────────────── */}
+      <header className="text-center" style={{ padding: "clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem) clamp(3rem, 6vw, 5rem)" }}>
+        <p
+          className="about-reveal"
+          style={{ color: "#B8922A", fontSize: "10px", letterSpacing: "0.5em", textTransform: "uppercase", fontFamily: "var(--font-geist-mono)", marginBottom: "2rem" }}
+        >
+          {t("eyebrow")}
+        </p>
+        <h1
+          className="about-reveal"
+          style={{
+            fontFamily: "var(--font-archivo-black), sans-serif",
+            fontWeight: 900,
+            fontSize: "clamp(2.8rem, 7.5vw, 7.5rem)",
+            lineHeight: 0.95,
+            letterSpacing: "-0.035em",
+            textTransform: "uppercase",
+            color: "#1A3040",
+          }}
+        >
+          {t("hero_l1")} {t("hero_l2")}
+          <span
+            style={{
+              display: "block",
+              fontFamily: "var(--font-dm-serif)",
+              fontStyle: "italic",
+              fontWeight: 400,
+              color: "#D4AF37",
+              textTransform: "none",
+              letterSpacing: "-0.02em",
+              marginTop: "0.08em",
+            }}
+          >
+            {t("hero_accent")}
+          </span>
+        </h1>
+        <div className="about-reveal" style={{ width: "56px", height: "1px", background: "#D4AF37", margin: "clamp(2rem, 4vw, 3rem) auto 0" }} />
+      </header>
+
       {/* ── EINSTIEG + VISION: Text links, Bild rechts (bleibt beim Scrollen stehen) ── */}
       <section className="grid grid-cols-1 md:grid-cols-2 items-start">
         <div style={{ padding: "clamp(3rem, 6vw, 6rem) clamp(1.5rem, 5vw, 5rem)" }}>
-          {/* Wo die Sonne nie untergeht */}
-          <p
-            className="about-reveal"
-            style={{
-              color: "#B8922A",
-              fontSize: "10px",
-              letterSpacing: "0.5em",
-              textTransform: "uppercase",
-              fontFamily: "var(--font-geist-mono)",
-              marginBottom: "2rem",
-            }}
-          >
-            {t("eyebrow")}
-          </p>
-          <h1
-            className="about-reveal"
-            style={{
-              fontFamily: "var(--font-archivo-black), sans-serif",
-              fontWeight: 900,
-              fontSize: "clamp(2.6rem, 5.2vw, 5rem)",
-              lineHeight: 1.0,
-              letterSpacing: "-0.03em",
-              textTransform: "uppercase",
-              color: "#1A3040",
-              marginBottom: "2rem",
-            }}
-          >
-            {t("hero_l1")}<br />{t("hero_l2")}<br />
-            <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", textTransform: "none", letterSpacing: "-0.02em" }}>
-              {t("hero_accent")}
-            </span>
-          </h1>
-          <div className="about-reveal" style={{ width: "48px", height: "1px", background: "linear-gradient(to right, #D4AF37, transparent)", marginBottom: "1.75rem" }} />
           <p
             className="about-reveal"
             style={{ color: "rgba(26,48,64,0.7)", fontSize: "0.95rem", fontFamily: "var(--font-syne)", maxWidth: "460px", lineHeight: 1.85 }}
