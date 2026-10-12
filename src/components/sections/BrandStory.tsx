@@ -238,14 +238,19 @@ export default function BrandStory() {
           }}
         >
           <Image
-            src="/images/shop-hero-3.webp"
+            src="/images/about/vision.jpg"
             alt=""
             fill
             sizes="(max-width: 900px) 100vw, 50vw"
-            style={{ objectFit: "cover", objectPosition: "60% center" }}
+            style={{ objectFit: "cover", objectPosition: "center top" }}
           />
         </div>
       </section>
+
+      {/* ── BILD: Meer (vollbreit) ────────────────────────────────── */}
+      <div style={{ position: "relative", height: "clamp(260px, 48vh, 540px)" }}>
+        <Image src="/images/about/meer.jpg" alt="" fill sizes="100vw" style={{ objectFit: "cover", objectPosition: "center 40%" }} />
+      </div>
 
       {/* ── DAS VERSPRECHEN ───────────────────────────────────────── */}
       <section
@@ -496,6 +501,15 @@ export default function BrandStory() {
           </div>
         </div>
       </section>
+
+      {/* ── ZWEI BILDER: Stoff-Detail und Flatlay ─────────────────── */}
+      <div className="grid grid-cols-2" style={{ gap: "4px" }}>
+        {["/images/about/stoff-detail.jpg", "/images/about/flatlay.jpg"].map((src) => (
+          <div key={src} style={{ position: "relative", aspectRatio: "4/5" }}>
+            <Image src={src} alt="" fill sizes="50vw" style={{ objectFit: "cover" }} />
+          </div>
+        ))}
+      </div>
 
       {/* ── CLOSING ───────────────────────────────────────────────── */}
       <section
