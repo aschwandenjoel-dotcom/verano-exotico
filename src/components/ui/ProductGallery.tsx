@@ -18,7 +18,8 @@ interface Props {
  * Gezeigt werden nur Fotos der gewählten Farbe: das Farbbild und – bei der Farbe mit
  * Packshot – das Model-Bild. Bei welcher Farbe die übrigen Lieferantenfotos sind, ist
  * nicht hinterlegt; sie erscheinen deshalb nur bei Produkten mit einer einzigen Farbe.
- * Anordnung auf dem Desktop im Wechsel: ein Bild gross, zwei nebeneinander, eines gross …
+ * Packshot, Model-Bild und das erste Bild stehen in voller Breite, Lieferantenfotos
+ * (oft kleiner/unschärfer) zu zweit nebeneinander.
  */
 export default function ProductGallery({ product, locale, activeColor }: Props) {
   const colorImages = product.colorImages ?? [];
@@ -39,11 +40,7 @@ export default function ProductGallery({ product, locale, activeColor }: Props) 
     ? general
     : activeColor === packshotColor && model ? [model] : [];
   const images = colorImg ? [colorImg, ...extra] : general;
-  // Rhythmus 1 – 2 – 1 – 2 …: jedes dritte Bild in voller Breite, dazwischen zwei
-  // nebeneinander. Bei genau zwei Bildern beide gross; bleibt am Ende eines allein
-  // in einer Zweierreihe, ebenfalls gross.
-  const isLarge = (i: number) =>
-    images.length === 2 || i % 3 === 0 || (i % 3 === 1 && i === images.length - 1);
+  const isLarge = (src: string, i: number) => i === 0 || src.includes("-packshot") || src.includes("-model");
   const colorAlt = colorNames[activeColor] ? `${name} – ${colorNames[activeColor]}` : name;
 
   // Neue Farbe gewählt: auf dem Handy wieder beim ersten Bild beginnen
@@ -76,7 +73,7 @@ export default function ProductGallery({ product, locale, activeColor }: Props) 
       >
         {images.map((src, i) => {
           const alt = i === 0 && colorImg ? colorAlt : name;
-          const large = isLarge(i);
+          const large = isLarge(src, i);
           return (
             <button
               key={src}
