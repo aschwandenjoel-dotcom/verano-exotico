@@ -182,7 +182,11 @@
     "submit": "Anmelden",
     "success": "Fast geschafft — bitte bestätige deine Anmeldung über den Link in der Mail, die wir dir gerade geschickt haben.",
     "error": "Anmeldung fehlgeschlagen — bitte versuche es später erneut.",
-    "offer": "{percent} % Rabatt auf deine nächste Bestellung — dein persönlicher Code kommt nach der Bestätigung per Mail."
+    "offer": "{percent} % Rabatt auf deine nächste Bestellung — dein persönlicher Code kommt nach der Bestätigung per Mail.",
+    "popup_title": "{percent} % Rabatt sichern",
+    "popup_text": "Melde dich für unseren Newsletter an und erhalte {percent} % auf deine erste Bestellung*.",
+    "popup_fine": "*Es gelten unsere AGB. Mit der Anmeldung erhältst du E-Mails von Verano Exotico zu neuen Drops und Angeboten und stimmst unserer <privacy>Datenschutzerklärung</privacy> zu. Abmeldung jederzeit möglich.",
+    "close": "Schliessen"
   },
   "about": {
     "eyebrow": "Über uns",

@@ -1,10 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 
-/** Newsletter-Anmeldung (Double-Opt-in über /api/newsletter) – für dunkle Flächen gestaltet. */
-export default function NewsletterInput() {
+/**
+ * Newsletter-Anmeldung (Double-Opt-in über /api/newsletter).
+ * "dark": Feld und Knopf nebeneinander für dunkle Flächen (Footer);
+ * "light": untereinander, Knopf dunkelblau in voller Breite (Popup).
+ */
+export default function NewsletterInput({
+  variant = "dark",
+  onSuccess,
+}: {
+  variant?: "dark" | "light";
+  onSuccess?: () => void;
+}) {
+  const light = variant === "light";
+  // Eindeutig pro Feld – Footer und Popup können gleichzeitig auf der Seite sein
+  const inputId = useId();
   const t = useTranslations("newsletter");
   const locale = useLocale();
   const [email, setEmail] = useState("");
@@ -23,7 +36,7 @@ export default function NewsletterInput() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), locale }),
       });
-      if (res.ok) setSubmitted(true);
+      if (res.ok) { setSubmitted(true); onSuccess?.(); }
       else setFailed(true);
     } catch {
       setFailed(true);
@@ -34,17 +47,17 @@ export default function NewsletterInput() {
 
   if (submitted) {
     return (
-      <p className="text-sm tracking-widest uppercase" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
+      <p className="text-sm tracking-widest uppercase" style={{ color: light ? "#1A3040" : "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
         ✓ {t("success")}
       </p>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-0 w-full max-w-md">
-      <label htmlFor="newsletter-email" className="sr-only">{t("placeholder")}</label>
+    <form onSubmit={handleSubmit} className={light ? "flex flex-col gap-4 w-full" : "flex flex-col sm:flex-row gap-0 w-full max-w-md"}>
+      <label htmlFor={inputId} className="sr-only">{t("placeholder")}</label>
       <input
-        id="newsletter-email"
+        id={inputId}
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -52,24 +65,30 @@ export default function NewsletterInput() {
         required
         className="flex-1 bg-transparent px-4 py-3 text-sm outline-none transition-colors"
         style={{
-          border: "1px solid rgba(248,243,232,0.3)",
-          color: "#F8F3E8",
+          border: `1px solid ${light ? "rgba(26,48,64,0.35)" : "rgba(248,243,232,0.3)"}`,
+          color: light ? "#1A3040" : "#F8F3E8",
           fontFamily: "var(--font-geist-mono)",
-          minHeight: "44px",
+          minHeight: light ? "52px" : "44px",
         }}
-        onFocus={(e) => (e.target.style.borderColor = "#D4AF37")}
-        onBlur={(e) => (e.target.style.borderColor = "rgba(248,243,232,0.3)")}
+        onFocus={(e) => (e.target.style.borderColor = light ? "#1A3040" : "#D4AF37")}
+        onBlur={(e) => (e.target.style.borderColor = light ? "rgba(26,48,64,0.35)" : "rgba(248,243,232,0.3)")}
       />
       <button
         type="submit"
         disabled={sending}
         className="px-6 py-3 text-[10px] font-black tracking-[0.25em] uppercase transition-colors hover:opacity-80"
-        style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px", opacity: sending ? 0.7 : 1 }}
+        style={{
+          fontFamily: "var(--font-archivo-black), sans-serif",
+          background: light ? "#1A3040" : "#D4AF37",
+          color: light ? "#F8F3E8" : "#1A3040",
+          minHeight: light ? "52px" : "44px",
+          opacity: sending ? 0.7 : 1,
+        }}
       >
         {sending ? "…" : t("submit")}
       </button>
       {failed && (
-        <p className="text-[11px] sm:self-center sm:ml-3 mt-2 sm:mt-0" style={{ color: "#E8A0A0", fontFamily: "var(--font-geist-mono)" }}>
+        <p className={light ? "text-[11px]" : "text-[11px] sm:self-center sm:ml-3 mt-2 sm:mt-0"} style={{ color: light ? "#B4553C" : "#E8A0A0", fontFamily: "var(--font-geist-mono)" }}>
           {t("error")}
         </p>
       )}

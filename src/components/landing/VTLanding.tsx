@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import Image from "next/image";
 import type { Locale, Product as ShopProduct } from "@/types";
-import { cardImages } from "@/lib/productImages";
 import Header from "@/components/ui/Header";
 import Footer from "@/components/ui/Footer";
 import CustomerVoices from "@/components/ui/CustomerVoices";
+import { ProductTile } from "@/components/sections/CollectionGrid";
 // Frueher dynamisch ohne SSR geladen (WebGL). Jetzt reines Markup + CSS,
 // darf serverseitig gerendert werden - das Bild ist dann Teil des ersten HTML.
 import PanoramaIntro from "@/components/3d/PanoramaIntro";
@@ -61,90 +60,11 @@ function useScrollReveal() {
   }, []);
 }
 
-/* ─── Shop Card (horizontal scroll) ─────────────────────────────── */
-function ShopCard({ product, locale, index, badgeNew }: { product: ShopProduct; locale: Locale; index: number; badgeNew: string }) {
-  const [hovered, setHovered] = useState(false);
-  const { title: image, hover: hoverImage } = cardImages(product);
-  const name = product.name[locale];
-
-  return (
-    <Link
-      href={`/${locale}/product/${product.slug}`}
-      style={{
-        // Feste 520px passten auf keinem Handy aufs Display (375px Viewport).
-        // 70vw laesst rund ein Viertel der naechsten Karte sichtbar - zusammen
-        // mit Pfeilen und Punkten der Hinweis, dass sich seitlich wischen laesst.
-        flexShrink: 0, width: "min(520px, 70vw)", display: "block", textDecoration: "none",
-        transform: hovered ? "translateY(-6px)" : "translateY(0)",
-        transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* 4:5 und randlos wie die Kollektionsseite; beim Überfahren das Model-Bild */}
-      <div style={{ position: "relative", aspectRatio: "4/5", background: "#EDE9E2", overflow: "hidden", marginBottom: "14px" }}>
-        {image ? (
-          <>
-            <Image src={image} alt={name} fill sizes="(max-width: 768px) 70vw, 520px" style={{ objectFit: "cover" }} priority={index < 2} />
-            {hoverImage && (
-              <Image
-                src={hoverImage}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 70vw, 520px"
-                style={{ objectFit: "cover", opacity: hovered ? 1 : 0, transition: "opacity 0.35s ease" }}
-              />
-            )}
-          </>
-        ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            {product.colors.slice(0, 3).map((c, i) => (
-              <div key={c} style={{ background: c, width: 32, height: 48 + i * 16, margin: "0 4px", opacity: 0.85 }} />
-            ))}
-          </div>
-        )}
-        {product.isNew && (
-          <span style={{ position: "absolute", top: "10px", left: "10px", background: "#D4AF37", color: "#1A3040", fontSize: "9px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, letterSpacing: "0.22em", textTransform: "uppercase", padding: "3px 8px" }}>
-            {badgeNew}
-          </span>
-        )}
-      </div>
-      <p style={{ fontSize: "9px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.18em", textTransform: "uppercase", color: "#00B4C5", marginBottom: "4px" }}>{product.category}</p>
-      <p style={{ fontSize: "13px", fontFamily: "var(--font-archivo-black), sans-serif", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", marginBottom: "4px", lineHeight: 1.2 }}>{name}</p>
-      <p style={{ fontSize: "13px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.55)" }}>CHF {product.price.toFixed(2)}</p>
-    </Link>
-  );
-}
-
 /* ─── Main Landing ───────────────────────────────────────────────── */
 export default function VTLanding({ locale, products }: Props) {
   useScrollReveal();
   const t = useTranslations("landing");
   const year = new Date().getFullYear();
-  const shopScrollRef = useRef<HTMLDivElement>(null);
-  // Welche Karte gerade links anliegt - fuer die Punkte unter der Reihe.
-  const [shopIndex, setShopIndex] = useState(0);
-  const cardStep = () => {
-    const row = shopScrollRef.current;
-    const card = row?.firstElementChild as HTMLElement | null;
-    return card ? card.getBoundingClientRect().width + 20 : 540;
-  };
-  // Schrittweite aus der tatsaechlichen Kartenbreite statt fester 540px -
-  // sonst springt der Pfeil auf schmalen Displays ueber mehrere Karten.
-  const scrollShop = (dir: number) => {
-    const row = shopScrollRef.current;
-    if (!row) return;
-    row.scrollBy({ left: dir * cardStep(), behavior: "smooth" });
-  };
-  const scrollShopTo = (index: number) => {
-    shopScrollRef.current?.scrollTo({ left: index * cardStep(), behavior: "smooth" });
-  };
-  const onShopScroll = () => {
-    const row = shopScrollRef.current;
-    if (!row) return;
-    setShopIndex(Math.round(row.scrollLeft / cardStep()));
-  };
-
   return (
     <div className="min-h-screen" style={{ background: "#F8F3E8", color: "#1A3040" }}>
       <PanoramaIntro />
@@ -313,77 +233,11 @@ export default function VTLanding({ locale, products }: Props) {
           </Link>
         </div>
 
-        <div style={{ position: "relative" }}>
-          <div
-            ref={shopScrollRef}
-            onScroll={onShopScroll}
-            style={{ display: "flex", gap: "20px", overflowX: "auto", scrollSnapType: "x mandatory", paddingBottom: "16px", scrollbarWidth: "none", msOverflowStyle: "none" }}
-            className="hide-scrollbar"
-          >
-            {products.map((product, i) => (
-              <div key={product.slug} style={{ scrollSnapAlign: "start" }}>
-                <ShopCard product={product} locale={locale} index={i} badgeNew={t("badge_new")} />
-              </div>
-            ))}
-          </div>
-          {/* Frueher lag hier ein 80px-Farbverlauf ueber der rechten Kante. Er
-              sollte das Wischen andeuten, verdeckte aber genau die angeschnittene
-              naechste Karte - und wirkte wie ein ausgeblichener Rand. Den Hinweis
-              geben jetzt die sichtbare Nachbarkarte, die Pfeile und die Punkte. */}
-
-          {/* Scroll-Pfeile - auch auf dem Handy, dort etwas kleiner */}
-          {[-1, 1].map((dir) => (
-            <button
-              key={dir}
-              type="button"
-              aria-label={dir < 0 ? t("aria_prev") : t("aria_next")}
-              onClick={() => scrollShop(dir)}
-              className="flex items-center justify-center w-9 h-9 md:w-11 md:h-11"
-              style={{
-                position: "absolute",
-                top: "calc(50% - 30px)",
-                [dir < 0 ? "left" : "right"]: "8px",
-                transform: "translateY(-50%)",
-                borderRadius: "9999px",
-                background: "#F8F3E8",
-                color: "#1A3040",
-                border: "1px solid rgba(26,48,64,0.15)",
-                boxShadow: "0 2px 10px rgba(26,48,64,0.15)",
-                cursor: "pointer",
-                zIndex: 5,
-                fontSize: "18px",
-                lineHeight: 1,
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#1A3040"; e.currentTarget.style.color = "#F8F3E8"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#F8F3E8"; e.currentTarget.style.color = "#1A3040"; }}
-            >
-              {dir < 0 ? "‹" : "›"}
-            </button>
+        {/* Raster wie im Shop (H&M-Stil) statt seitlichem Karussell */}
+        <div className="grid grid-cols-2 md:grid-cols-3" style={{ gap: "clamp(8px, 2vw, 16px)" }}>
+          {products.map((product) => (
+            <ProductTile key={product.slug} product={product} locale={locale} />
           ))}
-
-          {/* Punkte: Position in der Reihe, antippbar */}
-          <div className="flex justify-center gap-2 mt-2" role="tablist">
-            {products.map((product, i) => (
-              <button
-                key={product.slug}
-                type="button"
-                role="tab"
-                aria-selected={i === shopIndex}
-                aria-label={`${i + 1} / ${products.length}`}
-                onClick={() => scrollShopTo(i)}
-                style={{
-                  width: i === shopIndex ? "22px" : "8px",
-                  height: "8px",
-                  borderRadius: "9999px",
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                  background: i === shopIndex ? "#D4AF37" : "rgba(26,48,64,0.2)",
-                  transition: "width .25s ease, background .25s ease",
-                }}
-              />
-            ))}
-          </div>
         </div>
       </section>
 

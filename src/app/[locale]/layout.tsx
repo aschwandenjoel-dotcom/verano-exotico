@@ -8,6 +8,7 @@ import { routing } from "@/i18n/routing";
 import type { Locale } from "@/types";
 import ClientProviders from "@/components/ui/ClientProviders";
 import CookieConsent from "@/components/ui/CookieConsent";
+import NewsletterPopup from "@/components/ui/NewsletterPopup";
 import "../globals.css";
 
 const syne = Syne({
@@ -106,6 +107,8 @@ export default async function LocaleLayout({
             Vercel-Dashboard unter "Analytics"). */}
         <NextIntlClientProvider messages={messages}>
           <CookieConsent />
+          {/* Nach 2 Minuten auf der Seite (über Seitenwechsel hinweg) */}
+          <NewsletterPopup />
         </NextIntlClientProvider>
       </body>
     </html>

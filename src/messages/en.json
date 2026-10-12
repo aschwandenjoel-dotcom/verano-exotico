@@ -182,7 +182,11 @@
     "submit": "Subscribe",
     "success": "Almost there — please confirm your subscription via the link in the email we just sent you.",
     "error": "Subscription failed — please try again later.",
-    "offer": "{percent}% off your next order — your personal code arrives by email once you confirm."
+    "offer": "{percent}% off your next order — your personal code arrives by email once you confirm.",
+    "popup_title": "Unlock {percent}% off",
+    "popup_text": "Join the Verano Exotico email list and get {percent}% off your first order*.",
+    "popup_fine": "*T&C apply. By signing up, you agree to receive emails from Verano Exotico about new drops and offers and agree to our <privacy>privacy policy</privacy>. Unsubscribe at any time.",
+    "close": "Close"
   },
   "about": {
     "eyebrow": "About us",

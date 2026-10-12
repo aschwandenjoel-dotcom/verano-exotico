@@ -54,14 +54,16 @@ export default function ProductView({ product, locale, labels }: Props) {
   );
 }
 
-/** Abstand unter dem fixen Header bzw. zum unteren Fensterrand (px). */
-const STICKY_TOP = 96;
+/** Oberer Anschlag = Höhe des fixen Headers, unterer Abstand zum Fensterrand (px). */
+const STICKY_TOP = 72;
 const STICKY_BOTTOM = 24;
 
 /**
- * Info-Spalte wie bei H&M: Sie scrollt mit, bis ihr unteres Ende im Fenster ist,
- * und bleibt dann stehen, während die Bilder weiterlaufen. Ist sie kürzer als das
- * Fenster, klebt sie direkt unter dem Header. Nur ab Tablet-Breite (md:sticky).
+ * Info-Spalte wie bei H&M, in beide Richtungen: Beim Runterscrollen läuft sie mit,
+ * bis ihr Ende sichtbar ist, und bleibt dann stehen. Beim Hochscrollen läuft sie
+ * sofort wieder mit, bis ihr Anfang unter dem Header steht. Umgesetzt über das
+ * sticky-`top`, das bei jedem Scrollen um den gescrollten Weg verschoben und
+ * zwischen den beiden Anschlägen begrenzt wird. Nur ab Tablet-Breite (md:sticky).
  */
 function StickyPanel({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -69,18 +71,30 @@ function StickyPanel({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // top direkt am Element setzen: hängt von der gemessenen Höhe ab (Akkordeons,
-    // Grössentabelle, Fenstergrösse) und braucht keinen React-State
-    const update = () => {
-      el.style.top = `${Math.min(STICKY_TOP, window.innerHeight - el.offsetHeight - STICKY_BOTTOM)}px`;
+    // top direkt am Element setzen: hängt von Scrollrichtung und gemessener Höhe ab
+    // (Klappboxen, Fenstergrösse) und braucht keinen React-State
+    let top = STICKY_TOP;
+    let lastY = window.scrollY;
+    const lowest = () => Math.min(STICKY_TOP, window.innerHeight - el.offsetHeight - STICKY_BOTTOM);
+    const clampAndApply = () => {
+      top = Math.min(STICKY_TOP, Math.max(lowest(), top));
+      el.style.top = `${top}px`;
     };
-    update();
-    const observer = new ResizeObserver(update);
+    const onScroll = () => {
+      const y = window.scrollY;
+      top -= y - lastY;
+      lastY = y;
+      clampAndApply();
+    };
+    clampAndApply();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", clampAndApply);
+    const observer = new ResizeObserver(clampAndApply);
     observer.observe(el);
-    window.addEventListener("resize", update);
     return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", clampAndApply);
       observer.disconnect();
-      window.removeEventListener("resize", update);
     };
   }, []);
 

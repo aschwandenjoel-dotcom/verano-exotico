@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import type { Locale, Product } from "@/types";
 import { cardImages } from "@/lib/productImages";
+import { DARK_BLUE } from "@/lib/theme";
+
+/** Höhe des fixen Headers – darunter klebt die Filterleiste. */
+const HEADER_H = 72;
+const subscribeScroll = (cb: () => void) => {
+  window.addEventListener("scroll", cb, { passive: true });
+  window.addEventListener("resize", cb);
+  return () => { window.removeEventListener("scroll", cb); window.removeEventListener("resize", cb); };
+};
 
 const FILTERS = ["all", "new", "bikini", "onepiece", "set"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -29,7 +38,7 @@ interface Props {
 }
 
 /* ─── Single card ────────────────────────────────────────────── */
-function BershkaCard({
+export function ProductTile({
   product,
   locale,
   featured = false,
@@ -188,6 +197,13 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
   const t = useTranslations("collection");
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("default");
+  // Klebt die Leiste unter dem Header, bekommt sie dessen Dunkelblau
+  const barRef = useRef<HTMLDivElement>(null);
+  const stuck = useSyncExternalStore(
+    subscribeScroll,
+    () => (barRef.current ? barRef.current.getBoundingClientRect().top <= HEADER_H + 0.5 : false),
+    () => false,
+  );
 
   const filtered = products.filter((p) => {
     if (filter === "all") return true;
@@ -205,12 +221,14 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
     <>
       {/* ── Filter strip ─────────────────────────────────────── */}
       <div
+        ref={barRef}
         style={{
           position: "sticky",
-          top: "64px",
+          top: `${HEADER_H}px`,
           zIndex: 40,
-          background: "#F8F3E8",
-          borderBottom: "1px solid rgba(26,48,64,0.08)",
+          background: stuck ? DARK_BLUE : "#F8F3E8",
+          borderBottom: `1px solid ${stuck ? "rgba(248,243,232,0.08)" : "rgba(26,48,64,0.08)"}`,
+          transition: "background 0.25s ease",
           padding: "0 clamp(1.5rem, 5vw, 2.5rem)",
         }}
       >
@@ -240,8 +258,10 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
                   fontFamily: "var(--font-geist-mono)",
                   letterSpacing: "0.15em",
                   textTransform: "uppercase",
-                  background: filter === f ? "#1A3040" : "transparent",
-                  color: filter === f ? "#F8F3E8" : "rgba(26,48,64,0.5)",
+                  background: filter === f ? (stuck ? "#F8F3E8" : "#1A3040") : "transparent",
+                  color: filter === f
+                    ? (stuck ? "#1A3040" : "#F8F3E8")
+                    : (stuck ? "rgba(248,243,232,0.65)" : "rgba(26,48,64,0.5)"),
                   border: "none",
                   cursor: "pointer",
                   transition: "all 0.2s ease",
@@ -265,7 +285,7 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
                 fontFamily: "var(--font-geist-mono)",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                color: "rgba(26,48,64,0.6)",
+                color: stuck ? "rgba(248,243,232,0.85)" : "rgba(26,48,64,0.6)",
                 background: "transparent",
                 border: "none",
                 cursor: "pointer",
@@ -273,14 +293,14 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
               }}
             >
               {SORTS.map((s) => (
-                <option key={s} value={s}>{t(`sort_${s}`)}</option>
+                <option key={s} value={s} style={{ color: "#1A3040" }}>{t(`sort_${s}`)}</option>
               ))}
             </select>
             <span
               style={{
                 fontSize: "10px",
                 fontFamily: "var(--font-geist-mono)",
-                color: "rgba(26,48,64,0.35)",
+                color: stuck ? "rgba(248,243,232,0.5)" : "rgba(26,48,64,0.35)",
                 letterSpacing: "0.1em",
                 paddingRight: "4px",
               }}
@@ -304,7 +324,7 @@ export default function CollectionGrid({ products, locale, showFilters = true }:
           >
             {sorted.map((product) => (
               <div key={product.slug}>
-                <BershkaCard product={product} locale={locale} />
+                <ProductTile product={product} locale={locale} />
               </div>
             ))}
           </div>

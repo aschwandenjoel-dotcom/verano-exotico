@@ -331,7 +331,7 @@ function DetailText({ text }: { text: string }) {
   );
 }
 
-/** Dünnes Plus, das beim Aufklappen zum Minus wird. */
+/** Dünnes Plus (Bewertungs-Zeile, im Stil von Hunza G). */
 function PlusIcon({ open }: { open: boolean }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" aria-hidden style={{ flexShrink: 0 }}>
@@ -341,7 +341,7 @@ function PlusIcon({ open }: { open: boolean }) {
   );
 }
 
-/** Klappboxen: Titel in Versalien links, Plus rechts, Inhalt gleitet auf. Mehrere dürfen offen sein. */
+/** Klappboxen: Titel links, Pfeil rechts, Inhalt gleitet auf. Mehrere dürfen offen sein. */
 function Accordion({ items }: { items: { id: string; label: string; content: React.ReactNode }[] }) {
   const [open, setOpen] = useState<Set<string>>(new Set());
   const toggle = (id: string) =>
@@ -353,11 +353,11 @@ function Accordion({ items }: { items: { id: string; label: string; content: Rea
     });
 
   return (
-    <div>
+    <div style={{ borderTop: "1px solid rgba(26,48,64,0.15)" }}>
       {items.map(({ id, label, content }) => {
         const isOpen = open.has(id);
         return (
-          <div key={id}>
+          <div key={id} style={{ borderBottom: "1px solid rgba(26,48,64,0.15)" }}>
             <button
               type="button"
               id={`acc-${id}`}
@@ -367,8 +367,14 @@ function Accordion({ items }: { items: { id: string; label: string; content: Rea
               className="w-full flex items-center justify-between py-5 text-left"
               style={{ color: "#1A3040", background: "transparent", cursor: "pointer" }}
             >
-              <span className="text-[15px] uppercase tracking-[0.04em]">{label}</span>
-              <PlusIcon open={isOpen} />
+              <span className="text-base">{label}</span>
+              <svg
+                width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden
+                style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.25s ease", flexShrink: 0 }}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
             </button>
             {/* grid 0fr → 1fr: weiches Aufklappen ohne feste Höhe */}
             <div

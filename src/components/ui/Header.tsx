@@ -86,7 +86,9 @@ export default function Header({ locale, transparentAtTop = false }: Props) {
       className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 h-[72px]"
       style={{
         // Durchsichtig: leichter Verlauf, damit Logo und Navigation auf hellen Bildstellen lesbar bleiben
-        background: solid ? DARK_BLUE : "linear-gradient(to bottom, rgba(5,25,35,0.45), rgba(5,25,35,0))",
+        // no-repeat border-box: sonst wiederholt sich der Verlauf unter der 1-px-Kante und
+        // zeichnet dort seine dunkelste Zeile als schwarze Linie
+        background: solid ? DARK_BLUE : "linear-gradient(to bottom, rgba(5,25,35,0.45), rgba(5,25,35,0)) no-repeat border-box",
         borderBottom: `1px solid ${solid ? "rgba(248,243,232,0.08)" : "transparent"}`,
         transition: "background 0.3s ease, border-color 0.3s ease",
         display: "grid",
