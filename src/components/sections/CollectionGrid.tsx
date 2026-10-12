@@ -232,7 +232,7 @@ export default function CollectionGrid({ products, locale, showFilters = true, s
             position: "sticky",
             top: `${HEADER_H}px`,
             zIndex: 40,
-            background: stuck ? DARK_BLUE : "#F8F3E8",
+            background: stuck ? DARK_BLUE : "#FFFFFF",
             borderBottom: `1px solid ${stuck ? "rgba(248,243,232,0.08)" : "rgba(26,48,64,0.08)"}`,
             transition: "background 0.25s ease",
             padding: "0 clamp(1.5rem, 5vw, 2.5rem)",

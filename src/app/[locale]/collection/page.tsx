@@ -43,7 +43,7 @@ export default async function CollectionPage({
           style={{
             position: "relative",
             zIndex: 1,
-            background: "#F8F3E8",
+            background: "#FFFFFF",
             boxShadow: "0 -30px 60px rgba(5,25,35,0.28)",
           }}
         >

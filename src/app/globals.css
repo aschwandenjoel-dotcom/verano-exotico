@@ -194,28 +194,12 @@ body {
      darunter stünde Leere. */
   display: flex;
   flex-direction: column;
-  width: clamp(280px, 80vw, 400px);
-  margin-right: 24px;
-  background: #FFFFFF;
-  border: 1px solid rgba(26, 48, 64, 0.08);
-  border-radius: 18px;
-  padding: 28px 28px 30px;
-  box-shadow: 0 2px 16px rgba(26, 48, 64, 0.06);
-}
-
-/* Sprechblasen-Zipfel unten links */
-.voice-card::after {
-  content: "";
-  position: absolute;
-  left: 34px;
-  bottom: -9px;
-  width: 18px;
-  height: 18px;
-  background: #FFFFFF;
-  border-right: 1px solid rgba(26, 48, 64, 0.08);
-  border-bottom: 1px solid rgba(26, 48, 64, 0.08);
-  transform: rotate(45deg);
-  border-bottom-right-radius: 3px;
+  width: clamp(260px, 78vw, 380px);
+  margin-right: 56px;
+  /* Luxuriös und ruhig wie bei Hunza G: keine Box, keine Sprechblase –
+     nur eine feine Linie über jeder Stimme */
+  border-top: 1px solid rgba(26, 48, 64, 0.18);
+  padding: 26px 0 4px;
 }
 
 /* ── Kundenstimmen: eine Stimme blendet ein, dann die nächste ───── */

@@ -48,7 +48,8 @@ export default async function CategoryPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd(loc, slug, text.h1, products)) }}
       />
-      <div style={{ background: "#F8F3E8" }}>
+      {/* Shop-Seiten weiss (Joel, 12.10.) */}
+      <div style={{ background: "#FFFFFF" }}>
         <header className="max-w-6xl mx-auto px-6 md:px-10 pt-32 pb-10 text-center">
           <nav aria-label="Breadcrumb" className="text-[10px] font-mono uppercase tracking-[0.25em] mb-6" style={{ color: "rgba(26,48,64,0.45)" }}>
             <Link href={`/${loc}/collection`} style={{ color: "inherit" }}>Shop</Link>
@@ -67,9 +68,6 @@ export default async function CategoryPage({
           >
             {text.h1}
           </h1>
-          <p className="mt-5 mx-auto max-w-2xl text-sm md:text-base leading-relaxed" style={{ color: "rgba(26,48,64,0.7)" }}>
-            {text.intro}
-          </p>
         </header>
 
         <CollectionGrid products={products} locale={loc} showFilters={false} />

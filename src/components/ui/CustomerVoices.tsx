@@ -66,7 +66,7 @@ function flag(country: string | null): string {
 
 function Stars({ value }: { value: number }) {
   return (
-    <span aria-hidden="true" style={{ color: "#D4AF37", fontSize: "15px", letterSpacing: "2px" }}>
+    <span aria-hidden="true" style={{ color: "#B8922A", fontSize: "11px", letterSpacing: "3px" }}>
       {"★".repeat(Math.max(1, Math.min(5, value)))}
       <span style={{ color: "rgba(26,48,64,0.18)" }}>{"★".repeat(5 - Math.max(1, Math.min(5, value)))}</span>
     </span>
@@ -84,11 +84,10 @@ function VoiceCard({ voice, locale, copy = false }: { voice: Voice; locale: Loca
       <Stars value={voice.rating} />
       <blockquote
         style={{
-          margin: "14px 0 0",
+          margin: "16px 0 0",
           fontFamily: "var(--font-dm-serif)",
-          fontStyle: "italic",
-          fontSize: "17px",
-          lineHeight: 1.5,
+          fontSize: "19px",
+          lineHeight: 1.55,
           color: "#1A3040",
         }}
       >
@@ -97,10 +96,11 @@ function VoiceCard({ voice, locale, copy = false }: { voice: Voice; locale: Loca
       <figcaption
         style={{
           marginTop: "auto",
-          paddingTop: "18px",
-          fontSize: "11px",
+          paddingTop: "22px",
+          fontSize: "9.5px",
           fontFamily: "var(--font-geist-mono)",
-          letterSpacing: "0.06em",
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
           color: "rgba(26,48,64,0.5)",
         }}
       >
@@ -179,14 +179,14 @@ export default function CustomerVoices({
       >
         <div className="px-6 md:px-10 reveal">
           <p
-            className="text-[10px] tracking-[0.35em] uppercase mb-2 text-center"
-            style={{ color: "#00B4C5", fontFamily: "var(--font-geist-mono)" }}
+            className="text-[10px] tracking-[0.35em] uppercase mb-3 text-center"
+            style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)" }}
           >
             {t("label")}
           </p>
           <h2
-            className="font-black uppercase text-2xl md:text-3xl text-center mb-12"
-            style={{ fontFamily: "var(--font-archivo-black), sans-serif", color: "#1A3040" }}
+            className="text-center mb-14"
+            style={{ fontFamily: "var(--font-dm-serif)", fontWeight: 400, fontSize: "clamp(1.9rem, 3.6vw, 2.8rem)", lineHeight: 1.15, color: "#1A3040" }}
           >
             {t("title")}
           </h2>
@@ -227,14 +227,14 @@ export default function CustomerVoices({
     >
       <div className="max-w-4xl mx-auto reveal">
         <p
-          className="text-[10px] tracking-[0.35em] uppercase mb-2 text-center"
-          style={{ color: "#00B4C5", fontFamily: "var(--font-geist-mono)" }}
+          className="text-[10px] tracking-[0.35em] uppercase mb-3 text-center"
+          style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)" }}
         >
           {t("label")}
         </p>
         <h2
-          className="font-black uppercase text-2xl md:text-3xl text-center mb-10"
-          style={{ fontFamily: "var(--font-archivo-black), sans-serif", color: "#1A3040" }}
+          className="text-center mb-10"
+          style={{ fontFamily: "var(--font-dm-serif)", fontWeight: 400, fontSize: "clamp(1.9rem, 3.6vw, 2.8rem)", lineHeight: 1.15, color: "#1A3040" }}
         >
           {t("title")}
         </h2>
@@ -277,10 +277,9 @@ export default function CustomerVoices({
               <Stars value={v.rating} />
               <blockquote
                 style={{
-                  margin: "16px 0 0",
+                  margin: "18px 0 0",
                   fontFamily: "var(--font-dm-serif)",
-                  fontStyle: "italic",
-                  fontSize: "clamp(1.05rem, 2.4vw, 1.5rem)",
+                  fontSize: "clamp(1.15rem, 2.4vw, 1.6rem)",
                   lineHeight: 1.5,
                   color: "#1A3040",
                 }}
@@ -288,10 +287,12 @@ export default function CustomerVoices({
                 «{v.comment}»
               </blockquote>
               <p
-                className="mt-5 text-[11px]"
+                className="mt-6"
                 style={{
                   fontFamily: "var(--font-geist-mono)",
-                  letterSpacing: "0.08em",
+                  fontSize: "9.5px",
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
                   color: "rgba(26,48,64,0.5)",
                 }}
               >
