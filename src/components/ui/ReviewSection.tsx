@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations, useLocale } from "next-intl";
 
 export interface Review {
@@ -234,7 +235,9 @@ export function ReviewDrawer({
 
   if (!open) return null;
 
-  return (
+  // Per Portal direkt in <body>: Die Infospalte ist sticky und bildet einen eigenen
+  // Stapelkontext – darin läge die Leiste immer unter dem fixen Header.
+  return createPortal(
     <div style={{ position: "fixed", inset: 0, zIndex: 60 }} role="dialog" aria-modal="true" aria-labelledby="reviews-title">
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(26,48,64,0.35)" }} />
       <div
@@ -369,6 +372,7 @@ export function ReviewDrawer({
           ))}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
