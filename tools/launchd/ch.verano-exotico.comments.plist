@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Kommentar-Autopilot für Verano Exotico: startet täglich um 18:07 (und beim
+  Anmelden) tools/instagram-comments.mjs. Dank "every 3" antwortet das Tool
+  nur, wenn der letzte Lauf 3 Tage her ist; war der Mac aus, holt es den Lauf
+  am nächsten Tag nach. Kein offener Chat nötig, das Token bleibt auf dem Mac.
+
+  Einschalten (einmal im Terminal):
+    cp tools/launchd/ch.verano-exotico.comments.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/ch.verano-exotico.comments.plist
+  Ausschalten:
+    launchctl unload ~/Library/LaunchAgents/ch.verano-exotico.comments.plist
+  Protokoll: .tmp/comments/autopilot.log · Offene Kommentare: .tmp/comments/offen.md
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>ch.verano-exotico.comments</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/node</string>
+    <string>/Users/Joel/git/verano-exotico/tools/instagram-comments.mjs</string>
+    <string>--reply</string>
+    <string>--every</string>
+    <string>3</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/Joel/git/verano-exotico</string>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>18</integer>
+    <key>Minute</key><integer>7</integer>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>/Users/Joel/git/verano-exotico/.tmp/comments/autopilot.log</string>
+  <key>StandardErrorPath</key><string>/Users/Joel/git/verano-exotico/.tmp/comments/autopilot.log</string>
+</dict>
+</plist>

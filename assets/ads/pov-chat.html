@@ -1,0 +1,249 @@
+<!doctype html>
+<!--
+  UGC-Spot "POV: 3 Wochen vor Thailand", 9:16, 15 s, komplett aus Code.
+  Sieht aus wie eine Bildschirmaufnahme eines iMessage-Chats mit der besten
+  Freundin: sie schickt Links zu zwei Bikinis (echte Preise, TWINT), danach
+  ein Schlussbild im Hunza-G-Stil (Farbfläche, Sofortbild mit dem
+  Model-Foto aus dem Shop, Sticker). Bewusst kein KI-Bild.
+
+  Bewusst als "POV"-Szene gerahmt — keine erfundene Kundin, keine Bewertung;
+  die Nachrichten enthalten nur Fakten aus dem Shop.
+
+  Ton:       node tools/synth-soundtrack.mjs --html assets/ads/pov-chat.html --out .tmp/ads/pov-chat.wav
+  Rendern:   node tools/render-html-video.mjs --html assets/ads/pov-chat.html --out .tmp/ads/pov-chat.mp4 --audio .tmp/ads/pov-chat.wav
+  Standbild: … --preview 3.0
+
+  Regeln (Joel, 06.10.2026): Bild 0 zeigt den Hook, keine leeren Frames,
+  wichtige Inhalte oberhalb y≈1500 und nicht am rechten Rand.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>POV Chat</title>
+<style>
+  @font-face { font-family: "Archivo Black"; src: url("../fonts/ArchivoBlack-Regular.ttf"); }
+  @font-face { font-family: "DM Serif"; src: url("../fonts/DMSerifDisplay-Italic.ttf"); font-style: italic; }
+  @font-face { font-family: "Geist Mono"; src: url("../fonts/GeistMono[wght].ttf"); }
+
+  :root { --navy: #1A3040; --cream: #F8F3E8; --blue: #0A84FF; --grey: #E9E9EB; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #FF8FB1; }
+  body { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
+
+  /* ── Schlussbild (liegt hinter dem Handy) ── */
+  #end { position: absolute; inset: 0; background: #FF8FB1; overflow: hidden; }
+  .cut { position: absolute; object-fit: contain; filter: drop-shadow(0 26px 30px rgba(0,0,0,0.22)); will-change: transform; }
+  /* Sofortbild: Model-Foto aus dem Shop (kein KI-Bild, Joel 12.10.2026) */
+  #polaroid { position: absolute; left: 200px; top: 620px; width: 680px; padding: 28px 28px 96px; background: #fff; box-shadow: 0 30px 60px rgba(0,0,0,0.28); will-change: transform; }
+  #polaroid img { display: block; width: 624px; height: 780px; object-fit: cover; object-position: 50% 20%; }
+  #polaroid span { position: absolute; left: 0; right: 0; bottom: 26px; text-align: center; font-family: "DM Serif", serif; font-style: italic; font-size: 46px; color: var(--navy); }
+  .sticker {
+    position: absolute; left: 50%; background: var(--cream); color: var(--navy); border-radius: 22px;
+    padding: 16px 40px 24px; white-space: nowrap; text-align: center; box-shadow: 0 10px 0 rgba(26,48,64,0.18);
+  }
+  .sticker small { display: block; font-family: "Geist Mono", monospace; font-size: 24px; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 8px; opacity: 0.7; }
+  #endTitle { top: 140px; font-family: "DM Serif", serif; font-style: italic; font-size: 92px; line-height: 1; }
+  #endUrl { position: absolute; left: 50%; margin-left: -280px; width: 560px; top: 410px; text-align: center; background: var(--navy); color: var(--cream); font-family: "Archivo Black", sans-serif; font-size: 44px; padding: 20px 0; border-radius: 999px; white-space: nowrap; }
+  #endNote { position: absolute; left: 0; right: 0; top: 525px; text-align: center; font-size: 30px; font-weight: 600; color: var(--navy); }
+  .ptag { position: absolute; background: var(--navy); color: var(--cream); font-family: "Archivo Black", sans-serif; font-size: 40px; padding: 14px 26px; border-radius: 14px; white-space: nowrap; }
+  #tagLeo { left: 110px; top: 1330px; }
+
+  /* ── Handy-Bildschirm (Bildschirmaufnahme) ── */
+  #phone { position: absolute; inset: 0; background: #fff; will-change: transform; transform-origin: 50% 40%; }
+  #status { position: absolute; left: 0; right: 0; top: 0; height: 110px; display: flex; align-items: center; justify-content: space-between; padding: 30px 70px 0; font-weight: 600; font-size: 40px; color: #000; }
+  #rec { background: #FF3B30; color: #fff; border-radius: 30px; padding: 4px 22px; }
+  #icons { display: flex; align-items: center; gap: 14px; }
+  .bars { display: flex; align-items: flex-end; gap: 4px; height: 26px; }
+  .bars i { width: 7px; background: #000; border-radius: 2px; }
+  .batt { width: 58px; height: 28px; border: 3px solid #000; border-radius: 9px; padding: 3px; position: relative; }
+  .batt::after { content: ""; position: absolute; right: -8px; top: 7px; width: 4px; height: 9px; background: #000; border-radius: 0 3px 3px 0; }
+  .batt b { display: block; height: 100%; width: 72%; background: #000; border-radius: 4px; }
+
+  #header { position: absolute; left: 0; right: 0; top: 110px; height: 220px; background: rgba(247,247,247,0.96); border-bottom: 1px solid #ddd; text-align: center; z-index: 3; }
+  #back { position: absolute; left: 34px; top: 40px; color: var(--blue); font-size: 46px; }
+  #avatar { width: 112px; height: 112px; border-radius: 50%; margin: 24px auto 8px; background: linear-gradient(135deg, #FFB347, #FF5A8F); display: flex; align-items: center; justify-content: center; font-size: 60px; }
+  #name { font-size: 30px; color: #000; }
+
+  #chat { position: absolute; left: 0; right: 0; top: 540px; height: 950px; overflow: hidden; }
+  #feed { position: absolute; left: 0; right: 0; bottom: 20px; display: flex; flex-direction: column; gap: 14px; padding: 0 36px; will-change: transform; }
+  .msg { max-width: 760px; font-size: 46px; line-height: 1.22; padding: 22px 34px; border-radius: 44px; display: none; will-change: transform; }
+  .me { align-self: flex-end; background: var(--blue); color: #fff; transform-origin: 100% 100%; }
+  .fr { align-self: flex-start; background: var(--grey); color: #000; transform-origin: 0 100%; }
+  .card { padding: 0; overflow: hidden; width: 620px; border-radius: 40px; }
+  .card .img { height: 520px; background-size: cover; background-position: 50% 30%; }
+  .card .meta { padding: 20px 30px 24px; }
+  .card .meta b { display: block; font-size: 38px; }
+  .card .meta span { font-size: 32px; color: #6b6b70; }
+  .typing { display: none; align-self: flex-start; background: var(--grey); border-radius: 44px; padding: 30px 34px; gap: 12px; }
+  .typing i { width: 20px; height: 20px; border-radius: 50%; background: #9a9aa0; display: inline-block; margin: 0 5px; }
+
+  #input { position: absolute; left: 30px; right: 30px; top: 1510px; height: 96px; border: 2px solid #d0d0d4; border-radius: 48px; color: #b0b0b5; font-size: 40px; padding: 22px 36px; }
+
+  /* TikTok-Text (Original-Stil: weisse Schrift auf schwarzer Box) */
+  #pov { position: absolute; left: 0; right: 0; top: 370px; text-align: center; z-index: 5; }
+  #pov span { display: inline; background: #000; color: #fff; font-weight: 800; font-size: 54px; line-height: 1.5; padding: 6px 18px; border-radius: 12px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+
+  #grain {
+    position: absolute; inset: -50%; opacity: 0.06; mix-blend-mode: multiply; pointer-events: none; z-index: 20;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+</style>
+</head>
+<body>
+  <div id="end">
+    <div id="polaroid"><img src="../../public/products/safari-leopard-model.jpg"><span>ferien-look ✔️ 🐆</span></div>
+    <div class="sticker" id="endTitle"><small>Verano Exotico 🇨🇭</small>ferien-ready ✨</div>
+    <div id="endUrl">verano-exotico.ch</div>
+    <div id="endNote">💳 Karte &amp; TWINT 📱 · 🇨🇭 Schweizer Shop</div>
+    <div class="ptag" id="tagLeo">🐆 CHF 33.90</div>
+  </div>
+
+  <div id="phone">
+    <div id="status">
+      <span id="rec">18:07</span>
+      <span id="icons"><span class="bars"><i style="height:8px"></i><i style="height:13px"></i><i style="height:19px"></i><i style="height:26px"></i></span>5G<span class="batt"><b></b></span></span>
+    </div>
+    <div id="header">
+      <div id="back">‹ 12</div>
+      <div id="avatar">🌴</div>
+      <div id="name">Lara 🌴 ›</div>
+    </div>
+    <div id="chat"><div id="feed"></div></div>
+    <div id="input">iMessage</div>
+    <div id="pov"><span>POV: 3 Wochen vor Thailand 🌴<br>und NICHTS zum Anziehen 😭</span></div>
+  </div>
+  <div id="grain"></div>
+
+<script>
+window.VIDEO = { duration: 15, fps: 30, width: 1080, height: 1920 };
+
+// SOUND-START
+window.SOUND = {
+  style: "amapiano",
+  bpm: 120,
+  duration: 15,
+  sections: { intro: [0, 0.01], groove: [0, 10.5], pause: [10.5, 10.51], outro: [10.5, 15] },
+  cues: [
+    { t: 1.5, type: "pop" }, { t: 2.3, type: "pop" },
+    { t: 3.6, type: "tap" },
+    { t: 4.7, type: "pop" }, { t: 5.9, type: "pop" }, { t: 6.9, type: "pop" },
+    { t: 7.9, type: "tap" }, { t: 8.8, type: "success" },
+    { t: 9.8, type: "pop" },
+    { t: 10.5, type: "whoosh" }, { t: 11.0, type: "impact" },
+    { t: 11.6, type: "pop" }, { t: 12.4, type: "pop" }, { t: 12.9, type: "success" }
+  ]
+};
+// SOUND-END
+
+const IMG = (f) => `../../public/products/${f}`;
+// [Zeit, wer, Inhalt]; typing = ab wann "…" vor einer Nachricht der Freundin
+const MSGS = [
+  { t: -1, me: true, text: "3 wochen thailand und ich hab NICHTS zum anziehen 😭😭" },
+  { t: 1.5, typing: 1.0, text: "warte 👀" },
+  { t: 2.3, typing: 1.8, card: { img: "safari-leopard-model.jpg", title: "Push-up-Bikini Leopard 🐆", sub: "CHF 33.90 · verano-exotico.ch" } },
+  { t: 3.6, me: true, text: "CHF 33.90?? 😳🐆" },
+  { t: 4.7, typing: 4.1, text: "jaa und zahlen geht mit TWINT 📱💸" },
+  { t: 5.9, typing: 5.3, card: { img: "brillo-sequin-bikini-c4.jpg", title: "Triangel-Bikini mit Pailletten", sub: "CHF 36.90 · verano-exotico.ch" } },
+  { t: 6.9, text: "der glitzert sooo 🤩💖" },
+  { t: 7.9, me: true, text: "ich nehm beide 🐆💖" },
+  { t: 8.8, me: true, text: "bestellt ✅🛍️" },
+  { t: 9.8, typing: 9.3, text: "will fotos aus thailand sehen 📸☀️" },
+];
+
+const $ = (s) => document.querySelector(s);
+const feed = $("#feed");
+MSGS.forEach((m) => {
+  if (m.typing !== undefined) {
+    m.tEl = document.createElement("div");
+    m.tEl.className = "typing";
+    m.tEl.innerHTML = "<i></i><i></i><i></i>";
+    feed.appendChild(m.tEl);
+  }
+  const d = document.createElement("div");
+  d.className = `msg ${m.me ? "me" : "fr"}${m.card ? " card" : ""}`;
+  d.innerHTML = m.card
+    ? `<div class="img" style="background-image:url('${IMG(m.card.img)}')"></div><div class="meta"><b>${m.card.title}</b><span>${m.card.sub}</span></div>`
+    : m.text;
+  feed.appendChild(d);
+  m.el = d;
+});
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const outCubic = (p) => 1 - Math.pow(1 - p, 3);
+const outBack = (p) => { const c1 = 1.6, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); };
+const step = (t) => Math.floor(t * 12);
+const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const jit = (t, k, amt) => (hash(step(t) * 7 + k) - 0.5) * 2 * amt;
+const show = (e, v) => { e.style.display = v ? "" : "none"; };
+function popScale(t, a) {
+  const d = t - a;
+  if (d < 0) return 0;
+  if (d < 1 / 12) return 0.82;
+  if (d < 2 / 12) return 1.07;
+  return 1;
+}
+
+window.renderFrame = function (t) {
+  $("#grain").style.transform = `translate(${(step(t) * 37) % 200}px, ${(step(t) * 53) % 200}px)`;
+
+  // ── Chat: Nachrichten erscheinen, Liste rutscht nach oben ──
+  let newest = null, newestAt = -9;
+  MSGS.forEach((m) => {
+    const visible = t >= m.t;
+    show(m.el, visible);
+    m.el.style.display = visible ? "block" : "none";
+    if (m.tEl) m.tEl.style.display = t >= m.typing && t < m.t ? "flex" : "none";
+    if (m.tEl && t >= m.typing && t < m.t && m.typing > newestAt) { newest = m.tEl; newestAt = m.typing; }
+    if (visible && m.t > newestAt) { newest = m.el; newestAt = m.t; }
+    if (visible) m.el.style.transform = `scale(${m.t < 0 ? 1 : 0.85 + 0.15 * outBack(seg(t, m.t, m.t + 0.22))})`;
+  });
+  // Tippen-Punkte hüpfen
+  MSGS.forEach((m) => m.tEl && [...m.tEl.children].forEach((d, k) => {
+    d.style.transform = `translateY(${-8 * Math.max(0, Math.sin(t * 9 - k * 0.9))}px)`;
+  }));
+  // Weiches Nachrutschen: neue Nachricht schiebt die Liste um ihre Höhe hoch
+  let shift = 0;
+  if (newest && newestAt >= 0) {
+    const h = newest.offsetHeight + 14;
+    shift = h * (1 - outCubic(seg(t, newestAt, newestAt + 0.25)));
+  }
+  feed.style.transform = `translateY(${shift}px)`;
+
+  // Handkamera-Wackeln der Bildschirmaufnahme (sanft, nicht ruckelnd)
+  const hx = Math.sin(t * 1.3) * 4 + Math.sin(t * 2.9) * 2, hy = Math.cos(t * 1.1) * 3;
+
+  // ── Übergang ab 10.5 s: Handy kippt in drei Stop-Motion-Stufen weg ──
+  const k = t < 10.5 ? -1 : Math.floor((t - 10.5) * 12);
+  const OUT = [[0.92, -3, 40], [0.7, -9, 500], [0.45, -16, 1500], [0.3, -20, 2600]];
+  if (k < 0) $("#phone").style.transform = `translate(${hx}px, ${hy}px)`;
+  else {
+    const [s, r, y] = OUT[Math.min(OUT.length - 1, k)];
+    $("#phone").style.transform = `translateY(${y}px) rotate(${r}deg) scale(${s})`;
+  }
+  show($("#phone"), t < 10.5 + 4 / 12);
+  show($("#pov"), t < 10.5);
+  $("#pov").style.transform = `rotate(${jit(t, 3, 0.25)}deg)`;
+
+  // ── Schlussbild ──
+  show($("#end"), t >= 10.4);
+  // Sofortbild fällt in drei Stop-Motion-Stufen ins Bild
+  const pol = $("#polaroid");
+  show(pol, t >= 10.9);
+  const pk = Math.floor((t - 10.9) * 12);
+  const DROP = [[-420, -14, 1.15], [-60, -2, 1.04], [10, -5, 1]];
+  const [py, pr, ps] = DROP[Math.max(0, Math.min(DROP.length - 1, pk))];
+  pol.style.transform = `translateY(${py + jit(t, 10, 3)}px) rotate(${pr + jit(t, 30, 0.6)}deg) scale(${ps})`;
+  show($("#endTitle"), t >= 10.8);
+  $("#endTitle").style.transform = `translateX(-50%) rotate(${-2 + jit(t, 40, 0.5)}deg) scale(${popScale(t, 10.8)})`;
+  show($("#tagLeo"), t >= 11.6);
+  $("#tagLeo").style.transform = `rotate(${-4 + jit(t, 41, 0.5)}deg) scale(${popScale(t, 11.6)})`;
+  show($("#endUrl"), t >= 12.4);
+  $("#endUrl").style.transform = `rotate(${1.5 + jit(t, 43, 0.4)}deg) scale(${popScale(t, 12.4)})`;
+  show($("#endNote"), t >= 12.9);
+};
+
+window.renderFrame(0);
+</script>
+</body>
+</html>

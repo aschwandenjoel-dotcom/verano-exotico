@@ -1,0 +1,214 @@
+<!doctype html>
+<!--
+  Spot "Packliste Thailand" — sechs Ferienbikinis, 9:16, 15 s, im Stil von
+  Hunza G: Stop-Motion (12 Bilder/s), freigestellte Flatlays auf einer
+  kräftigen Farbfläche, Sticker statt Effekte. Jeder Bikini landet gross in
+  der Mitte (mit Name und Preis) und springt dann in die Collage.
+
+  Freisteller: assets/ads/cutouts/ (siehe farbwechsel.html).
+
+  Ton:       node tools/synth-soundtrack.mjs --html assets/ads/packliste.html --out .tmp/ads/packliste.wav
+  Rendern:   node tools/render-html-video.mjs --html assets/ads/packliste.html --out .tmp/ads/packliste.mp4 --audio .tmp/ads/packliste.wav
+  Standbild: … --preview 3.0
+
+  Regeln (Joel, 06.10.2026): Bild 0 zeigt den Hook, keine leeren Frames,
+  wichtige Inhalte oberhalb y≈1500 und nicht am rechten Rand.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Packliste Thailand</title>
+<style>
+  @font-face { font-family: "Archivo Black"; src: url("../fonts/ArchivoBlack-Regular.ttf"); }
+  @font-face { font-family: "DM Serif"; src: url("../fonts/DMSerifDisplay-Italic.ttf"); font-style: italic; }
+  @font-face { font-family: "Geist Mono"; src: url("../fonts/GeistMono[wght].ttf"); }
+
+  :root { --navy: #1A3040; --cream: #F8F3E8; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #2F6BFF; }
+  #stage { position: absolute; inset: 0; overflow: hidden; }
+  #bg { position: absolute; inset: 0; background: #2F6BFF; }
+  #collage { position: absolute; inset: 0; will-change: transform; }
+
+  .item { position: absolute; left: 0; top: 0; will-change: transform; }
+  .item img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 22px 22px rgba(0,0,0,0.28)); }
+
+  .sticker {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    background: var(--cream); color: var(--navy); border-radius: 22px;
+    padding: 16px 40px 24px; white-space: nowrap; text-align: center;
+    box-shadow: 0 10px 0 rgba(26,48,64,0.22); z-index: 10;
+  }
+  .sticker small { display: block; font-family: "Geist Mono", monospace; font-style: normal; font-size: 24px; letter-spacing: 0.32em; text-transform: uppercase; margin-bottom: 8px; opacity: 0.7; }
+  .serif { font-family: "DM Serif", serif; font-style: italic; }
+  .mono { font-family: "Geist Mono", monospace; text-transform: uppercase; letter-spacing: 0.3em; }
+  #hook { top: 140px; font-size: 92px; line-height: 1.02; }
+  #full { top: 140px; font-size: 84px; line-height: 1.02; }
+  #tag {
+    position: absolute; left: 50%; top: 1330px; z-index: 12;
+    background: var(--navy); color: var(--cream); border-radius: 14px; padding: 16px 28px;
+    font-family: "Geist Mono", monospace; text-transform: uppercase; letter-spacing: 0.16em; font-size: 28px; white-space: nowrap;
+  }
+  #tag b { font-family: "Archivo Black", sans-serif; letter-spacing: 0.02em; margin-left: 14px; color: #F7E04B; font-weight: 400; }
+  #endTitle { top: 130px; font-size: 80px; line-height: 1.02; }
+  #endPrice { position: absolute; left: 0; right: 0; top: 370px; text-align: center; font-family: "Archivo Black", sans-serif; font-size: 104px; color: var(--cream); z-index: 10; text-shadow: 0 8px 0 rgba(26,48,64,0.3); }
+  #endUrl { position: absolute; left: 50%; margin-left: -270px; width: 540px; top: 520px; text-align: center; background: var(--cream); color: var(--navy); font-family: "Archivo Black", sans-serif; font-size: 44px; padding: 20px 0; border-radius: 999px; white-space: nowrap; z-index: 10; }
+  #endNote { position: absolute; left: 0; right: 0; top: 630px; text-align: center; font-size: 22px; color: var(--cream); z-index: 10; }
+
+  #grain {
+    position: absolute; inset: -50%; opacity: 0.1; mix-blend-mode: multiply; pointer-events: none; z-index: 20;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  #vignette { position: absolute; inset: 0; pointer-events: none; z-index: 19; background: radial-gradient(130% 90% at 50% 45%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.2) 100%); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div>
+  <div id="collage"></div>
+  <div class="sticker serif" id="hook"><small>Packliste</small>thailand,<br>2 wochen.</div>
+  <div class="sticker serif" id="full"><small>Alles drin</small>6 bikinis.<br>1 koffer.</div>
+  <div id="tag"></div>
+  <div class="sticker serif" id="endTitle"><small>Verano Exotico</small>ferienbikinis</div>
+  <div id="endPrice">ab CHF 29.90</div>
+  <div id="endUrl">verano-exotico.ch</div>
+  <div class="mono" id="endNote">Karte &amp; TWINT · S–L · Link in Bio</div>
+  <div id="vignette"></div>
+  <div id="grain"></div>
+</div>
+
+<script>
+window.VIDEO = { duration: 15, fps: 30, width: 1080, height: 1920 };
+
+// 120 BPM. Jeder Bikini: landet auf einem Schlag, springt 1.5 Schläge
+// später in die Collage.
+// SOUND-START
+window.SOUND = {
+  style: "amapiano",
+  bpm: 120,
+  duration: 15,
+  sections: { intro: [0, 0.01], groove: [0, 10], pause: [10, 11], outro: [11, 15] },
+  cues: [
+    { t: 0.75, type: "swipe" },
+    { t: 1.25, type: "pop" }, { t: 2.0, type: "swipe" },
+    { t: 2.5, type: "pop" }, { t: 3.25, type: "swipe" },
+    { t: 3.75, type: "pop" }, { t: 4.5, type: "swipe" },
+    { t: 5.0, type: "pop" }, { t: 5.75, type: "swipe" },
+    { t: 6.25, type: "pop" }, { t: 7.0, type: "swipe" },
+    { t: 7.5, type: "hit" },
+    { t: 10.0, type: "tap" }, { t: 10.25, type: "tap" }, { t: 10.5, type: "tap" }, { t: 10.75, type: "tap" },
+    { t: 11.0, type: "impact" }, { t: 11.6, type: "pop" }, { t: 12.2, type: "success" }
+  ]
+};
+// SOUND-END
+
+// [Freisteller, Name, Preis, Collage-Platz: Mitte x/y, Grösse, Drehung]
+const ITEMS = [
+  ["brillo-sequin-bikini-c5", "Pailletten Weinrot",  "36.90", 270, 560, 440, -8],
+  ["rayas-striped-bikini-1",  "Bandeau Streifen Rosa", "29.90", 805, 590, 450,  7],
+  ["selva-floral-bikini-1",   "Off-Shoulder Blumen", "32.90", 275, 940, 450,  5],
+  ["palma-print-bikini-1",    "Neckholder Paisley",  "34.90", 800, 970, 440, -6],
+  ["marea-bikini-1",          "Set mit Mesh-Rock",   "34.90", 275, 1310, 430, -4],
+  ["rayas-striped-bikini-c2", "Bandeau Streifen Gelb", "29.90", 800, 1320, 440,  8],
+];
+const STEP = 1.25;           // Abstand zwischen zwei Bikinis
+const HOLD = 0.75;           // so lange liegt ein Bikini gross in der Mitte
+const BIG = { x: 540, y: 860, s: 860 };
+const FLICKER = ["#FF8FB1", "#F7E04B", "#8FD3C7", "#2F6BFF"];
+
+const $ = (s) => document.querySelector(s);
+const items = ITEMS.map(([f]) => {
+  const d = document.createElement("div");
+  d.className = "item";
+  d.innerHTML = `<img src="cutouts/${f}.webp">`;
+  $("#collage").appendChild(d);
+  return d;
+});
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const show = (e, v) => { e.style.display = v ? "block" : "none"; };
+const step = (t) => Math.floor(t * 12);
+const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const jit = (t, k, amt) => (hash(step(t) * 7 + k) - 0.5) * 2 * amt;
+function popScale(t, a) {
+  const d = t - a;
+  if (d < 0) return 0;
+  if (d < 1 / 12) return 0.82;
+  if (d < 2 / 12) return 1.07;
+  return 1;
+}
+// Stop-Motion-Weg von gross (Mitte) zum Collage-Platz: drei feste Stufen
+const MOVE = [0.3, 0.75, 1.04, 1];
+function moveP(t, a) {
+  const k = Math.floor((t - a) * 12);
+  if (k < 0) return 0;
+  return MOVE[Math.min(MOVE.length - 1, k)];
+}
+const place = (e, x, y, s, rot, sc = 1) => {
+  e.style.width = e.style.height = `${s}px`;
+  e.style.transform = `translate(${x - s / 2}px, ${y - s / 2}px) rotate(${rot}deg) scale(${sc})`;
+};
+
+window.renderFrame = function (t) {
+  $("#grain").style.transform = `translate(${(step(t) * 37) % 200}px, ${(step(t) * 53) % 200}px)`;
+
+  // Hintergrund: blau, kurz vor dem Ende im Takt durch vier Farben
+  let bg = "#2F6BFF";
+  if (t >= 10 && t < 11) bg = FLICKER[Math.floor((t - 10) / 0.25)];
+  if (t >= 11) bg = "#FF8FB1";
+  $("#bg").style.background = bg;
+  document.body.style.background = bg;
+
+  // Bikinis
+  let current = -1;
+  ITEMS.forEach(([, , , x, y, s, rot], i) => {
+    const a = i * STEP;            // landet gross
+    const m = a + HOLD;            // springt in die Collage
+    const e = items[i];
+    show(e, t >= a);
+    if (t < a) return;
+    e.style.zIndex = t < m + 0.3 ? 5 : 1;
+    if (t < m) {
+      current = i;
+      const sc = i === 0 && t < 1 / 6 ? 1 : popScale(t, a);
+      place(e, BIG.x + jit(t, i, 5), BIG.y + jit(t, i + 9, 5), BIG.s, rot * 0.3 + jit(t, i + 20, 1.2), sc);
+    } else {
+      const p = moveP(t, m);
+      const wob = t > 7.5 && t < 11 ? jit(t, i + 40, 1.5) : jit(t, i + 40, 0.6);
+      place(e,
+        BIG.x + (x - BIG.x) * p, BIG.y + (y - BIG.y) * p,
+        BIG.s + (s - BIG.s) * p, rot * (0.3 + 0.7 * p) + wob);
+    }
+  });
+
+  // Name + Preis zum Bikini, der gerade gross liegt
+  const tag = $("#tag");
+  show(tag, current >= 0);
+  if (current >= 0) {
+    const [, name, price] = ITEMS[current];
+    tag.innerHTML = `${name}<b>CHF ${price}</b>`;
+    tag.style.transform = `translateX(-50%) rotate(${(current % 2 ? 2 : -2) + jit(t, 60, 0.4)}deg) scale(${current === 0 && t < 0.2 ? 1 : popScale(t, current * STEP + 0.08)})`;
+  }
+
+  // Collage rückt fürs Schlussbild nach unten zusammen
+  const endP = moveP(t, 11.0);
+  $("#collage").style.transformOrigin = "50% 100%";
+  $("#collage").style.transform = `translateY(${endP * 300}px) scale(${1 - endP * 0.18})`;
+
+  show($("#hook"), t < 7.5);
+  $("#hook").style.transform = `translateX(-50%) rotate(${-2 + jit(t, 70, 0.5)}deg)`;
+  show($("#full"), t >= 7.5 && t < 11);
+  $("#full").style.transform = `translateX(-50%) rotate(${2 + jit(t, 71, 0.5)}deg) scale(${popScale(t, 7.5)})`;
+  show($("#endTitle"), t >= 11);
+  $("#endTitle").style.transform = `translateX(-50%) rotate(${-2 + jit(t, 72, 0.5)}deg) scale(${popScale(t, 11)})`;
+  show($("#endPrice"), t >= 11.6);
+  $("#endPrice").style.transform = `rotate(${-2 + jit(t, 73, 0.4)}deg) scale(${popScale(t, 11.6)})`;
+  show($("#endUrl"), t >= 12.2);
+  $("#endUrl").style.transform = `rotate(${1.5 + jit(t, 74, 0.4)}deg) scale(${popScale(t, 12.2)})`;
+  show($("#endNote"), t >= 12.6);
+};
+
+window.renderFrame(0);
+</script>
+</body>
+</html>

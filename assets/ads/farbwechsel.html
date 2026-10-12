@@ -1,0 +1,246 @@
+<!doctype html>
+<!--
+  Produkt-Spot "Farbwechsel" — Triangel-Bikini mit Pailletten
+  (brillo-sequin-bikini), 9:16, 15 s, im Stil von Hunza G:
+  flache, kräftige Farbflächen, freigestellte Produkte, harte Schnitte im
+  Takt, Stop-Motion-Ruckeln (12 Bilder/s), kaum Text, Sticker statt Effekte.
+
+  Freisteller liegen in assets/ads/cutouts/ (aus den Produktbildern,
+  Hintergrund lokal entfernt mit @imgly/background-removal-node).
+
+  Ton:       node tools/synth-soundtrack.mjs --html assets/ads/farbwechsel.html --out .tmp/ads/farbwechsel.wav
+  Rendern:   node tools/render-html-video.mjs --html assets/ads/farbwechsel.html --out .tmp/ads/farbwechsel.mp4 --audio .tmp/ads/farbwechsel.wav
+  Standbild: … --preview 3.0
+
+  Regeln (Joel, 06.10.2026): Bild 0 zeigt den Hook, keine leeren Frames,
+  wichtige Inhalte oberhalb y≈1500 und nicht am rechten Rand.
+-->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Farbwechsel</title>
+<style>
+  @font-face { font-family: "Archivo Black"; src: url("../fonts/ArchivoBlack-Regular.ttf"); }
+  @font-face { font-family: "DM Serif"; src: url("../fonts/DMSerifDisplay-Italic.ttf"); font-style: italic; }
+  @font-face { font-family: "Geist Mono"; src: url("../fonts/GeistMono[wght].ttf"); }
+
+  :root { --navy: #1A3040; --cream: #F8F3E8; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #F7E04B; }
+  #stage { position: absolute; inset: 0; overflow: hidden; }
+
+  .scene { position: absolute; inset: 0; }
+  .fill { position: absolute; inset: 0; }
+  .cut { position: absolute; object-fit: contain; filter: drop-shadow(0 26px 30px rgba(0,0,0,0.22)); will-change: transform; }
+
+  /* Szene 1: ein Bikini, Farbe wechselt auf jeden Schlag */
+  /* Models sitzen bündig auf der Unterkante — die Schnittkante des Freistellers
+     fällt so mit dem Bildrand zusammen. Flatlays schweben in der Mitte. */
+  #s1 .cut { left: -110px; top: 400px; width: 1300px; height: 1520px; object-position: 50% 100%; display: none; }
+  #s1 .cut.flat { left: 90px; top: 520px; width: 900px; height: 940px; object-position: 50% 50%; }
+
+  /* Szene 2: 2×2-Raster */
+  .tile { position: absolute; width: 540px; height: 960px; overflow: hidden; display: none; }
+  .tile .cut { left: 10px; top: 150px; width: 520px; height: 810px; object-position: 50% 100%; display: none; }
+  .tile .cut.flat { left: 50px; top: 250px; width: 440px; height: 500px; object-position: 50% 50%; }
+
+  /* Szene 3: Ausschnitt, nah an den Pailletten */
+  .photo { position: absolute; inset: 0; background-size: cover; display: none; will-change: transform; }
+
+  /* Szene 4: Aufstellung */
+  #s4 .cut { top: 700px; height: 1220px; width: 1100px; object-position: 50% 100%; display: none; }
+
+  /* Sticker: hält auf jeder Farbe, wirkt wie aufgeklebt */
+  .sticker {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    background: var(--cream); color: var(--navy); border-radius: 22px;
+    padding: 18px 40px 26px; white-space: nowrap; text-align: center;
+    box-shadow: 0 10px 0 rgba(26,48,64,0.18);
+  }
+  .serif { font-family: "DM Serif", serif; font-style: italic; }
+  .mono { font-family: "Geist Mono", monospace; text-transform: uppercase; letter-spacing: 0.3em; }
+  .tag {
+    position: absolute; background: var(--navy); color: var(--cream);
+    font-family: "Geist Mono", monospace; text-transform: uppercase; letter-spacing: 0.22em;
+    font-size: 26px; padding: 12px 20px; border-radius: 10px; white-space: nowrap;
+  }
+  #hook { top: 150px; font-size: 92px; line-height: 1.02; }
+  #hook small { display: block; font-family: "Geist Mono", monospace; font-style: normal; font-size: 24px; letter-spacing: 0.32em; text-transform: uppercase; margin-bottom: 10px; opacity: 0.7; }
+  #tag1 { left: 60px; top: 1430px; }
+  #mid { top: 860px; font-size: 84px; line-height: 1.02; z-index: 5; }
+  #detail { top: 170px; font-size: 86px; line-height: 1.02; }
+  #endTitle { top: 150px; font-size: 74px; line-height: 1.05; }
+  #endTitle small { display: block; font-family: "Geist Mono", monospace; font-style: normal; font-size: 24px; letter-spacing: 0.32em; text-transform: uppercase; margin-bottom: 8px; opacity: 0.7; }
+  #endPrice { position: absolute; left: 0; right: 0; text-align: center; top: 390px; font-family: "Archivo Black", sans-serif; font-size: 112px; color: var(--navy); transform-origin: center; }
+  #endUrl { position: absolute; left: 50%; margin-left: -270px; width: 540px; white-space: nowrap; text-align: center; top: 540px; z-index: 3; background: var(--navy); color: var(--cream); font-family: "Archivo Black", sans-serif; font-size: 44px; padding: 20px 40px; border-radius: 999px; transform-origin: center; }
+  #endNote { position: absolute; left: 0; right: 0; text-align: center; top: 650px; font-size: 22px; color: var(--navy); opacity: 0.75; }
+
+  #grain {
+    position: absolute; inset: -50%; opacity: 0.09; mix-blend-mode: multiply; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  #vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(130% 90% at 50% 45%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.18) 100%); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="scene" id="s1"><div class="fill" id="s1bg"></div></div>
+  <div class="scene" id="s2"></div>
+  <div class="scene" id="s3"></div>
+  <div class="scene" id="s4"><div class="fill" style="background:#FF8FB1"></div></div>
+
+  <div class="sticker serif" id="hook"><small>Pailletten-Bikini</small>welche farbe<br>nimmst du mit?</div>
+  <div class="tag" id="tag1"></div>
+  <div class="sticker serif" id="mid">1 bikini.<br>7 farben.</div>
+  <div class="sticker serif" id="detail">glitzert bei<br>jeder bewegung.</div>
+  <div class="sticker serif" id="endTitle"><small>Verano Exotico</small>triangel-bikini<br>mit pailletten</div>
+  <div id="endPrice">CHF 36.90</div>
+  <div id="endUrl">verano-exotico.ch</div>
+  <div class="mono" id="endNote">Karte &amp; TWINT · S–L · Link in Bio</div>
+
+  <div id="vignette"></div>
+  <div id="grain"></div>
+</div>
+
+<script>
+window.VIDEO = { duration: 15, fps: 30, width: 1080, height: 1920 };
+
+// 120 BPM: ein Schlag = 0.5 s, jeder Farbwechsel sitzt auf einem Schlag.
+// SOUND-START
+window.SOUND = {
+  style: "amapiano",
+  bpm: 120,
+  duration: 15,
+  sections: { intro: [0, 0.01], groove: [0, 11], pause: [11, 11.01], outro: [11, 15] },
+  cues: [
+    { t: 0.5, type: "tap" }, { t: 1.0, type: "tap" }, { t: 1.5, type: "tap" }, { t: 2.0, type: "tap" },
+    { t: 2.5, type: "tap" }, { t: 3.0, type: "tap" }, { t: 3.5, type: "tap" },
+    { t: 4.0, type: "pop" }, { t: 4.5, type: "pop" }, { t: 5.0, type: "pop" }, { t: 5.5, type: "pop" },
+    { t: 6.0, type: "swipe" }, { t: 6.5, type: "swipe" }, { t: 7.0, type: "swipe" }, { t: 7.5, type: "swipe" },
+    { t: 8.0, type: "hit" }, { t: 8.1, type: "shimmer" },
+    { t: 9.5, type: "whoosh" }, { t: 9.6, type: "shimmer" },
+    { t: 10.4, type: "riser", len: 0.6 },
+    { t: 11.0, type: "impact" }, { t: 11.5, type: "pop" }, { t: 12.0, type: "pop" },
+    { t: 12.6, type: "pop" }, { t: 13.2, type: "success" }
+  ]
+};
+// SOUND-END
+
+const CUT = (n) => `cutouts/brillo-sequin-bikini-${n}.webp`;
+const PHOTO = (n) => `../../public/products/brillo-sequin-bikini-${n}.jpg`;
+const FLAT = new Set(["c1", "c5"]); // Flatlays, ohne Model
+const NAME = { c0: "Schwarz", c1: "Weiss", c2: "Orange", c3: "Blau", c4: "Rosarot", c5: "Weinrot" };
+
+// Szene 1: [Bikini, Hintergrund] je Schlag
+const S1 = [
+  ["c4", "#F7E04B"], ["c3", "#FF8FB1"], ["c2", "#2F6BFF"], ["c0", "#FF5A36"],
+  ["c5", "#F6C9D8"], ["c1", "#2D7A5F"], ["c3", "#FFB347"], ["c4", "#8FD3C7"],
+];
+// Szene 2: vier Kacheln, erst A, dann (ab 6 s, eine nach der anderen) B
+const S2A = [["c0", "#FF8FB1"], ["c3", "#F7E04B"], ["c4", "#2F6BFF"], ["c2", "#8FD3C7"]];
+const S2B = [["c5", "#F7E04B"], ["c1", "#FF5A36"], ["c3", "#F6C9D8"], ["c0", "#FFB347"]];
+// Szene 4: Aufstellung
+const S4 = [["c3", -430], ["c0", 410], ["c4", -10]];
+
+const $ = (s) => document.querySelector(s);
+const el = (html) => { const d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstChild; };
+
+// ── Aufbau ──
+const s1imgs = S1.map(([c]) => { const i = el(`<img class="cut${FLAT.has(c) ? " flat" : ""}" src="${CUT(c)}">`); $("#s1").appendChild(i); return i; });
+const tiles = [0, 1, 2, 3].map((k) => {
+  const t = el(`<div class="tile" style="left:${(k % 2) * 540}px;top:${Math.floor(k / 2) * 960}px"><div class="fill"></div></div>`);
+  const mk = (c) => el(`<img class="cut${FLAT.has(c) ? " flat" : ""}" src="${CUT(c)}">`);
+  const a = mk(S2A[k][0]), b = mk(S2B[k][0]);
+  t.append(a, b); $("#s2").appendChild(t);
+  return { t, bg: t.querySelector(".fill"), a, b };
+});
+const photoA = el(`<div class="photo" style="background-image:url('${PHOTO("c4")}');background-position:50% 30%"></div>`);
+const photoB = el(`<div class="photo" style="background-image:url('${PHOTO("c3")}');background-position:50% 30%"></div>`);
+$("#s3").append(photoA, photoB);
+const s4imgs = S4.map(([c, x]) => { const i = el(`<img class="cut" src="${CUT(c)}" style="left:${x}px">`); $("#s4").appendChild(i); return i; });
+
+// ── Hilfsfunktionen ──
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const show = (e, v) => { e.style.display = v ? "block" : "none"; };
+// Stop-Motion: Zeit auf 12 Bilder/s runden, pro Schritt leicht verrückt
+const step = (t) => Math.floor(t * 12);
+const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const jit = (t, k, amt) => (hash(step(t) * 7 + k) - 0.5) * 2 * amt;
+// "Aufploppen" in drei Stop-Motion-Stufen: klein → zu gross → richtig
+function popScale(t, a) {
+  const d = t - a;
+  if (d < 0) return 0;
+  if (d < 1 / 12) return 0.82;
+  if (d < 2 / 12) return 1.07;
+  return 1;
+}
+const isOn = (t, a, b) => t >= a && t < b;
+
+window.renderFrame = function (t) {
+  $("#grain").style.transform = `translate(${(step(t) * 37) % 200}px, ${(step(t) * 53) % 200}px)`;
+
+  // ── Szene 1: 0–4 s (bleibt bis 5.5 s hinter dem Raster stehen) ──
+  const s1on = t < 5.6;
+  show($("#s1"), s1on);
+  if (s1on) {
+    const i = Math.min(S1.length - 1, Math.floor(t / 0.5));
+    $("#s1bg").style.background = S1[i][1];
+    document.body.style.background = S1[i][1];
+    s1imgs.forEach((img, k) => show(img, k === i));
+    const p = popScale(t, i * 0.5);
+    s1imgs[i].style.transform = `translate(${jit(t, 1, 6)}px, ${jit(t, 2, 6)}px) rotate(${jit(t, 3, 1.2)}deg) scale(${i === 0 && t < 0.5 ? 1 : p})`;
+  }
+  show($("#hook"), t < 4.0);
+  $("#hook").style.transform = `translateX(-50%) rotate(${-2 + jit(t, 9, 0.6)}deg)`;
+  show($("#tag1"), t < 4.0);
+  if (t < 4) {
+    const i = Math.min(S1.length - 1, Math.floor(t / 0.5));
+    $("#tag1").textContent = `${String(i % 6 + 1).padStart(2, "0")} · ${NAME[S1[i][0]]}`;
+    $("#tag1").style.transform = `rotate(${3 + jit(t, 11, 0.5)}deg)`;
+  }
+
+  // ── Szene 2: 4–8 s, Raster ──
+  show($("#s2"), isOn(t, 4.0, 8.0));
+  tiles.forEach((tl, k) => {
+    const a = 4.0 + k * 0.5, b = 6.0 + k * 0.5;
+    show(tl.t, t >= a);
+    const useB = t >= b;
+    tl.bg.style.background = useB ? S2B[k][1] : S2A[k][1];
+    show(tl.a, !useB); show(tl.b, useB);
+    const img = useB ? tl.b : tl.a;
+    img.style.transform = `translate(${jit(t, 20 + k, 5)}px, ${jit(t, 30 + k, 5)}px) rotate(${jit(t, 40 + k, 1.5)}deg) scale(${popScale(t, useB ? b : a)})`;
+  });
+  show($("#mid"), isOn(t, 5.5, 8.0));
+  $("#mid").style.transform = `translateX(-50%) rotate(${2 + jit(t, 50, 0.6)}deg) scale(${popScale(t, 5.5)})`;
+
+  // ── Szene 3: 8–11 s, nah an den Pailletten ──
+  show($("#s3"), isOn(t, 8.0, 11.0));
+  show(photoA, isOn(t, 8.0, 9.5));
+  show(photoB, isOn(t, 9.5, 11.0));
+  photoA.style.transformOrigin = "50% 34%"; photoA.style.transform = `scale(${1.25 + seg(t, 8, 9.5) * 0.12})`;
+  photoB.style.transformOrigin = "50% 60%"; photoB.style.transform = `scale(${1.3 + seg(t, 9.5, 11) * 0.12})`;
+  photoA.style.filter = photoB.style.filter = `brightness(${1 + 0.25 * Math.max(0, 1 - seg(t, 8, 8.25) * 4, 1 - seg(t, 9.5, 9.75) * 4)}) saturate(1.15)`;
+  show($("#detail"), isOn(t, 8.0, 11.0));
+  $("#detail").style.transform = `translateX(-50%) rotate(${-1.5 + jit(t, 60, 0.5)}deg) scale(${popScale(t, 8.0)})`;
+
+  // ── Szene 4: 11–15 s, Aufstellung + Preis ──
+  show($("#s4"), t >= 11.0);
+  s4imgs.forEach((img, k) => {
+    const a = 11.0 + k * 0.5;
+    show(img, t >= a);
+    img.style.transform = `translate(${jit(t, 70 + k, 4)}px, ${jit(t, 80 + k, 4)}px) rotate(${(k - 1) * 3 + jit(t, 90 + k, 1)}deg) scale(${popScale(t, a)})`;
+  });
+  show($("#endTitle"), t >= 11.0);
+  $("#endTitle").style.transform = `translateX(-50%) rotate(${-1.5 + jit(t, 95, 0.5)}deg) scale(${popScale(t, 11.0)})`;
+  show($("#endPrice"), t >= 12.6);
+  $("#endPrice").style.transform = `rotate(${-2 + jit(t, 96, 0.4)}deg) scale(${popScale(t, 12.6)})`;
+  show($("#endUrl"), t >= 13.2);
+  $("#endUrl").style.transform = `rotate(${1.5 + jit(t, 97, 0.4)}deg) scale(${popScale(t, 13.2)})`;
+  show($("#endNote"), t >= 13.5);
+};
+
+window.renderFrame(0);
+</script>
+</body>
+</html>

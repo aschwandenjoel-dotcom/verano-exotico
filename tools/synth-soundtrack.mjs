@@ -13,12 +13,16 @@
  * cues [{ t, type }] mit type = tap | swipe | whoosh | pop | success |
  * shimmer | riser | hit | impact.
  *
- * Musik: sommerlicher House-Loop (Am–F–C–G), Kick/Clap/Hats, Offbeat-Bass,
- * Flächen und gezupfte Arpeggios. Intro gefiltert, Groove ab "groove",
- * Pause nur Fläche, Outro mit Schlussakkord.
+ * Musik je nach `style` (in window.SOUND oder per --style):
+ * - house (Standard): sommerlicher House-Loop (Am–F–C–G), Kick/Clap/Hats,
+ *   Offbeat-Bass, Flächen, gezupfte Arpeggios. Outro mit Schlussakkord.
+ * - amapiano: Log Drum, Shaker, E-Piano-Offbeats, jazzige Akkorde.
+ * - jerseyclub: hüpfende Kick-Salven, Quietsch-Sound, Synth-Stabs.
+ * Intro gefiltert, Groove ab "groove", Pause nur Fläche. Bei amapiano und
+ * jerseyclub läuft der Groove im Outro weiter (Schlussbild mit Energie).
  *
  * Aufruf:
- *   node tools/synth-soundtrack.mjs --html assets/ads/kauf-in-3-taps.html --out .tmp/ads/kauf-in-3-taps.wav
+ *   node tools/synth-soundtrack.mjs --html assets/ads/kauf-in-3-taps.html --out .tmp/ads/kauf-in-3-taps.wav [--style amapiano]
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
@@ -195,8 +199,110 @@ const SFX = {
   },
 };
 
+// ---------- Stil "amapiano": Log Drum, Shaker, E-Piano ----------
+// Akkorde jazziger als beim House: Fmaj9 – Em7 – Dm9 – Am9
+const KEYS = [
+  { root: 41, notes: [57, 60, 64, 67] },
+  { root: 40, notes: [55, 59, 62, 67] },
+  { root: 38, notes: [53, 57, 60, 64] },
+  { root: 45, notes: [55, 60, 64, 71] },
+];
+const keysAt = (t) => KEYS[Math.floor(t / BAR) % KEYS.length];
+
+function logDrum(t0, note, len = 0.38) {
+  let ph = 0;
+  const f0 = midi(note);
+  const b = render(len, (t) => {
+    ph += (2 * Math.PI * f0 * (1 + 1.2 * Math.exp(-t * 45))) / SR;
+    const s = Math.sin(ph) + 0.35 * Math.sin(ph * 2) * Math.exp(-t * 20);
+    return Math.tanh(s * 2.2) * Math.exp(-t * 5.5) * Math.min(1, t / 0.002);
+  });
+  add(t0, biquad(b, "lp", 1800), 0.7);
+}
+const shaker = (t0, accent) => add(t0, biquad(render(0.07, (x) => noise() * Math.exp(-x * 55)), "hp", 6500), accent ? 0.2 : 0.09, 0.35);
+const rim = (t0) => add(t0, biquad(render(0.05, (x) => noise() * Math.exp(-x * 90) + Math.sin(2 * Math.PI * 1700 * x) * Math.exp(-x * 60)), "bp", 2200, 2), 0.3, -0.2);
+
+function epiano(t0, notes, len = BEAT * 1.5, gain = 0.13) {
+  const mix = new Float32Array(Math.round(len * SR));
+  for (const n of notes) {
+    const f = midi(n);
+    for (let i = 0; i < mix.length; i++) {
+      const t = i / SR;
+      const mod = 1.4 * Math.exp(-t * 6) * Math.sin(2 * Math.PI * f * t);
+      mix[i] += Math.sin(2 * Math.PI * f * t + mod) * Math.exp(-t * 2.5) * Math.min(1, t / 0.003) * Math.min(1, (len - t) / 0.05);
+    }
+  }
+  add(t0, mix, gain, 0);
+}
+
+function amapiano() {
+  // Log-Drum-Muster in Sechzehnteln pro Takt: [Schritt, Halbtöne über Grundton]
+  const LOG = [[0, 12], [3, 12], [6, 19], [10, 12], [11, 15], [14, 7]];
+  for (let bar = 0; bar * BAR < DUR; bar++) {
+    const t = bar * BAR;
+    const c = keysAt(t);
+    const full = inSec(t, S.groove) || inSec(t, S.outro);
+    pad(t, BAR + 0.3, c.notes, full ? 1400 : 600);
+    // E-Piano: Offbeat-Akkorde
+    for (const s of [2, 7, 12]) if (full || s === 2) epiano(t + (s * BEAT) / 4, c.notes.map((n) => n + 12), BEAT, full ? 0.12 : 0.08);
+    for (let s = 0; s < 16; s++) {
+      const ts = t + (s * BEAT) / 4;
+      if (ts >= DUR) break;
+      const on = inSec(ts, S.groove) || inSec(ts, S.outro);
+      shaker(ts, s % 4 === 2);
+      if (!on) continue;
+      if (s % 4 === 0) add(ts, kick(), 0.42);
+      if (s === 4 || s === 12) rim(ts);
+      const hit = LOG.find(([k]) => k === s);
+      if (hit) logDrum(ts, c.root + hit[1] - 12);
+    }
+  }
+}
+
+// ---------- Stil "jerseyclub": hüpfender Kick, Quietschen, Stabs ----------
+const squeak = (t0) => {
+  let ph = 0;
+  add(t0, biquad(render(0.16, (x) => { ph += (2 * Math.PI * (1500 + 1400 * Math.sin(Math.PI * x / 0.16))) / SR; return Math.sin(ph) * Math.sin(Math.PI * x / 0.16); }), "bp", 2400, 1.5), 0.16, 0.3);
+};
+function stab(t0, notes, gain = 0.2) {
+  const mix = new Float32Array(Math.round(0.22 * SR));
+  for (const n of notes) for (const d of [-7, 7]) {
+    const s = saw(midi(n), 0.22, d);
+    for (let i = 0; i < mix.length; i++) mix[i] += (s[i] / 8) * Math.exp(-(i / SR) * 14);
+  }
+  add(t0, biquad(mix, "lp", 3200), gain, 0);
+}
+function jerseyclub() {
+  // Klassisches Jersey-Club-Muster (Sechzehntel): Kick-Salven gegen Ende des Takts
+  const KICK = [0, 3, 6, 8, 10, 12, 13, 14];
+  for (let bar = 0; bar * BAR < DUR; bar++) {
+    const t = bar * BAR;
+    const c = chordAt(t);
+    const full = inSec(t, S.groove) || inSec(t, S.outro);
+    pad(t, BAR + 0.3, c.notes, full ? 1800 : 600);
+    for (let s = 0; s < 16; s++) {
+      const ts = t + (s * BEAT) / 4;
+      if (ts >= DUR) break;
+      const on = inSec(ts, S.groove) || inSec(ts, S.outro);
+      if (s % 2 === 1) add(ts, hat(), on ? 0.12 : 0.06, 0.25);
+      if (!on) continue;
+      if (KICK.includes(s)) add(ts, kick(), s >= 12 ? 0.5 : 0.6);
+      if (s === 4 || s === 12) add(ts, clap(), 0.5, 0.05);
+      if (s === 7 || s === 15) squeak(ts);
+      if (s === 0 || s === 6 || s === 10) stab(ts, c.notes.map((n) => n + 12));
+      if (s === 0 || s === 8) bass(ts, c.root, BEAT * 0.9);
+    }
+  }
+}
+
 // ---------- Arrangement ----------
-for (let bar = 0; bar * BAR < DUR; bar++) {
+// Stil: SOUND.style oder --style; "house" ist der ursprüngliche Loop.
+const STYLE = arg("style", SOUND.style ?? "house");
+if (STYLE === "amapiano") amapiano();
+else if (STYLE === "jerseyclub") jerseyclub();
+else if (STYLE !== "house") { console.error(`❌ Unbekannter Stil: ${STYLE} (house | amapiano | jerseyclub)`); process.exit(1); }
+
+if (STYLE === "house") for (let bar = 0; bar * BAR < DUR; bar++) {
   const t = bar * BAR;
   const c = chordAt(t);
   // Fläche immer — im Intro und in der Pause stark gefiltert
@@ -204,7 +310,7 @@ for (let bar = 0; bar * BAR < DUR; bar++) {
   pad(t, BAR + 0.3, c.notes, open ? 2600 : 700);
 }
 
-for (let b = 0; b * BEAT < DUR; b++) {
+if (STYLE === "house") for (let b = 0; b * BEAT < DUR; b++) {
   const t = b * BEAT;
   const c = chordAt(t);
   if (inSec(t, S.groove)) {
@@ -255,4 +361,4 @@ header.writeUInt32LE(SR, 24); header.writeUInt32LE(SR * 4, 28); header.writeUInt
 header.write("data", 36); header.writeUInt32LE(data.length, 40);
 mkdirSync(path.dirname(out), { recursive: true });
 writeFileSync(out, Buffer.concat([header, data]));
-console.log(`🎵 ${path.relative(process.cwd(), out)} — ${DUR} s, ${SOUND.bpm} BPM, ${SOUND.cues.length} Geräusche`);
+console.log(`🎵 ${path.relative(process.cwd(), out)} — ${DUR} s, ${SOUND.bpm} BPM, Stil ${STYLE}, ${SOUND.cues.length} Geräusche`);

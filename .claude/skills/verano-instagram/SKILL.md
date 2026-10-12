@@ -211,8 +211,10 @@ streichen — nicht endlos variieren.
 
 ## Was dieser Skill nicht tut
 
-- **Keine Kommentare und DMs beantworten.** Das bleibt bei Joel; automatische
-  Antworten wirken bei einer kleinen Marke sofort unecht.
+- **Keine DMs beantworten.** Kommentare beantwortet seit 09.10.2026
+  `tools/instagram-comments.mjs` (Joels Wunsch), aber nur klare Fälle mit
+  festen Bausteinen und Shopdaten; Kritik, Spam und unklare Fragen landen in
+  `.tmp/comments/offen.md` für Joel. Keine KI-Freitext-Antworten.
 - **Keine Follower kaufen, keine Massen-Follows.** Instagram sperrt das, und es
   bringt keine Käuferinnen.
 - **Keine erfundenen Bewertungen oder Testimonials.**

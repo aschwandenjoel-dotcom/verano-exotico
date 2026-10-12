@@ -74,7 +74,11 @@ wählen. Das Konten-Center allein genügt der Schnittstelle nicht.
    `instagram_content_publish`, `instagram_manage_insights`,
    `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`
    (letztere seit 06.10.2026: damit jeder Post auch als Reel auf die
-   Facebook-Seite geht — Instagram teilt API-Posts nicht selbst)
+   Facebook-Seite geht — Instagram teilt API-Posts nicht selbst),
+   seit 09.10.2026 zusätzlich `instagram_manage_comments`,
+   `pages_manage_engagement`, `pages_read_user_content` für den
+   Kommentar-Autopiloten (`tools/instagram-comments.mjs`, siehe unten).
+   Prüfen: `node tools/instagram-comments.mjs --check`
 3. **Generate Access Token** → im Dialog Facebook-Konto, die Seite und das
    Instagram-Konto freigeben
 4. Das angezeigte (kurzlebige) Token kopieren und in `.env.local` hinter
@@ -179,3 +183,33 @@ erzeugten Reels sind ohnehin stumm.
   Publora-, Apify- und Pixfaro-Teilen befreit; sie erzeugen nur Text.
 - Das Token erlaubt Veröffentlichen und Statistiken lesen — keine Zahlungen,
   keine Kontoänderungen, kein Zugriff auf DMs.
+
+## Kommentare automatisch beantworten (seit 09.10.2026)
+
+Joel wollte automatische Antworten auf Kommentare (vorher galt: Kommentare
+bleiben Handarbeit). `tools/instagram-comments.mjs` antwortet auf Instagram
+und Facebook, aber **regelbasiert mit echten Shopdaten**, nicht per KI:
+
+- Beantwortet: Preis, Grösse, Versand/Lieferzeit, Bezahlung, Wo kaufen,
+  Farben, genannte Lieblingsfarbe, genanntes Ferienziel, Komplimente/Emojis.
+  Produktdaten kommen aus dem Google-Feed, das Produkt aus dem
+  `/product/<slug>`-Link in der Caption. Fehlt der Link, nur allgemeine
+  Antworten (ab CHF 27).
+- Bleibt liegen und wird gemeldet (`.tmp/comments/offen.md`, Mitteilung auf
+  dem Mac): unklare Fragen, Kritik/Reklamation (auch „Shein/Temu/Wish“),
+  Spam. Eine Farbe, die es beim Produkt nicht gibt, beantwortet das Tool nicht.
+- Doppelte Antworten sind ausgeschlossen: das Tool erkennt die eigene Antwort
+  im Thread. Höchstens 15 Antworten pro Lauf, 2,5 s Abstand.
+
+```bash
+node tools/instagram-comments.mjs            # Probelauf: zeigt die Antworten
+node tools/instagram-comments.mjs --reply    # sendet
+node tools/instagram-comments.mjs --check    # Rechte des Tokens prüfen
+```
+
+Autopilot (Joel, 09.10.2026: alle 3 Tage, ohne offenen Chat): macOS-LaunchAgent
+`tools/launchd/ch.verano-exotico.comments.plist` startet täglich 18:07 mit
+`--reply --every 3`; das Tool läuft nur, wenn der letzte Lauf 3 Tage her ist
+(holt verpasste Läufe nach, wenn der Mac aus war). Einschalten macht Joel
+selbst im Terminal (Befehle oben in der plist) — Claude darf keine
+Hintergrunddienste installieren. Protokoll: `.tmp/comments/autopilot.log`.

@@ -23,6 +23,7 @@
  *   node tools/instagram-publish.mjs --video x.mp4 --caption-file x.md [--audio trending|"<suche>"|--audio-id <id>]
  *   node tools/instagram-publish.mjs --list-audio [--query "summer beach"] [--limit 10]
  *   node tools/instagram-publish.mjs --video … --caption-file … --dry-run
+ *   node tools/instagram-publish.mjs --image bild.jpg --caption-file x.md   (Bild-Post, IG + Facebook)
  *   … --no-facebook        nur Instagram (Standard: danach auch als Reel auf die Facebook-Seite)
  *   … --facebook-only      nur Facebook (z. B. zum Nachholen)
  *   node tools/instagram-publish.mjs --insights [--limit 10] | --profile | --whoami
@@ -359,6 +360,62 @@ async function publishReel({ video, caption, story = false }) {
   }
 }
 
+// ---------- Bild-Post (Instagram + Facebook) ----------
+/**
+ * Instagram nimmt Bilder nur über eine öffentliche image_url an (kein
+ * Direkt-Upload wie bei Videos). Deshalb: Bild zuerst unveröffentlicht auf die
+ * Facebook-Seite laden (Datei-Upload geht dort direkt), dessen CDN-URL an
+ * Instagram geben, und erst danach den Facebook-Post veröffentlichen.
+ * Kein Vercel Blob nötig.
+ */
+async function publishImage(file, caption) {
+  const abs = path.resolve(file);
+  if (!/\.jpe?g$/i.test(abs)) throw new Error("Instagram nimmt nur JPEG — bitte .jpg verwenden.");
+  console.log(`🖼  ${path.relative(ROOT, abs)} (${(statSync(abs).size / 1e6).toFixed(1)} MB) → BILD`);
+  console.log(`📝 ${caption.split("\n")[0].slice(0, 70)}…  (${caption.length} Zeichen)`);
+  if (DRY) {
+    console.log("\n🔍 Probelauf — es wurde nichts hochgeladen und nichts veröffentlicht.\n\n--- Caption ---\n" + caption);
+    return;
+  }
+  const page = await graph("/me", { fields: "id,name" });
+
+  process.stdout.write("⬆️  Bild unveröffentlicht auf die Facebook-Seite laden … ");
+  const form = new FormData();
+  form.append("source", new Blob([readFileSync(abs)], { type: "image/jpeg" }), path.basename(abs));
+  form.append("published", "false");
+  form.append("access_token", TOKEN);
+  const up = await (await fetch(`${API}/${page.id}/photos`, { method: "POST", body: form })).json();
+  if (up.error) throw new Error(`Facebook-Upload: ${up.error.message}`);
+  const photo = await graph(`/${up.id}`, { fields: "images" });
+  const imageUrl = photo.images?.sort((a, b) => b.width - a.width)[0]?.source;
+  if (!imageUrl) throw new Error("Keine Bild-URL von Facebook erhalten.");
+  console.log("ok");
+
+  process.stdout.write("📦 Instagram-Container anlegen … ");
+  const container = await graph(`/${USER_ID}/media`, { image_url: imageUrl, caption }, "POST");
+  console.log(container.id);
+  for (let i = 0; i < 24; i++) {
+    const s = await graph(`/${container.id}`, { fields: "status_code" });
+    if (s.status_code === "FINISHED") break;
+    if (s.status_code === "ERROR") throw new Error("Instagram konnte das Bild nicht verarbeiten.");
+    await new Promise((r) => setTimeout(r, 2500));
+  }
+  process.stdout.write("🚀 Veröffentlichen … ");
+  const published = await graph(`/${USER_ID}/media_publish`, { creation_id: container.id }, "POST");
+  const permalink = await graph(`/${published.id}`, { fields: "permalink" }).catch(() => null);
+  console.log(`ok\n✅ Instagram: ${permalink?.permalink ?? published.id}`);
+
+  if (has("no-facebook")) return;
+  process.stdout.write(`📘 Facebook-Post auf „${page.name}" … `);
+  try {
+    const message = caption.replace(/\s*\((link in bio|Link in Bio)\)/gi, "");
+    const post = await graph(`/${page.id}/feed`, { message, attached_media: [{ media_fbid: up.id }] }, "POST");
+    console.log(`ok\n✅ Facebook: https://www.facebook.com/${post.id}`);
+  } catch (err) {
+    console.error(`\n⚠️  Facebook fehlgeschlagen: ${err.message}`);
+  }
+}
+
 // ---------- Weitere Befehle ----------
 async function showAudio() {
   requireAuth();
@@ -379,15 +436,54 @@ async function showInsights(limit) {
     fields: "id,caption,media_type,timestamp,permalink,like_count,comments_count",
     limit,
   });
-  const rows = (data.data ?? []).map((m) => ({
+  // Aufrufe und Reichweite je Beitrag (braucht instagram_manage_insights);
+  // fehlt die Berechtigung, bleibt die Spalte leer statt abzubrechen.
+  let insightsError = null;
+  const stats = await Promise.all((data.data ?? []).map(async (m) => {
+    try {
+      const r = await graph(`/${m.id}/insights`, { metric: "views,reach" });
+      return Object.fromEntries((r.data ?? []).map((x) => [x.name, x.values?.[0]?.value ?? x.total_value?.value]));
+    } catch (err) {
+      insightsError ??= err.message;
+      return {};
+    }
+  }));
+  const rows = (data.data ?? []).map((m, i) => ({
     Datum: new Date(m.timestamp).toLocaleDateString("de-CH"),
     Typ: m.media_type,
+    "👁 Aufrufe": stats[i].views ?? "–",
+    "Reichweite": stats[i].reach ?? "–",
     "❤️": m.like_count ?? 0,
     "💬": m.comments_count ?? 0,
     Anfang: (m.caption ?? "").split("\n")[0].slice(0, 45),
   }));
-  if (rows.length === 0) console.log("Noch keine Beiträge.");
-  else console.table(rows);
+  if (insightsError) console.warn(`⚠️  Aufrufe nicht abrufbar: ${insightsError}`);
+  if (rows.length) console.log("Instagram:");
+  if (rows.length) console.table(rows);
+  await showFacebookInsights(limit);
+  return;
+}
+
+/** Facebook-Reels der Seite mit Aufrufen (Seiten-Token = /me). */
+async function showFacebookInsights(limit) {
+  try {
+    const reels = await graph("/me/video_reels", { fields: "id,description,created_time,permalink_url", limit });
+    const rows = await Promise.all((reels.data ?? []).map(async (v) => {
+      const r = await graph(`/${v.id}/video_insights`, { metric: "blue_reels_play_count,post_impressions_unique" }).catch((e) => { console.warn(`⚠️  ${e.message}`); return {}; });
+      const val = (n) => (r.data ?? []).find((x) => x.name === n)?.values?.[0]?.value ?? "–";
+      return {
+        Datum: new Date(v.created_time).toLocaleDateString("de-CH"),
+        "👁 Aufrufe": val("blue_reels_play_count"),
+        Reichweite: val("post_impressions_unique"),
+        Anfang: (v.description ?? "").split("\n")[0].slice(0, 45),
+      };
+    }));
+    console.log("Facebook:");
+    if (rows.length) console.table(rows);
+    else console.log("Noch keine Reels.");
+  } catch (err) {
+    console.warn(`⚠️  Facebook-Zahlen nicht abrufbar: ${err.message}`);
+  }
 }
 
 async function showProfile() {
@@ -545,6 +641,13 @@ try {
   else if (has("whoami")) await whoami();
   else if (has("exchange-token")) await exchangeToken(arg("exchange-token"));
   else if (has("setup")) await exchangeToken();
+  else if (arg("image")) {
+    requireAuth();
+    const captionFile = arg("caption-file");
+    const caption = arg("caption") ?? (captionFile ? captionFromFile(path.resolve(ROOT, captionFile)) : null);
+    if (!caption) { console.error('Nutzung: --image <jpg> (--caption-file <md> | --caption "Text") [--dry-run] [--no-facebook]'); process.exit(1); }
+    await publishImage(arg("image"), caption);
+  }
   else {
     const video = arg("video");
     const captionFile = arg("caption-file");
