@@ -243,7 +243,8 @@
     "col_about": "Über uns",
     "col_legal": "Rechtliches",
     "our_story": "Unsere Geschichte",
-    "philosophy": "Philosophie"
+    "philosophy": "Philosophie",
+    "at_a_glance": "Auf einen Blick"
   },
   "meta": {
     "home_title": "Bikinis & Bademode online kaufen | Verano Exotico",
@@ -265,7 +266,9 @@
     "datenschutz_title": "Datenschutzerklärung — Verano Exotico",
     "datenschutz_description": "Wie Verano Exotico deine Daten bei Bestellung, Zahlung und Newsletter verarbeitet.",
     "philosophy_title": "Unsere Philosophie | Verano Exotico",
-    "philosophy_description": "Golden Days, Timeless Wear: Wofür Verano Exotico steht – Bademode, die sich wie Ferien anfühlt und nicht nach einer Saison verschwindet."
+    "philosophy_description": "Golden Days, Timeless Wear: Wofür Verano Exotico steht – Bademode, die sich wie Ferien anfühlt und nicht nach einer Saison verschwindet.",
+    "glance_title": "Auf einen Blick — Fakten zu Verano Exotico",
+    "glance_description": "Verano Exotico in Kürze: Sitz in Altdorf UR, Einzelunternehmen von Joel Aschwanden, Sortiment, Bezahlung mit TWINT oder Karte, Versand und Kontakt."
   },
   "landing": {
     "season": "Sommer {year}",

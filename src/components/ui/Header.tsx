@@ -253,6 +253,7 @@ function MobileMenu({ locale, pathname, onClose }: { locale: Locale; pathname: s
       links: [
         { href: `/${locale}/about`, label: tf("our_story") },
         { href: `/${locale}/philosophie`, label: tf("philosophy") },
+        { href: `/${locale}/auf-einen-blick`, label: tf("at_a_glance") },
       ],
     },
     {

@@ -47,6 +47,7 @@ ${categories}
 - [Shop – alle Produkte](${de}/collection)
 - [Über uns](${de}/about): Geschichte der Marke
 - [Philosophie](${de}/philosophie): wofür Verano Exotico steht
+- [Auf einen Blick](${de}/auf-einen-blick): Kernfakten zu Firma, Sitz, Sortiment, Bezahlung und Versand
 - [FAQ](${de}/faq): Lieferung, Bezahlung, Grössen, Rückgabe
 - [Versand & Rückgabe](${de}/versand)
 - [Impressum](${de}/impressum)

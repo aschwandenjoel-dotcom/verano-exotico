@@ -59,6 +59,7 @@ export default function Footer() {
       links: [
         { href: `/${locale}/about`, label: t("our_story") },
         { href: `/${locale}/philosophie`, label: t("philosophy") },
+        { href: `/${locale}/auf-einen-blick`, label: t("at_a_glance") },
       ],
     },
     {

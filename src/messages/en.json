@@ -243,7 +243,8 @@
     "col_about": "About us",
     "col_legal": "Legal",
     "our_story": "Our story",
-    "philosophy": "Philosophy"
+    "philosophy": "Philosophy",
+    "at_a_glance": "At a glance"
   },
   "meta": {
     "home_title": "Bikinis & Swimwear Online | Verano Exotico",
@@ -253,7 +254,9 @@
     "collection_description": "Browse all bikinis, swimsuits and beach sets by Verano Exotico. Many colours and sizes, TWINT or card, shipping to Switzerland from CHF 4.90.",
     "about_description": "Who is behind Verano Exotico and how we choose our swimwear: a small Swiss online shop for bikinis and beach sets.",
     "philosophy_title": "Our philosophy | Verano Exotico",
-    "philosophy_description": "Golden Days, Timeless Wear: what Verano Exotico stands for – swimwear that feels like a holiday and outlasts a single season."
+    "philosophy_description": "Golden Days, Timeless Wear: what Verano Exotico stands for – swimwear that feels like a holiday and outlasts a single season.",
+    "glance_title": "At a glance — facts about Verano Exotico",
+    "glance_description": "Verano Exotico in brief: based in Altdorf, Switzerland, sole proprietorship of Joel Aschwanden, range, payment with TWINT or card, shipping and contact."
   },
   "landing": {
     "season": "Summer {year}",

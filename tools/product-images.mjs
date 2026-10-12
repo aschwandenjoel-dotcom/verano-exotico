@@ -2,7 +2,9 @@
  * Produktbilder im H&M-Stil: Packshot auf Weiss (Titelbild) + Model-Bild (beim Überfahren).
  *
  * Schritt 1 – Bilder umwandeln (lokal, danach committen und deployen):
- *   node tools/product-images.mjs convert --slug <slug> [--packshot <datei>] [--model <datei>]
+ *   node tools/product-images.mjs convert --slug <slug> [--color <index>] [--packshot <datei>] [--model <datei>]
+ *   Ab der zweiten Farbe (--color 1, 2 …) heissen die Dateien <slug>-c<index>-packshot.jpg /
+ *   <slug>-c<index>-model.jpg; die erste Farbe behält <slug>-packshot.jpg / <slug>-model.jpg.
  *   → public/products/<slug>-packshot.jpg  (auf 4:5 erweitert, nichts abgeschnitten)
  *   → public/products/<slug>-model.jpg     (4:5 wie die Produktkarte, Kopf bis Fuss bleibt drin)
  *   Beide 1600×2000 mit IPTC-Kennzeichnung "KI-generiert" (Google Merchant Center verlangt sie).
@@ -10,7 +12,8 @@
  * Schritt 2 – im Live-Shop eintragen (erst wenn die Dateien deployed sind):
  *   node tools/product-images.mjs apply --slug <slug> [--color <index>] [--dry-run]
  *   → color_images[index] = Packshot (das bisherige Farbbild rückt in die Galerie)
- *   → images = [Model-Bild, …bisherige Galerie]
+ *   → images = [Model-Bild, …bisherige Galerie] – bei weiteren Farben kommt das
+ *     Model-Bild ans Ende (die Karte zeigt beim Überfahren das Model der ersten Farbe)
  *   --color = Index der Farbe, die der Packshot zeigt (Default 0). Prüft vorher, dass beide
  *   Bilder live erreichbar sind, und sichert den alten Stand nach .tmp/.
  *
@@ -44,8 +47,10 @@ if (!["convert", "apply"].includes(cmd) || !slug) {
   console.error("Aufruf: node tools/product-images.mjs convert|apply --slug <slug> …  (Details im Kopf der Datei)");
   process.exit(1);
 }
-const packshotPath = `/products/${slug}-packshot.jpg`;
-const modelPath = `/products/${slug}-model.jpg`;
+const color = Number(arg("color") ?? 0);
+const suffix = color > 0 ? `-c${color}` : "";
+const packshotPath = `/products/${slug}${suffix}-packshot.jpg`;
+const modelPath = `/products/${slug}${suffix}-model.jpg`;
 
 if (cmd === "convert") {
   const packshot = arg("packshot");
@@ -91,7 +96,6 @@ if (cmd === "convert") {
 }
 
 // ── apply ────────────────────────────────────────────────────────
-const color = Number(arg("color") ?? 0);
 const dryRun = rest.includes("--dry-run");
 const hasPackshot = existsSync(`${ROOT}public${packshotPath}`);
 const hasModel = existsSync(`${ROOT}public${modelPath}`);
@@ -114,7 +118,10 @@ if (hasPackshot) {
   colorImages[color] = packshotPath;
   if (old && old !== packshotPath && !images.includes(old)) images.push(old);
 }
-if (hasModel) images = [modelPath, ...images.filter((s) => s !== modelPath)];
+if (hasModel) {
+  const others = images.filter((s) => s !== modelPath);
+  images = color > 0 ? [...others, modelPath] : [modelPath, ...others];
+}
 
 const body = { images, color_images: colorImages };
 console.log(`${slug}${dryRun ? " (dry-run)" : ""}`);
