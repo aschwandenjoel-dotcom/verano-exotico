@@ -9,6 +9,12 @@
  *   → public/products/<slug>-model.jpg     (4:5 wie die Produktkarte, Kopf bis Fuss bleibt drin)
  *   Beide 1600×2000 mit IPTC-Kennzeichnung "KI-generiert" (Google Merchant Center verlangt sie).
  *
+ * Hintergrund weiss ziehen (bestehende Packshots reparieren):
+ *   node tools/product-images.mjs whiten --slug <slug>|--all
+ *   Gemini liefert Packshots oft auf hellgrauem Grund; zusammen mit dem angesetzten
+ *   Rand ergibt das einen sichtbaren Kasten (Shop-Kachel, Google Shopping). `convert`
+ *   macht das seit 13.10.2026 automatisch.
+ *
  * Schritt 2 – im Live-Shop eintragen (erst wenn die Dateien deployed sind):
  *   node tools/product-images.mjs apply --slug <slug> [--color <index>] [--dry-run]
  *   → color_images[index] = Packshot (das bisherige Farbbild rückt in die Galerie)
@@ -33,6 +39,41 @@ const AI_XMP =
   'Iptc4xmpExt:DigitalSourceType="http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"/>' +
   "</rdf:RDF></x:xmpmeta>";
 
+/**
+ * Zieht den Hintergrund eines Packshots auf reines Weiss: Hintergrundfarbe aus
+ * dem Bildrand schätzen, alle Kanäle so strecken, dass sie 255 wird, und fast
+ * weisse Pixel ganz weiss setzen. Das Produkt wird dabei nur so stark
+ * aufgehellt, wie der Grund grau war (meist 2–6 %). Träger und Bänder bleiben
+ * erhalten — es wird nichts freigestellt.
+ */
+async function whiteBackground(input) {
+  const { data, info } = await sharp(input).flatten({ background: "#ffffff" }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { width: w, height: h } = info;
+  // Hintergrund = Median der Randpixel (je Kanal)
+  const samples = [[], [], []];
+  const take = (x, y) => { const i = (y * w + x) * 3; for (let c = 0; c < 3; c++) samples[c].push(data[i + c]); };
+  for (let x = 0; x < w; x += 4) { take(x, 2); take(x, h - 3); }
+  for (let y = 0; y < h; y += 4) { take(2, y); take(w - 3, y); }
+  const med = samples.map((a) => a.sort((p, q) => p - q)[a.length >> 1]);
+  // Weisses Produkt? Dann nicht aufhellen — es verschwände im weissen Grund
+  // (Häkel-, Sol-, Duna-Bikini). Zurück kommt null, der Aufrufer behält den Grund.
+  let n = 0, lum = 0;
+  for (let i = 0; i < data.length; i += 3 * 7) {
+    const d = Math.abs(data[i] - med[0]) + Math.abs(data[i + 1] - med[1]) + Math.abs(data[i + 2] - med[2]);
+    if (d > 36) { n++; lum += (data[i] + data[i + 1] + data[i + 2]) / 3; }
+  }
+  if (n && lum / n > 205) return null;
+  const gain = med.map((m) => 255 / Math.max(m, 200));
+  const out = Buffer.alloc(data.length);
+  for (let i = 0; i < data.length; i += 3) {
+    let mn = 255;
+    for (let c = 0; c < 3; c++) { const v = Math.min(255, Math.round(data[i + c] * gain[c])); out[i + c] = v; if (v < mn) mn = v; }
+    // weicher Übergang: ab 244 schrittweise, ab 250 ganz weiss (keine harte Kante)
+    if (mn >= 244) { const k = Math.min(1, (mn - 244) / 6); for (let c = 0; c < 3; c++) out[i + c] = Math.round(out[i + c] + (255 - out[i + c]) * k); }
+  }
+  return sharp(out, { raw: { width: w, height: h, channels: 3 } }).png().toBuffer();
+}
+
 function env(key) {
   const txt = readFileSync(`${ROOT}.env.local`, "utf8");
   const line = txt.split("\n").find((l) => l.startsWith(key + "="));
@@ -43,8 +84,35 @@ function env(key) {
 const [cmd, ...rest] = process.argv.slice(2);
 const arg = (name) => { const i = rest.indexOf(`--${name}`); return i >= 0 ? rest[i + 1] : undefined; };
 const slug = arg("slug");
+if (cmd === "whiten") {
+  const all = rest.includes("--all");
+  if (!all && !slug) throw new Error("--slug <slug> oder --all angeben");
+  const { readdirSync } = await import("node:fs");
+  const files = readdirSync(`${ROOT}public/products`).filter((f) => f.endsWith("-packshot.jpg") && (all || f.startsWith(`${slug}-`)));
+  for (const f of files) {
+    const file = `${ROOT}public/products/${f}`;
+    const before = await sharp(file).stats();
+    if (before.channels.slice(0, 3).every((c) => c.max === 255) && (await isWhiteEdge(file))) continue;
+    const white = await whiteBackground(file);
+    if (!white) { console.log(`⏭  ${f}: weisses Produkt, Grund bleibt`); continue; }
+    await sharp(white).withXmp(AI_XMP).jpeg({ quality: 88, mozjpeg: true }).toFile(file + ".tmp");
+    const { renameSync } = await import("node:fs");
+    renameSync(file + ".tmp", file);
+    console.log(`⬜ ${f}`);
+  }
+  process.exit(0);
+}
+
+/** Rand schon reinweiss? (dann nichts tun) */
+async function isWhiteEdge(file) {
+  const { data, info } = await sharp(file).resize(160, 200).raw().toBuffer({ resolveWithObject: true });
+  for (let x = 0; x < 160; x++) for (const y of [0, 199]) { const i = (y * 160 + x) * info.channels; if (data[i] < 250 || data[i + 1] < 250 || data[i + 2] < 250) return false; }
+  for (let y = 0; y < 200; y++) for (const x of [0, 159]) { const i = (y * 160 + x) * info.channels; if (data[i] < 250 || data[i + 1] < 250 || data[i + 2] < 250) return false; }
+  return true;
+}
+
 if (!["convert", "apply"].includes(cmd) || !slug) {
-  console.error("Aufruf: node tools/product-images.mjs convert|apply --slug <slug> …  (Details im Kopf der Datei)");
+  console.error("Aufruf: node tools/product-images.mjs convert|apply|whiten --slug <slug> …  (Details im Kopf der Datei)");
   process.exit(1);
 }
 const color = Number(arg("color") ?? 0);
@@ -60,19 +128,23 @@ if (cmd === "convert") {
   if (packshot) {
     // Auf 4:5 erweitern statt zuschneiden – Träger und Bänder bleiben sichtbar,
     // dazu etwas Raum rundherum
-    const { width, height } = await sharp(packshot).metadata();
+    // Erst den Grund auf Weiss ziehen, dann weiss erweitern — sonst entsteht
+    // zwischen grauem Bild und Rand ein sichtbarer Kasten
+    const whitened = await whiteBackground(packshot);
+    const source = whitened ?? (await sharp(packshot).flatten({ background: "#ffffff" }).png().toBuffer());
+    const { width, height } = await sharp(source).metadata();
     const cw = Math.round(Math.max(width * 1.08, height * 1.08 * (W / H)));
     const ch = Math.round(cw * (H / W));
     const padX = Math.floor((cw - width) / 2), padY = Math.floor((ch - height) / 2);
-    // Rand in der Hintergrundfarbe des Bildes (Ecke oben links) – liefert Gemini hellgrau
-    // statt weiss, entstünde sonst ein sichtbarer Kasten
-    const { data: px } = await sharp(packshot).flatten({ background: "#ffffff" })
-      .extract({ left: 0, top: 0, width: 8, height: 8 }).raw().toBuffer({ resolveWithObject: true });
-    const avg = (o) => Math.round([...Array(64).keys()].reduce((s, i) => s + px[i * 3 + o], 0) / 64);
-    const bg = { r: avg(0), g: avg(1), b: avg(2) };
+    // Weisses Produkt (nicht aufgehellt): Rand in der Farbe des Grundes, sonst Kasten
+    let bg = { r: 255, g: 255, b: 255 };
+    if (!whitened) {
+      const { data: px } = await sharp(source).extract({ left: 0, top: 0, width: 8, height: 8 }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+      const avg = (o) => Math.round([...Array(64).keys()].reduce((s, i) => s + px[i * 3 + o], 0) / 64);
+      bg = { r: avg(0), g: avg(1), b: avg(2) };
+    }
     // Zwei Durchgänge: sharp verkleinert sonst immer vor dem Erweitern
-    const padded = await sharp(packshot)
-      .flatten({ background: "#ffffff" })
+    const padded = await sharp(source)
       .extend({ left: padX, right: cw - width - padX, top: padY, bottom: ch - height - padY, background: bg })
       .toBuffer();
     await sharp(padded)
