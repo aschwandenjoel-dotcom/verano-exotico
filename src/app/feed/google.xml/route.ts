@@ -75,7 +75,8 @@ function variantsOf(product: Product): Variant[] {
   const override = OVERRIDES[product.slug] ?? {};
   // Frischer Packshot (KI, 4:5, IPTC-gekennzeichnet) zeigt die erste Farbe →
   // dort Hauptbild statt des Lieferantenfotos. Ersetzungen gehen weiterhin vor.
-  const packshot = gallery.find((s) => s.includes("-packshot"));
+  // Packshot liegt je nach Produkt in colorImages oder in images.
+  const packshot = [...colorImages, ...gallery].find((s) => s?.includes("-packshot"));
   const imageFor = (i: number) => override[String(i)] || (i === 0 && packshot) || colorImages[i] || "";
 
   if (names.length <= 1) {
@@ -97,8 +98,9 @@ function variantsOf(product: Product): Variant[] {
 function moreImages(product: Product, main: string): string[] {
   if (OVERRIDES[product.slug]) return [];
   const images = (product.images ?? []).filter(Boolean);
-  if (images.some((s) => s.includes("-packshot"))) {
-    const model = images.find((s) => s.includes("-model"));
+  const fresh = [...(product.colorImages ?? []), ...images].filter(Boolean);
+  if (fresh.some((s) => s.includes("-packshot"))) {
+    const model = fresh.find((s) => s.includes("-model"));
     return main.includes("-packshot") && model ? [model] : [];
   }
   return images.filter((img) => img !== main).slice(0, 10);
