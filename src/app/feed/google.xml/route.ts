@@ -25,6 +25,9 @@ import type { Product } from "@/types";
  * für Artikel, die Google wegen zu freizügiger Modelbilder als „nur für
  * Erwachsene" abgelehnt hat (Format: { slug: { farbindex: "/products/…" } }).
  *
+ * Frische Bilder (13.10.2026): Wo ein `-packshot` existiert, ist er das
+ * Hauptbild der ersten Farbe, das `-model`-Bild das einzige Zusatzbild.
+ *
  * Preise in CHF, Sprache Deutsch, Land Schweiz — für DE/AT wäre ein zweiter
  * Feed mit EUR-Preisen nötig (siehe Doku).
  */
@@ -70,7 +73,10 @@ function variantsOf(product: Product): Variant[] {
   const colorImages = product.colorImages ?? [];
   const gallery = (product.images ?? []).filter(Boolean);
   const override = OVERRIDES[product.slug] ?? {};
-  const imageFor = (i: number) => override[String(i)] || colorImages[i] || "";
+  // Frischer Packshot (KI, 4:5, IPTC-gekennzeichnet) zeigt die erste Farbe →
+  // dort Hauptbild statt des Lieferantenfotos. Ersetzungen gehen weiterhin vor.
+  const packshot = gallery.find((s) => s.includes("-packshot"));
+  const imageFor = (i: number) => override[String(i)] || (i === 0 && packshot) || colorImages[i] || "";
 
   if (names.length <= 1) {
     const image = imageFor(0) || gallery[0] || "";
@@ -82,10 +88,20 @@ function variantsOf(product: Product): Variant[] {
     .filter((v) => v.image);
 }
 
-/** Weitere Bilder: Galerie ohne das Hauptbild — bei ersetzten Bildern keine, damit Google nur das sichere Bild prüft. */
+/**
+ * Weitere Bilder: Galerie ohne das Hauptbild — bei ersetzten Bildern keine,
+ * damit Google nur das sichere Bild prüft. Hat ein Produkt frische Bilder
+ * (Packshot/Model), gehen nur diese mit: beim Packshot das Modelbild derselben
+ * Farbe, bei den übrigen Farben nichts (das Modelbild zeigt Farbe 1).
+ */
 function moreImages(product: Product, main: string): string[] {
   if (OVERRIDES[product.slug]) return [];
-  return (product.images ?? []).filter((img) => img && img !== main).slice(0, 10);
+  const images = (product.images ?? []).filter(Boolean);
+  if (images.some((s) => s.includes("-packshot"))) {
+    const model = images.find((s) => s.includes("-model"));
+    return main.includes("-packshot") && model ? [model] : [];
+  }
+  return images.filter((img) => img !== main).slice(0, 10);
 }
 
 function describe(product: Product): string {
