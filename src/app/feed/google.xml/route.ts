@@ -58,6 +58,15 @@ function absolute(path: string): string {
   return path.startsWith("http") ? path : `${SITE}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
+/**
+ * Bildversion: Google speichert Bilder pro URL zwischen und holt eine geänderte
+ * Datei unter gleicher Adresse erst nach Wochen neu. Wer Produktbilder
+ * austauscht oder bearbeitet, erhöht diesen Wert — dann lädt Google alle
+ * Bilder beim nächsten Feed-Abruf frisch.
+ */
+const IMAGE_VERSION = "2026-10-13";
+const imageUrl = (path: string) => `${absolute(path)}?v=${IMAGE_VERSION}`;
+
 const OVERRIDES = imageOverrides as Record<string, Record<string, string>>;
 
 interface Variant {
@@ -124,8 +133,8 @@ function itemXml(product: Product, variant: Variant, size: string | null): strin
     ? `${product.name[FEED_LOCALE]} – ${variant.colorName}`
     : product.name[FEED_LOCALE];
   const link = `${SITE}/${FEED_LOCALE}/product/${product.slug}${variant.multiColor ? `?farbe=${variant.colorIndex}` : ""}`;
-  const main = absolute(variant.image);
-  const more = moreImages(product, variant.image).map(absolute);
+  const main = imageUrl(variant.image);
+  const more = moreImages(product, variant.image).map(imageUrl);
 
   const fields: Array<[string, string]> = [
     ["g:id", id],
