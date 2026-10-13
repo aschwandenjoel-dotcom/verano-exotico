@@ -25,8 +25,10 @@ import type { Product } from "@/types";
  * für Artikel, die Google wegen zu freizügiger Modelbilder als „nur für
  * Erwachsene" abgelehnt hat (Format: { slug: { farbindex: "/products/…" } }).
  *
- * Frische Bilder (13.10.2026): Wo ein `-packshot` existiert, ist er das
- * Hauptbild der ersten Farbe, das `-model`-Bild das einzige Zusatzbild.
+ * Frische Bilder (13.10.2026): Hat eine Farbe einen eigenen Packshot
+ * (`<slug>-packshot` bzw. `<slug>-c<i>-packshot`), ist er ihr Hauptbild und das
+ * Modelbild derselben Farbe das einzige Zusatzbild. Nie das Bild einer anderen
+ * Farbe — Google lehnt Artikel ab, deren Bild nicht zur Farbe passt.
  *
  * Preise in CHF, Sprache Deutsch, Land Schweiz — für DE/AT wäre ein zweiter
  * Feed mit EUR-Preisen nötig (siehe Doku).
@@ -73,11 +75,14 @@ function variantsOf(product: Product): Variant[] {
   const colorImages = product.colorImages ?? [];
   const gallery = (product.images ?? []).filter(Boolean);
   const override = OVERRIDES[product.slug] ?? {};
-  // Frischer Packshot (KI, 4:5, IPTC-gekennzeichnet) zeigt die erste Farbe →
-  // dort Hauptbild statt des Lieferantenfotos. Ersetzungen gehen weiterhin vor.
-  // Packshot liegt je nach Produkt in colorImages oder in images.
-  const packshot = [...colorImages, ...gallery].find((s) => s?.includes("-packshot"));
-  const imageFor = (i: number) => override[String(i)] || (i === 0 && packshot) || colorImages[i] || "";
+  // Frische Packshots (KI, 4:5, IPTC-gekennzeichnet) gibt es pro Farbe:
+  // Farbe 1 = "<slug>-packshot", weitere = "<slug>-c<i>-packshot". Nur den
+  // Packshot GENAU dieser Farbe nehmen — Google verlangt, dass das Hauptbild
+  // die angegebene Farbe zeigt. Ersetzungen gehen weiterhin vor.
+  const all = [...colorImages, ...gallery].filter(Boolean);
+  const packshotFor = (i: number) =>
+    all.find((s) => s.endsWith(i === 0 ? `/${product.slug}-packshot.jpg` : `/${product.slug}-c${i}-packshot.jpg`));
+  const imageFor = (i: number) => override[String(i)] || packshotFor(i) || colorImages[i] || "";
 
   if (names.length <= 1) {
     const image = imageFor(0) || gallery[0] || "";
@@ -100,8 +105,9 @@ function moreImages(product: Product, main: string): string[] {
   const images = (product.images ?? []).filter(Boolean);
   const fresh = [...(product.colorImages ?? []), ...images].filter(Boolean);
   if (fresh.some((s) => s.includes("-packshot"))) {
-    const model = fresh.find((s) => s.includes("-model"));
-    return main.includes("-packshot") && model ? [model] : [];
+    // Modelbild derselben Farbe wie der Packshot (…-c2-packshot → …-c2-model)
+    const model = main.includes("-packshot") ? main.replace("-packshot", "-model") : null;
+    return model && fresh.some((s) => s.endsWith(model.slice(model.lastIndexOf("/")))) ? [model] : [];
   }
   return images.filter((img) => img !== main).slice(0, 10);
 }
