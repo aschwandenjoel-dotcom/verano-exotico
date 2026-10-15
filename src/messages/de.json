@@ -300,9 +300,9 @@
     "bestsellers": "Bestseller"
   },
   "consent": {
-    "aria": "Hinweis zur Reichweitenmessung",
+    "aria": "Hinweis zu Reichweiten- und Kaufmessung",
     "eyebrow": "Datenschutz",
-    "text": "Wir messen anonym, wie oft unsere Seiten aufgerufen werden, um den Shop zu verbessern. Ohne Cookies, ohne Werbenetzwerke, ohne Profile. Du entscheidest.",
+    "text": "Wir messen anonym, wie oft unsere Seiten aufgerufen werden, und mit Google, ob ein Klick aus der Google-Suche zu einem Kauf führt. Dafür setzt Google Cookies. Keine personalisierte Werbung. Du entscheidest.",
     "link": "Mehr dazu",
     "accept": "Einverstanden",
     "decline": "Nur notwendige",

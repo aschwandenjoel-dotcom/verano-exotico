@@ -2,7 +2,11 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import ShopShell from "@/components/ui/ShopShell";
 import ClearCartOnSuccess from "@/components/ui/ClearCartOnSuccess";
-import { queryOne } from "@/lib/db";
+import PurchaseTracker from "@/components/ui/PurchaseTracker";
+import { fetchProductBySlug } from "@/lib/api";
+import { query, queryOne } from "@/lib/db";
+import { colorIndexOf, feedItemId } from "@/lib/feedIds";
+import type { Purchase } from "@/lib/googleTag";
 import { renderSwissQrDataUrl } from "@/lib/swissQr";
 import { paymentMode } from "@/lib/stripe";
 import type { Locale } from "@/types";
@@ -40,6 +44,8 @@ export default async function OrderConfirmationPage({
       [id]
     );
   }
+
+  const purchase = order && order.status !== "payment_failed" ? await buildPurchase(order) : null;
 
   const iban = process.env.PAYMENT_IBAN || "";
   const holder = process.env.PAYMENT_ACCOUNT_HOLDER || "Joel Aschwanden";
@@ -101,6 +107,7 @@ export default async function OrderConfirmationPage({
           }}
         >
           <ClearCartOnSuccess />
+          {purchase && <PurchaseTracker purchase={purchase} />}
 
           {/* Icon */}
           <div
@@ -262,4 +269,50 @@ export default async function OrderConfirmationPage({
       </div>
     </ShopShell>
   );
+}
+
+interface OrderItemRow {
+  product_slug: string;
+  product_name: string;
+  price: number;
+  quantity: number;
+  color: string | null;
+  color_name: string | null;
+  size: string | null;
+}
+
+/**
+ * Kauf-Ereignis für Google mit denselben Artikelnummern wie im Feed. Fehler
+ * hier dürfen die Bestätigungsseite nie verhindern — dann wird nichts gemeldet.
+ */
+async function buildPurchase(order: OrderRow): Promise<Purchase | null> {
+  try {
+    const rows = await query<OrderItemRow>(
+      "SELECT product_slug, product_name, price, quantity, color, color_name, size FROM order_items WHERE order_id = ?",
+      [order.id]
+    );
+    const items = await Promise.all(
+      rows.map(async (row) => {
+        const product = await fetchProductBySlug(row.product_slug);
+        const itemId = product
+          ? feedItemId(product, colorIndexOf(product, row.color, row.color_name), row.size)
+          : row.product_slug;
+        return {
+          item_id: itemId,
+          item_name: row.product_name,
+          price: Number(row.price),
+          quantity: Number(row.quantity),
+        };
+      })
+    );
+    return {
+      transaction_id: `VE-${order.order_number}`,
+      value: Number(order.subtotal),
+      currency: "CHF",
+      items,
+    };
+  } catch (err) {
+    console.error("Kauf-Ereignis für Google konnte nicht erstellt werden:", err);
+    return null;
+  }
 }

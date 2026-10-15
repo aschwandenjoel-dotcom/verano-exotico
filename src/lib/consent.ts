@@ -10,7 +10,10 @@
  */
 export type Consent = "yes" | "no" | "none";
 
-const KEY = "ve-consent";
+// "-2": Seit Oktober 2026 umfasst die Zustimmung auch die Kaufmessung mit
+// Google (Cookies). Eine frühere Zustimmung galt nur für Vercel Analytics und
+// zählt deshalb nicht — alle werden einmal neu gefragt.
+const KEY = "ve-consent-2";
 const listeners = new Set<() => void>();
 
 function notify() {

@@ -1,6 +1,7 @@
 import imageOverrides from "@/data/feed-image-overrides.json";
 import { fetchProducts } from "@/lib/api";
 import { feedProductType } from "@/lib/categories";
+import { feedItemId } from "@/lib/feedIds";
 import { plainText } from "@/lib/seo";
 import { calcShipping } from "@/lib/shipping";
 import type { Product } from "@/types";
@@ -127,8 +128,7 @@ function describe(product: Product): string {
 }
 
 function itemXml(product: Product, variant: Variant, size: string | null): string {
-  const colorPart = variant.multiColor ? `-c${variant.colorIndex}` : "";
-  const id = `${product.slug}${colorPart}${size ? `-${size}` : ""}`;
+  const id = feedItemId(product, variant.colorIndex, size);
   const title = variant.multiColor && variant.colorName
     ? `${product.name[FEED_LOCALE]} – ${variant.colorName}`
     : product.name[FEED_LOCALE];

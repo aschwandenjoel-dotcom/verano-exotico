@@ -288,9 +288,9 @@
     "bestsellers": "Bestsellers"
   },
   "consent": {
-    "aria": "Notice about analytics",
+    "aria": "Notice about analytics and purchase measurement",
     "eyebrow": "Privacy",
-    "text": "We measure anonymously how often our pages are viewed, to improve the shop. No cookies, no ad networks, no profiles. Your choice.",
+    "text": "We measure anonymously how often our pages are viewed and, with Google, whether a click from Google Search leads to a purchase. Google sets cookies for this. No personalised ads. Your choice.",
     "link": "Learn more",
     "accept": "I agree",
     "decline": "Essential only",

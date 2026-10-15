@@ -1,9 +1,10 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Analytics } from "@vercel/analytics/next";
 import { getConsent, getServerConsent, setConsent, subscribe } from "@/lib/consent";
+import { loadGoogleTag } from "@/lib/googleTag";
 
 /**
  * Hinweis auf die Reichweitenmessung mit Auswahl.
@@ -22,6 +23,9 @@ import { getConsent, getServerConsent, setConsent, subscribe } from "@/lib/conse
  * Entscheidung "unknown", dann wird nichts gerendert — kein Aufblitzen des
  * Banners bei Besucherinnen, die längst zugestimmt haben.
  *
+ * Seit Oktober 2026 lädt "Einverstanden" zusätzlich den Google-Tag für die
+ * Kaufmessung im Merchant Center (siehe src/lib/googleTag.ts).
+ *
  * Das Banner blockiert die Seite nicht — der Shop bleibt vollständig nutzbar,
  * auch ohne Entscheidung.
  */
@@ -32,7 +36,12 @@ export default function CookieConsent() {
 
   return (
     <>
-      {choice === "yes" && <Analytics />}
+      {choice === "yes" && (
+        <>
+          <Analytics />
+          <GoogleTagLoader />
+        </>
+      )}
 
       {choice === "none" && (
         <div
@@ -132,4 +141,9 @@ export default function CookieConsent() {
       )}
     </>
   );
+}
+
+function GoogleTagLoader() {
+  useEffect(() => loadGoogleTag(), []);
+  return null;
 }

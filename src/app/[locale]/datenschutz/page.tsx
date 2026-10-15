@@ -75,7 +75,7 @@ function PrivacyContent() {
         <p>Der Inhalt Ihres Warenkorbs wird ausschliesslich lokal in Ihrem Browser gespeichert (localStorage). Diese Daten verlassen Ihr Gerät nicht und werden von uns nicht verarbeitet, bis Sie eine Bestellung aufgeben.</p>
 
         <h3 style={h3}>Cookies</h3>
-        <p>Unsere Website verwendet ausschliesslich technisch notwendige Cookies, die für den Betrieb des Shops erforderlich sind. Es werden keine Tracking-, Werbe- oder Analyse-Cookies eingesetzt. Eine Einwilligung ist nach Art. 6 Abs. 1 lit. f DSGVO nicht erforderlich.</p>
+        <p>Ohne Ihre Zustimmung verwendet unsere Website ausschliesslich technisch notwendige Cookies, die für den Betrieb des Shops erforderlich sind (Art. 6 Abs. 1 lit. f DSGVO). Nur wenn Sie im Hinweis beim ersten Besuch „Einverstanden“ wählen, setzt Google Cookies zur Kaufmessung (siehe Abschnitt 10).</p>
       </Section>
 
       <Section title="3. Bestellprozess & Kundendaten">
@@ -130,8 +130,9 @@ function PrivacyContent() {
 
       <Section title="10. Analyse & Tracking">
         <p>Zur Reichweitenmessung setzen wir <strong>Vercel Web Analytics</strong> ein (Vercel Inc., siehe Abschnitt 6). Der Dienst arbeitet <strong>ohne Cookies</strong> und ohne geräteübergreifende Kennungen: Erfasst werden Seitenaufrufe, Referrer, Land, Gerätetyp und Browser; die IP-Adresse wird nur zur Bildung eines täglich wechselnden, anonymen Besucher-Hashes verwendet und nicht gespeichert. Eine Identifizierung einzelner Personen ist damit nicht möglich. Rechtsgrundlage ist unser berechtigtes Interesse an der Auswertung und Verbesserung unseres Angebots (Art. 6 Abs. 1 lit. f DSGVO).</p>
-        <p style={{ marginTop: "12px" }}>Beim ersten Besuch fragen wir Sie, ob wir diese Messung durchführen dürfen. Ohne Ihre Zustimmung wird der Dienst nicht geladen. Ihre Entscheidung speichern wir lokal in Ihrem Browser (kein Cookie); Sie können sie jederzeit ändern: <ConsentReset label="Auswahl zurücksetzen" />.</p>
-        <p style={{ marginTop: "12px" }}>Wir setzen <strong>keine</strong> Werbe-Tracking-Pixel (wie Meta Pixel, TikTok Pixel o. ä.) ein. Es erfolgt keine Erstellung von Nutzerprofilen und keine Weitergabe Ihrer Daten an Werbenetzwerke.</p>
+        <p style={{ marginTop: "12px" }}><strong>Google-Tag (Kaufmessung):</strong> Mit Ihrer Zustimmung binden wir den Google-Tag der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, ein. Damit messen wir, ob ein Besuch über unsere kostenlosen Produkteinträge bei Google (Google Shopping) zu einer Bestellung geführt hat. Übermittelt werden Seitenaufrufe, bei einer Bestellung die Bestellnummer, die bestellten Artikel und der Betrag, sowie technische Daten wie IP-Adresse, Browser und Gerät; Google setzt dafür Cookies (z. B. „_gcl_au“, „_ga“). Name, E-Mail- und Lieferadresse übermitteln wir nicht. Personalisierte Werbung und Remarketing nutzen wir nicht. Google kann Daten in die USA übertragen; Google LLC ist unter dem EU-US Data Privacy Framework und dem Swiss-US Data Privacy Framework zertifiziert. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, Art. 31 Abs. 1 DSG). Weitere Informationen: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#1A3040" }}>policies.google.com/privacy</a>.</p>
+        <p style={{ marginTop: "12px" }}>Beim ersten Besuch fragen wir Sie, ob wir diese Messungen (Vercel Web Analytics und Google-Tag) durchführen dürfen. Ohne Ihre Zustimmung wird keiner der beiden Dienste geladen. Ihre Entscheidung speichern wir lokal in Ihrem Browser (kein Cookie); Sie können sie jederzeit ändern: <ConsentReset label="Auswahl zurücksetzen" />.</p>
+        <p style={{ marginTop: "12px" }}>Weitere Werbe-Tracking-Pixel (wie Meta Pixel, TikTok Pixel o. ä.) setzen wir <strong>nicht</strong> ein. Nutzerprofile für personalisierte Werbung werden nicht erstellt.</p>
       </Section>
 
       <Section title="11. Ihre Rechte als betroffene Person">
