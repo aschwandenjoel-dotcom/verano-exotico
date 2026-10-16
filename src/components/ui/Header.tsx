@@ -125,15 +125,18 @@ export default function Header({ locale, transparentAtTop = false }: Props) {
           Navigation (hidden md:flex) ausgeblendet war - Warenkorb und Menue
           hingen dann bei 75 % statt am rechten Rand. */}
       {/* Handy: Menü links wie bei Hunza G (Logo Mitte, Warenkorb rechts) */}
+      {/* display über die Klasse (flex md:hidden), nicht im style: ein inline
+          display:flex schlägt md:hidden — dann lag der Knopf auf dem Desktop
+          unsichtbar unter dem Logo und seine Striche schimmerten durch "VE". */}
       <button
-        className="md:hidden row-start-1 col-start-1 justify-self-start"
+        className="flex md:hidden row-start-1 col-start-1 justify-self-start"
         onClick={() => setMenuOpen(true)}
         aria-label={t("menu_open")}
         aria-expanded={menuOpen}
         aria-controls="mobile-menu"
         style={{
           width: "40px", height: "40px", marginLeft: "-8px", background: "transparent", border: "none",
-          color: CREAM, cursor: "pointer", display: "flex", flexDirection: "column",
+          color: CREAM, cursor: "pointer", flexDirection: "column",
           alignItems: "center", justifyContent: "center", gap: "6px",
         }}
       >
