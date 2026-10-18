@@ -5,6 +5,8 @@
  *   node tools/product-images.mjs convert --slug <slug> [--color <index>] [--packshot <datei>] [--model <datei>]
  *   Ab der zweiten Farbe (--color 1, 2 …) heissen die Dateien <slug>-c<index>-packshot.jpg /
  *   <slug>-c<index>-model.jpg; die erste Farbe behält <slug>-packshot.jpg / <slug>-model.jpg.
+ *   --indexed: auch Farbe 0 als <slug>-c0-… speichern (wenn <slug>-packshot.jpg schon zu
+ *   einer anderen Farbe gehört und nicht überschrieben werden darf).
  *   → public/products/<slug>-packshot.jpg  (auf 4:5 erweitert, nichts abgeschnitten)
  *   → public/products/<slug>-model.jpg     (4:5 wie die Produktkarte, Kopf bis Fuss bleibt drin)
  *   Beide 1600×2000 mit IPTC-Kennzeichnung "KI-generiert" (Google Merchant Center verlangt sie).
@@ -74,6 +76,36 @@ async function whiteBackground(input) {
   return sharp(out, { raw: { width: w, height: h, channels: 3 } }).png().toBuffer();
 }
 
+/**
+ * 4:5-Ausschnitt aus einem höheren Bild (z. B. 3:4), wenn das Produkt mit
+ * mindestens 3 % Luft oben und unten hineinpasst — sonst null. Das Produkt
+ * wird über die Abweichung vom Grund (Median der Randpixel) gefunden.
+ */
+async function cropToFormat(input, width, height) {
+  const targetH = Math.round(width * (H / W));
+  if (targetH >= height) return null; // nicht höher als 4:5 → nichts zu beschneiden
+  const { data, info } = await sharp(input).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const w = info.width, h = info.height;
+  const at = (x, y, c) => data[(y * w + x) * 3 + c];
+  const edge = [[], [], []];
+  for (let x = 0; x < w; x += 4) for (const y of [2, h - 3]) for (let c = 0; c < 3; c++) edge[c].push(at(x, y, c));
+  const bg = edge.map((a) => a.sort((p, q) => p - q)[a.length >> 1]);
+  let top = -1, bottom = -1;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x += 2) {
+      const d = Math.abs(at(x, y, 0) - bg[0]) + Math.abs(at(x, y, 1) - bg[1]) + Math.abs(at(x, y, 2) - bg[2]);
+      if (d > 36) { if (top < 0) top = y; bottom = y; break; }
+    }
+  }
+  if (top < 0) return null;
+  const margin = Math.round(height * 0.03);
+  if (bottom - top + 2 * margin > targetH) return null; // Produkt zu hoch → erweitern
+  const center = Math.round((top + bottom) / 2);
+  const y0 = Math.min(Math.max(center - Math.round(targetH / 2), 0), height - targetH);
+  if (top - y0 < margin || y0 + targetH - bottom < margin) return null;
+  return sharp(input).extract({ left: 0, top: y0, width, height: targetH }).png().toBuffer();
+}
+
 function env(key) {
   const txt = readFileSync(`${ROOT}.env.local`, "utf8");
   const line = txt.split("\n").find((l) => l.startsWith(key + "="));
@@ -116,7 +148,7 @@ if (!["convert", "apply"].includes(cmd) || !slug) {
   process.exit(1);
 }
 const color = Number(arg("color") ?? 0);
-const suffix = color > 0 ? `-c${color}` : "";
+const suffix = color > 0 || rest.includes("--indexed") ? `-c${color}` : "";
 const packshotPath = `/products/${slug}${suffix}-packshot.jpg`;
 const modelPath = `/products/${slug}${suffix}-model.jpg`;
 
@@ -126,33 +158,37 @@ if (cmd === "convert") {
   if (!packshot && !model) throw new Error("--packshot und/oder --model angeben");
 
   if (packshot) {
-    // Auf 4:5 erweitern statt zuschneiden – Träger und Bänder bleiben sichtbar,
-    // dazu etwas Raum rundherum
-    // Erst den Grund auf Weiss ziehen, dann weiss erweitern — sonst entsteht
-    // zwischen grauem Bild und Rand ein sichtbarer Kasten
+    // Erst den Grund auf Weiss ziehen — sonst entsteht zwischen grauem Bild und
+    // weissem Rand ein sichtbarer Kasten
     const whitened = await whiteBackground(packshot);
     const source = whitened ?? (await sharp(packshot).flatten({ background: "#ffffff" }).png().toBuffer());
     const { width, height } = await sharp(source).metadata();
-    const cw = Math.round(Math.max(width * 1.08, height * 1.08 * (W / H)));
-    const ch = Math.round(cw * (H / W));
-    const padX = Math.floor((cw - width) / 2), padY = Math.floor((ch - height) / 2);
-    // Weisses Produkt (nicht aufgehellt): Rand in der Farbe des Grundes, sonst Kasten
-    let bg = { r: 255, g: 255, b: 255 };
-    if (!whitened) {
-      const { data: px } = await sharp(source).extract({ left: 0, top: 0, width: 8, height: 8 }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
-      const avg = (o) => Math.round([...Array(64).keys()].reduce((s, i) => s + px[i * 3 + o], 0) / 64);
-      bg = { r: avg(0), g: avg(1), b: avg(2) };
+
+    // Gemini liefert 3:4 (1792×2400). Passt das Produkt mit Luft in einen
+    // 4:5-Ausschnitt, oben/unten beschneiden statt erweitern: kein angesetzter
+    // Rand, also auch kein Kasten (18.10.2026, Duo- und Rayas-Bikini).
+    const cropped = await cropToFormat(source, width, height);
+    let framed = cropped;
+    if (!framed) {
+      // Sonst auf 4:5 erweitern – nur so viel wie nötig und nur in der Richtung,
+      // die fehlt (bei 3:4 links/rechts je ~4 %). Ein Rand rundherum setzte
+      // auch unten an, wo der Schatten liegt — das ergab Streifen.
+      const cw = Math.max(width, Math.round(height * (W / H)));
+      const ch = Math.max(height, Math.round(cw * (H / W)));
+      const padX = Math.floor((cw - width) / 2), padY = Math.floor((ch - height) / 2);
+      const ext = { left: padX, right: cw - width - padX, top: padY, bottom: ch - height - padY };
+      // Randpixel fortsetzen statt mit einer Einheitsfarbe auffüllen: Der
+      // Gemini-Grund hat einen Verlauf, den auch whiteBackground nicht überall
+      // ganz auf 255 bringt — reines Weiss daneben ergab einen Kasten.
+      // Zwei Durchgänge: sharp verkleinert sonst immer vor dem Erweitern
+      framed = await sharp(source).extend({ ...ext, extendWith: "copy" }).toBuffer();
     }
-    // Zwei Durchgänge: sharp verkleinert sonst immer vor dem Erweitern
-    const padded = await sharp(source)
-      .extend({ left: padX, right: cw - width - padX, top: padY, bottom: ch - height - padY, background: bg })
-      .toBuffer();
-    await sharp(padded)
+    await sharp(framed)
       .resize(W, H, { withoutEnlargement: true }) // kleine Bilder nicht aufblasen
       .withXmp(AI_XMP)
       .jpeg({ quality: 88, mozjpeg: true })
       .toFile(`${ROOT}public${packshotPath}`);
-    console.log(`🖼  public${packshotPath}`);
+    console.log(`🖼  public${packshotPath}${cropped ? "  (auf 4:5 zugeschnitten)" : "  (auf 4:5 erweitert)"}`);
   }
   if (model) {
     // Gemini liefert fast genau 4:5 – nur ein paar Pixel Rand fallen weg
