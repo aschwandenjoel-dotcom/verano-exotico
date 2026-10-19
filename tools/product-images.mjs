@@ -106,6 +106,58 @@ async function cropToFormat(input, width, height) {
   return sharp(input).extract({ left: 0, top: y0, width, height: targetH }).png().toBuffer();
 }
 
+/**
+ * Erweitert ein Bild, indem der Hintergrund am Rand fortgesetzt wird (kein
+ * Einheitsweiss → kein Kasten). Wo das Produkt selbst den Rand berührt (z. B.
+ * ein Band, das aus dem Bild läuft), würde das Fortsetzen das Band bis an den
+ * neuen Rand ziehen — dort wird stattdessen der Grund der nächsten freien Zeile
+ * bzw. Spalte genommen. Das Band endet dann wie im Original.
+ */
+async function extendBackground(input, width, height, ext) {
+  const { data } = await sharp(input).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const W2 = width + ext.left + ext.right, H2 = height + ext.top + ext.bottom;
+  const out = Buffer.alloc(W2 * H2 * 3);
+  const src = (x, y) => (y * width + x) * 3;
+  // Grundfarbe = Median der Randpixel
+  const edge = [[], [], []];
+  for (let x = 0; x < width; x += 3) for (const y of [0, height - 1]) for (let c = 0; c < 3; c++) edge[c].push(data[src(x, y) + c]);
+  for (let y = 0; y < height; y += 3) for (const x of [0, width - 1]) for (let c = 0; c < 3; c++) edge[c].push(data[src(x, y) + c]);
+  const bg = edge.map((a) => a.sort((p, q) => p - q)[a.length >> 1]);
+  const isProduct = (i) => Math.abs(data[i] - bg[0]) + Math.abs(data[i + 1] - bg[1]) + Math.abs(data[i + 2] - bg[2]) > 36;
+  // Randpixel je Zeile (links/rechts) und je Spalte (oben/unten); Produktpixel
+  // durch den nächsten freien Randpixel ersetzen
+  const fixEdge = (n, at) => {
+    const ok = Array.from({ length: n }, (_, k) => !isProduct(at(k)));
+    return Array.from({ length: n }, (_, k) => {
+      if (ok[k]) return at(k);
+      for (let d = 1; d < n; d++) {
+        if (k - d >= 0 && ok[k - d]) return at(k - d);
+        if (k + d < n && ok[k + d]) return at(k + d);
+      }
+      return null;
+    });
+  };
+  const leftCol = fixEdge(height, (y) => src(0, y)), rightCol = fixEdge(height, (y) => src(width - 1, y));
+  const topRow = fixEdge(width, (x) => src(x, 0)), bottomRow = fixEdge(width, (x) => src(x, height - 1));
+  for (let y = 0; y < H2; y++) {
+    const sy = Math.min(Math.max(y - ext.top, 0), height - 1);
+    for (let x = 0; x < W2; x++) {
+      const sx = Math.min(Math.max(x - ext.left, 0), width - 1);
+      const inside = x >= ext.left && x < ext.left + width && y >= ext.top && y < ext.top + height;
+      let i;
+      if (inside) i = src(sx, sy);
+      else if (x < ext.left) i = leftCol[sy];
+      else if (x >= ext.left + width) i = rightCol[sy];
+      else if (y < ext.top) i = topRow[sx];
+      else i = bottomRow[sx];
+      const o = (y * W2 + x) * 3;
+      if (i === null) { out[o] = bg[0]; out[o + 1] = bg[1]; out[o + 2] = bg[2]; }
+      else { out[o] = data[i]; out[o + 1] = data[i + 1]; out[o + 2] = data[i + 2]; }
+    }
+  }
+  return sharp(out, { raw: { width: W2, height: H2, channels: 3 } }).png().toBuffer();
+}
+
 function env(key) {
   const txt = readFileSync(`${ROOT}.env.local`, "utf8");
   const line = txt.split("\n").find((l) => l.startsWith(key + "="));
@@ -181,7 +233,7 @@ if (cmd === "convert") {
       // Gemini-Grund hat einen Verlauf, den auch whiteBackground nicht überall
       // ganz auf 255 bringt — reines Weiss daneben ergab einen Kasten.
       // Zwei Durchgänge: sharp verkleinert sonst immer vor dem Erweitern
-      framed = await sharp(source).extend({ ...ext, extendWith: "copy" }).toBuffer();
+      framed = await extendBackground(source, width, height, ext);
     }
     await sharp(framed)
       .resize(W, H, { withoutEnlargement: true }) // kleine Bilder nicht aufblasen
