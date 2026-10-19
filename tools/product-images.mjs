@@ -106,8 +106,43 @@ async function cropToFormat(input, width, height) {
   return sharp(input).extract({ left: 0, top: y0, width, height: targetH }).png().toBuffer();
 }
 
+/** Mindestabstand zwischen Kopf (Haar) und oberem Bildrand, Anteil der Bildhöhe */
+const HEADROOM = 0.04;
+
 /**
- * Erweitert ein Bild, indem der Hintergrund am Rand fortgesetzt wird (kein
+ * Model-Bild auf 4:5 bringen, ohne den Kopf anzuschneiden. Gemini liefert 3:4
+ * (höher als 4:5): Der Überschuss wird unten weggenommen (Beine), oben bleibt
+ * HEADROOM Luft über dem Haar bzw. so viel, wie das Original hat. Seitlich
+ * erweitern gab sichtbare Streifen, weil die Studiowand Verläufe hat.
+ * Breitere Bilder werden wie bisher mittig beschnitten.
+ */
+async function modelFrame(input) {
+  const { data, info } = await sharp(input).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const w = info.width, h = info.height;
+  const targetH = Math.round(w * (H / W));
+  if (targetH >= h) {
+    const targetW = Math.round(h * (W / H));
+    return sharp(input).extract({ left: Math.floor((w - targetW) / 2), top: 0, width: targetW, height: h }).png().toBuffer();
+  }
+  const px = (x, y, c) => data[(y * w + x) * 3 + c];
+  // Wandfarbe aus den oberen Ecken
+  const bgS = [[], [], []];
+  const cw = Math.round(w * 0.12), rows = Math.max(4, Math.round(h * 0.03));
+  for (let y = 0; y < rows; y++) for (const x0 of [0, w - cw]) for (let x = x0; x < x0 + cw; x += 3) for (let c = 0; c < 3; c++) bgS[c].push(px(x, y, c));
+  const bg = bgS.map((a) => a.sort((p, q) => p - q)[a.length >> 1]);
+  // Oberkante des Kopfs: erste Zeile, in der im mittleren Bereich etwas deutlich von der Wand abweicht
+  let headTop = h;
+  for (let y = 0; y < h && headTop === h; y++) {
+    for (let x = Math.round(w * 0.2); x < w * 0.8; x += 2) {
+      const d = Math.abs(px(x, y, 0) - bg[0]) + Math.abs(px(x, y, 1) - bg[1]) + Math.abs(px(x, y, 2) - bg[2]);
+      if (d > 60) { headTop = y; break; }
+    }
+  }
+  const y0 = Math.min(Math.max(headTop - Math.round(HEADROOM * h), 0), h - targetH);
+  return sharp(input).extract({ left: 0, top: y0, width: w, height: targetH }).png().toBuffer();
+}
+
+/** Erweitert ein Bild, indem der Hintergrund am Rand fortgesetzt wird (kein
  * Einheitsweiss → kein Kasten). Wo das Produkt selbst den Rand berührt (z. B.
  * ein Band, das aus dem Bild läuft), würde das Fortsetzen das Band bis an den
  * neuen Rand ziehen — dort wird stattdessen der Grund der nächsten freien Zeile
@@ -124,35 +159,49 @@ async function extendBackground(input, width, height, ext) {
   for (let y = 0; y < height; y += 3) for (const x of [0, width - 1]) for (let c = 0; c < 3; c++) edge[c].push(data[src(x, y) + c]);
   const bg = edge.map((a) => a.sort((p, q) => p - q)[a.length >> 1]);
   const isProduct = (i) => Math.abs(data[i] - bg[0]) + Math.abs(data[i + 1] - bg[1]) + Math.abs(data[i + 2] - bg[2]) > 36;
-  // Randpixel je Zeile (links/rechts) und je Spalte (oben/unten); Produktpixel
-  // durch den nächsten freien Randpixel ersetzen
-  const fixEdge = (n, at) => {
+  // Randfarben je Zeile (links/rechts) und je Spalte (oben/unten). Wo das
+  // Produkt (Band, Haar) den Rand berührt, wird zwischen den nächsten freien
+  // Stellen davor und danach linear interpoliert und danach geglättet —
+  // "nächster freier Pixel" ergab sichtbare Rechtecke (19.10.2026).
+  const edgeColors = (n, at) => {
     const ok = Array.from({ length: n }, (_, k) => !isProduct(at(k)));
-    return Array.from({ length: n }, (_, k) => {
-      if (ok[k]) return at(k);
-      for (let d = 1; d < n; d++) {
-        if (k - d >= 0 && ok[k - d]) return at(k - d);
-        if (k + d < n && ok[k + d]) return at(k + d);
+    const col = Array.from({ length: n }, () => [0, 0, 0]);
+    let prev = -1;
+    for (let k = 0; k <= n; k++) {
+      if (k < n && !ok[k]) continue;
+      const next = k < n ? k : -1;
+      for (let j = prev + 1; j < (next < 0 ? n : next); j++) {
+        const a = prev >= 0 ? at(prev) : null, b = next >= 0 ? at(next) : null;
+        const t = prev >= 0 && next >= 0 ? (j - prev) / (next - prev) : 0;
+        for (let c = 0; c < 3; c++) {
+          const va = a !== null ? data[a + c] : b !== null ? data[b + c] : bg[c];
+          const vb = b !== null ? data[b + c] : va;
+          col[j][c] = va + (vb - va) * t;
+        }
       }
-      return null;
+      if (next >= 0) { const i = at(next); col[next] = [data[i], data[i + 1], data[i + 2]]; }
+      prev = next;
+    }
+    // Glätten (gleitender Mittelwert, ~2 % der Kantenlänge)
+    const r = Math.max(4, Math.round(n * 0.02));
+    const sm = col.map((_, k) => {
+      const acc = [0, 0, 0]; let m = 0;
+      for (let d = -r; d <= r; d++) { const q = k + d; if (q < 0 || q >= n) continue; for (let c = 0; c < 3; c++) acc[c] += col[q][c]; m++; }
+      return acc.map((v) => Math.round(v / m));
     });
+    return sm;
   };
-  const leftCol = fixEdge(height, (y) => src(0, y)), rightCol = fixEdge(height, (y) => src(width - 1, y));
-  const topRow = fixEdge(width, (x) => src(x, 0)), bottomRow = fixEdge(width, (x) => src(x, height - 1));
+  const leftCol = edgeColors(height, (y) => src(0, y)), rightCol = edgeColors(height, (y) => src(width - 1, y));
+  const topRow = edgeColors(width, (x) => src(x, 0)), bottomRow = edgeColors(width, (x) => src(x, height - 1));
   for (let y = 0; y < H2; y++) {
     const sy = Math.min(Math.max(y - ext.top, 0), height - 1);
     for (let x = 0; x < W2; x++) {
       const sx = Math.min(Math.max(x - ext.left, 0), width - 1);
-      const inside = x >= ext.left && x < ext.left + width && y >= ext.top && y < ext.top + height;
-      let i;
-      if (inside) i = src(sx, sy);
-      else if (x < ext.left) i = leftCol[sy];
-      else if (x >= ext.left + width) i = rightCol[sy];
-      else if (y < ext.top) i = topRow[sx];
-      else i = bottomRow[sx];
       const o = (y * W2 + x) * 3;
-      if (i === null) { out[o] = bg[0]; out[o + 1] = bg[1]; out[o + 2] = bg[2]; }
-      else { out[o] = data[i]; out[o + 1] = data[i + 1]; out[o + 2] = data[i + 2]; }
+      const inside = x >= ext.left && x < ext.left + width && y >= ext.top && y < ext.top + height;
+      if (inside) { const i = src(sx, sy); out[o] = data[i]; out[o + 1] = data[i + 1]; out[o + 2] = data[i + 2]; continue; }
+      const v = x < ext.left ? leftCol[sy] : x >= ext.left + width ? rightCol[sy] : y < ext.top ? topRow[sx] : bottomRow[sx];
+      out[o] = v[0]; out[o + 1] = v[1]; out[o + 2] = v[2];
     }
   }
   return sharp(out, { raw: { width: W2, height: H2, channels: 3 } }).png().toBuffer();
@@ -243,9 +292,12 @@ if (cmd === "convert") {
     console.log(`🖼  public${packshotPath}${cropped ? "  (auf 4:5 zugeschnitten)" : "  (auf 4:5 erweitert)"}`);
   }
   if (model) {
-    // Gemini liefert fast genau 4:5 – nur ein paar Pixel Rand fallen weg
-    await sharp(model)
-      .resize(W, H, { fit: "cover", position: "centre", withoutEnlargement: true }) // kleine Bilder nicht aufblasen
+    // Nicht mittig zuschneiden: Bei 3:4 fielen oben ~3 % weg und mit ihnen
+    // der Haaransatz (Joel, 19.10.2026: "der Kopf soll immer ganz drauf sein").
+    // Stattdessen Luft über dem Kopf sichern und seitlich auf 4:5 erweitern.
+    const framed = await modelFrame(await sharp(model).flatten({ background: "#ffffff" }).png().toBuffer());
+    await sharp(framed)
+      .resize(W, H, { withoutEnlargement: true }) // kleine Bilder nicht aufblasen
       .withXmp(AI_XMP)
       .jpeg({ quality: 88, mozjpeg: true })
       .toFile(`${ROOT}public${modelPath}`);
