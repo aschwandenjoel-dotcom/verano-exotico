@@ -138,7 +138,27 @@ async function modelFrame(input) {
       if (d > 60) { headTop = y; break; }
     }
   }
-  const y0 = Math.min(Math.max(headTop - Math.round(HEADROOM * h), 0), h - targetH);
+  // Unterkante der Füsse: letzte Zeile, die vom Boden (untere Ecken) deutlich abweicht
+  const flS = [[], [], []];
+  for (let y = h - rows; y < h; y++) for (const x0 of [0, w - cw]) for (let x = x0; x < x0 + cw; x += 3) for (let c = 0; c < 3; c++) flS[c].push(px(x, y, c));
+  const fl = flS.map((a) => a.sort((p, q) => p - q)[a.length >> 1]);
+  let feetBottom = -1;
+  for (let y = h - 1; y >= 0 && feetBottom < 0; y--) {
+    for (let x = Math.round(w * 0.2); x < w * 0.8; x += 2) {
+      const d = Math.abs(px(x, y, 0) - fl[0]) + Math.abs(px(x, y, 1) - fl[1]) + Math.abs(px(x, y, 2) - fl[2]);
+      if (d > 60) { feetBottom = y; break; }
+    }
+  }
+  const top = Math.max(headTop - Math.round(HEADROOM * h), 0);
+  const bottom = Math.min(feetBottom + Math.round(0.015 * h), h);
+  if (bottom - top > targetH) {
+    // Kopf und Füsse passen nicht beide in den 4:5-Ausschnitt → nichts abschneiden,
+    // stattdessen die Wand links und rechts fortsetzen
+    const targetW = Math.round(h * (W / H)), add = targetW - w;
+    return extendBackground(input, w, h, { left: add >> 1, right: add - (add >> 1), top: 0, bottom: 0 });
+  }
+  // Beide passen: Rest gleichmässig über Kopf und unter den Füssen verteilen
+  const y0 = Math.min(Math.max(top - Math.floor((targetH - (bottom - top)) / 2), 0), h - targetH);
   return sharp(input).extract({ left: 0, top: y0, width: w, height: targetH }).png().toBuffer();
 }
 
