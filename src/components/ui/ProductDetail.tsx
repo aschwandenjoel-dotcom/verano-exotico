@@ -112,48 +112,39 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         </div>
       )}
 
-      {/* Color swatches */}
+      {/* Farbwahl wie bei H&M: "Farbe: <Name>" und darunter kleine Produktbilder
+          jeder Farbe (4:5), die gewählte mit dünnem dunklem Rahmen. Ohne
+          Farbbild bleibt eine Kachel in der Farbe selbst. */}
       {product.colors.length > 1 && (
         <div className="mb-8">
-          <p
-            className="text-xs font-mono tracking-widest uppercase mb-3"
-            style={{ color: "#5E7A8A" }}
-          >
-            {t.color}
+          <p className="text-sm mb-3" style={{ color: "#1A3040" }}>
+            <span style={{ color: "#5E7A8A" }}>{t.color}:</span>{" "}
+            {product.colorNames?.[loc]?.[activeColor]}
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {product.colors.map((color, i) => {
               const name = product.colorNames?.[loc]?.[i];
               const img = product.colorImages?.[i];
+              const active = activeColor === i;
               return (
-                <div key={i} className="group relative">
-                  {/* Frueher lag hier das Original-Produktfoto (bis 1 MB pro
-                      Farbe) als background-image auf einem 32-px-Kreis - an
-                      next/image vorbei, also ohne Verkleinerung. Jetzt eine
-                      64-px-Variante aus der Bildoptimierung. */}
-                  <div
-                    onClick={() => onSelectColor(i)}
-                    className="relative w-8 h-8 rounded-full overflow-hidden cursor-pointer hover:scale-110 transition-transform"
-                    style={{
-                      backgroundColor: color,
-                      border: `2px solid ${activeColor === i ? "#1A3040" : "rgba(26,48,64,0.15)"}`,
-                      outline: activeColor === i ? "2px solid #1A3040" : "none",
-                      outlineOffset: "2px",
-                    }}
-                  >
-                    {img && (
-                      <Image src={img} alt="" fill sizes="32px" style={{ objectFit: "cover", objectPosition: "center 30%" }} />
-                    )}
-                  </div>
-                  {name && (
-                    <span
-                      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-mono whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                      style={{ background: "#0A3D52", color: "#F8F3E8", borderRadius: "3px" }}
-                    >
-                      {name}
-                    </span>
-                  )}
-                </div>
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => onSelectColor(i)}
+                  aria-label={name}
+                  aria-pressed={active}
+                  title={name}
+                  className="relative cursor-pointer overflow-hidden"
+                  style={{
+                    width: "52px",
+                    height: "65px",
+                    backgroundColor: img ? "#fff" : color,
+                    border: `1px solid ${active ? "#1A3040" : "transparent"}`,
+                    padding: 0,
+                  }}
+                >
+                  {img && <Image src={img} alt="" fill sizes="52px" style={{ objectFit: "cover" }} />}
+                </button>
               );
             })}
           </div>

@@ -131,29 +131,6 @@ export function ProductTile({
 
       {/* Product info */}
       <div style={{ padding: "12px 2px 0" }}>
-        {/* Color swatches */}
-        {product.colors.length > 1 && (
-          <div style={{ display: "flex", gap: "5px", marginBottom: "8px", flexWrap: "wrap" }}>
-            {product.colors.slice(0, 6).map((color) => (
-              <div
-                key={color}
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "50%",
-                  background: color,
-                  border: "1px solid rgba(26,48,64,0.15)",
-                }}
-              />
-            ))}
-            {product.colors.length > 6 && (
-              <span style={{ fontSize: "9px", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", lineHeight: "12px" }}>
-                +{product.colors.length - 6}
-              </span>
-            )}
-          </div>
-        )}
-
         <p
           style={{
             fontSize: "9px",
@@ -190,6 +167,27 @@ export function ProductTile({
         >
           CHF {product.price.toFixed(2)}
         </p>
+        {/* Farben wie bei H&M: kleine eckige Farbfelder unter dem Preis, ab der fünften "+n" */}
+        {product.colors.length > 1 && (
+          <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "8px" }}>
+            {product.colors.slice(0, 4).map((color, i) => (
+              <span
+                key={i}
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  background: color,
+                  border: "1px solid rgba(26,48,64,0.2)",
+                }}
+              />
+            ))}
+            {product.colors.length > 4 && (
+              <span style={{ fontSize: "11px", color: "#5E7A8A", marginLeft: "2px", lineHeight: "10px" }}>
+                +{product.colors.length - 4}
+              </span>
+            )}
+          </div>
+        )}
         {/* KI-Kennzeichnung unter dem Bild statt darin */}
         {isAiImage(title) && <AiBadge variant="inline" />}
       </div>
