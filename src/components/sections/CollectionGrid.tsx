@@ -132,7 +132,7 @@ export function ProductTile({
       {/* Product info */}
       <div style={{ padding: "12px 2px 0" }}>
         {/* Color swatches */}
-        {product.colors.length > 0 && (
+        {product.colors.length > 1 && (
           <div style={{ display: "flex", gap: "5px", marginBottom: "8px", flexWrap: "wrap" }}>
             {product.colors.slice(0, 6).map((color) => (
               <div

@@ -69,7 +69,7 @@ export default function ProductCard({ product, locale }: Props) {
       </div>
 
       {/* Color swatches */}
-      {product.colors.length > 0 && (
+      {product.colors.length > 1 && (
         <div className="px-4 pt-3 flex gap-1.5 flex-wrap">
           {product.colors.map((color) => (
             <div

@@ -113,7 +113,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
       )}
 
       {/* Color swatches */}
-      {product.colors.length > 0 && (
+      {product.colors.length > 1 && (
         <div className="mb-8">
           <p
             className="text-xs font-mono tracking-widest uppercase mb-3"
