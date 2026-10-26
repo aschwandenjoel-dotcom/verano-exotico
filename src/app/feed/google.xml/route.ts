@@ -65,7 +65,7 @@ function absolute(path: string): string {
  * austauscht oder bearbeitet, erhöht diesen Wert — dann lädt Google alle
  * Bilder beim nächsten Feed-Abruf frisch.
  */
-const IMAGE_VERSION = "2026-10-24";
+const IMAGE_VERSION = "2026-10-26";
 const imageUrl = (path: string) => `${absolute(path)}?v=${IMAGE_VERSION}`;
 
 const OVERRIDES = imageOverrides as Record<string, Record<string, string>>;
