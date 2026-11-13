@@ -14,7 +14,7 @@ const EMAIL_HEAD = `<meta charset="utf-8">
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
 <style>:root { color-scheme: light; supported-color-schemes: light; }</style>`;
-const REPLY_TO = process.env.RESEND_REPLY_TO ?? "veranoexotico@gmail.com";
+const REPLY_TO = process.env.RESEND_REPLY_TO ?? "info@verano-exotico.ch";
 
 export type EmailLocale = "de" | "en";
 
@@ -135,7 +135,7 @@ function footer(locale: EmailLocale) {
       </p>
       <p style="font-family:sans-serif;font-size:10px;color:rgba(26,48,64,0.35);margin:0;line-height:1.6;">
         Verano Exotico · Joel Aschwanden · Gotthardstrasse 59 · 6460 Altdorf · Schweiz<br>
-        <a href="mailto:veranoexotico@gmail.com" style="color:rgba(26,48,64,0.45);">veranoexotico@gmail.com</a> · +41 79 389 66 59
+        <a href="mailto:info@verano-exotico.ch" style="color:rgba(26,48,64,0.45);">info@verano-exotico.ch</a> · +41 79 389 66 59
       </p>
     </div>`;
 }

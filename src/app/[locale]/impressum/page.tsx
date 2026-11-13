@@ -53,7 +53,7 @@ function LegalContent() {
 
       <Section title="Kontakt">
         <p>
-          E-Mail: <a href="mailto:veranoexotico@gmail.com" style={{ color: "#1A3040" }}>veranoexotico@gmail.com</a><br />
+          E-Mail: <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a><br />
           Telefon: <a href="tel:+41793896659" style={{ color: "#1A3040" }}>+41 79 389 66 59</a>
         </p>
       </Section>

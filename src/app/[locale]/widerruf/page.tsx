@@ -47,7 +47,7 @@ export default async function WiderrufPage({
           <li>
             Melden Sie den Mangel innerhalb von <strong>14 Tagen nach Erhalt</strong> per
             E-Mail an{" "}
-            <a href="mailto:veranoexotico@gmail.com" style={{ color: "#1A3040" }}>veranoexotico@gmail.com</a>{" "}
+            <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a>{" "}
             — mit Bestellnummer und Fotos des Mangels.
           </li>
           <li>Wir prüfen die Meldung und melden uns mit den weiteren Schritten (Umtausch, Nachbesserung oder Rückerstattung).</li>

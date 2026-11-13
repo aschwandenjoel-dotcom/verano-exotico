@@ -15,7 +15,7 @@ export default function AboutFacts({ locale, productCount }: { locale: Locale; p
         ["Range", `${productCount} styles: bikinis, swimsuits and bikini sets`],
         ["Payment", "TWINT, credit and debit card"],
         ["Shipping", "Worldwide, Switzerland from CHF 4.90, usually 5–14 business days"],
-        ["Contact", "veranoexotico@gmail.com"],
+        ["Contact", "info@verano-exotico.ch"],
       ]
     : [
         ["Sitz", "Altdorf, Kanton Uri, Schweiz"],
@@ -23,7 +23,7 @@ export default function AboutFacts({ locale, productCount }: { locale: Locale; p
         ["Sortiment", `${productCount} Modelle: Bikinis, Badeanzüge und Bikini-Sets`],
         ["Bezahlung", "TWINT, Kredit- und Debitkarte"],
         ["Versand", "Weltweit, Schweiz ab CHF 4.90, meist 5–14 Werktage"],
-        ["Kontakt", "veranoexotico@gmail.com"],
+        ["Kontakt", "info@verano-exotico.ch"],
       ];
 
   const links: [string, string][] = en

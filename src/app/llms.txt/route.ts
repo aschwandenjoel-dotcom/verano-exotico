@@ -53,7 +53,7 @@ ${categories}
 - [Impressum](${de}/impressum)
 
 ## Kontakt
-- E-Mail: veranoexotico@gmail.com
+- E-Mail: info@verano-exotico.ch
 - Telefon: +41 79 389 66 59
 - Adresse: Verano Exotico, Joel Aschwanden, Gotthardstrasse 59, 6460 Altdorf, Schweiz
 - Instagram: https://www.instagram.com/veranoexotico/

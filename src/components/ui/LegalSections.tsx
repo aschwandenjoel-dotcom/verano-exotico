@@ -35,7 +35,7 @@ export function LegalPage({
             {locale === "en" && (
               <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.55)", fontStyle: "italic", marginBottom: "40px" }}>
                 Our legal and service pages are provided in German. For questions in English, contact us at{" "}
-                <a href="mailto:veranoexotico@gmail.com" style={{ color: "#1A3040" }}>veranoexotico@gmail.com</a>.
+                <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a>.
               </p>
             )}
             {children}

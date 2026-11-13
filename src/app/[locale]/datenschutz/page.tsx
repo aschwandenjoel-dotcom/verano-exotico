@@ -54,7 +54,7 @@ function PrivacyContent() {
           <strong>Verano Exotico</strong><br />
           Inhaber: Joel Aschwanden<br />
           Gotthardstrasse 59, 6460 Altdorf, Schweiz<br />
-          E-Mail: <a href="mailto:veranoexotico@gmail.com" style={{ color: "#1A3040" }}>veranoexotico@gmail.com</a><br />
+          E-Mail: <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a><br />
           Telefon: +41 79 389 66 59
         </p>
       </Section>
@@ -145,7 +145,7 @@ function PrivacyContent() {
           <li><strong>Datenübertragbarkeit</strong> (Art. 20 DSGVO): Sie haben das Recht, Ihre Daten in einem maschinenlesbaren Format zu erhalten.</li>
           <li><strong>Widerspruchsrecht</strong> (Art. 21 DSGVO): Sie können der Verarbeitung Ihrer Daten auf Basis berechtigter Interessen widersprechen.</li>
         </ul>
-        <p style={{ marginTop: "12px" }}>Zur Ausübung Ihrer Rechte wenden Sie sich bitte an: <a href="mailto:veranoexotico@gmail.com" style={{ color: "#1A3040" }}>veranoexotico@gmail.com</a></p>
+        <p style={{ marginTop: "12px" }}>Zur Ausübung Ihrer Rechte wenden Sie sich bitte an: <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a></p>
         <p style={{ marginTop: "12px" }}>Sie haben zudem das Recht, sich bei der zuständigen Datenschutzbehörde zu beschweren. In der Schweiz ist dies der <strong>Eidgenössische Datenschutz- und Öffentlichkeitsbeauftragte (EDÖB)</strong>, in der EU die zuständige nationale Aufsichtsbehörde.</p>
       </Section>
 

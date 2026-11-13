@@ -17,7 +17,7 @@ Kaufabsicht („bikini kaufen schweiz", „high waist bikini").
 1. https://merchants.google.com → mit dem Google-Konto anmelden, Konto
    erstellen (Unternehmen: Verano Exotico, Land: Schweiz, Zeitzone Zürich).
 2. **Unternehmensinformationen** ausfüllen: Website `https://verano-exotico.ch`,
-   Adresse wie im Impressum, Kundendienst-Mail `veranoexotico@gmail.com`.
+   Adresse wie im Impressum, Kundendienst-Mail `info@verano-exotico.ch` (bis 13.11.2026: veranoexotico@gmail.com).
 3. **Website verifizieren und beanspruchen**: Google bietet mehrere Wege.
    Am einfachsten „HTML-Tag" — den Meta-Tag an Claude geben, er baut ihn ins
    Layout ein. Alternativ über die Search Console, falls die Domain dort schon

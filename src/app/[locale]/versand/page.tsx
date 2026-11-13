@@ -106,7 +106,7 @@ export default async function VersandPage({
           <li>
             Melde den Mangel innerhalb von <strong>14 Tagen nach Erhalt</strong> per
             E-Mail an{" "}
-            <a href="mailto:veranoexotico@gmail.com" style={{ color: "#1A3040" }}>veranoexotico@gmail.com</a>{" "}
+            <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a>{" "}
             mit Bestellnummer und Fotos.
           </li>
           <li>Du erhältst die Rücksendeadresse und alle weiteren Schritte von uns.</li>
@@ -124,7 +124,7 @@ export default async function VersandPage({
       <Section title="Fragen?">
         <p>
           Wir helfen gerne:{" "}
-          <a href="mailto:veranoexotico@gmail.com" style={{ color: "#1A3040" }}>veranoexotico@gmail.com</a>{" "}
+          <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a>{" "}
           · Telefon <a href="tel:+41793896659" style={{ color: "#1A3040" }}>+41 79 389 66 59</a>
         </p>
       </Section>

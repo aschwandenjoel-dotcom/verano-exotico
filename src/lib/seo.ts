@@ -83,7 +83,7 @@ export const BRAND_DESCRIPTION =
 
 /** Kontaktdaten wie im Impressum. */
 export const CONTACT = {
-  email: "veranoexotico@gmail.com",
+  email: "info@verano-exotico.ch",
   telephone: "+41 79 389 66 59",
   address: {
     "@type": "PostalAddress",

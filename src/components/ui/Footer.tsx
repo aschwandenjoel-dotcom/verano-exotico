@@ -74,7 +74,13 @@ export default function Footer() {
   ];
 
   return (
-    <footer style={{ background: SAND, color: INK, borderTop: "1px solid rgba(26,48,64,0.12)" }}>
+    <footer style={{ background: SAND, color: INK, position: "relative" }}>
+      {/* Weicher Übergang: die letzten 120 px über dem Footer laufen in Sand aus,
+          egal ob die Seite darüber weiss oder creme ist (keine harte Kante) */}
+      <div
+        aria-hidden="true"
+        style={{ position: "absolute", left: 0, right: 0, bottom: "100%", height: "120px", background: `linear-gradient(to bottom, rgba(237,230,218,0), ${SAND})`, pointerEvents: "none", zIndex: 1 }}
+      />
       <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "64px clamp(1.5rem, 5vw, 2.5rem) 32px" }}>
 
         {/* Marke + Linkspalten */}

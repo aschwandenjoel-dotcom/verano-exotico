@@ -19,7 +19,7 @@ const TEXT = {
     },
     ungueltig: {
       title: "Link ungültig",
-      body: "Dieser Link ist nicht (mehr) gültig. Melde dich einfach auf der Startseite neu an oder schreib uns an veranoexotico@gmail.com.",
+      body: "Dieser Link ist nicht (mehr) gültig. Melde dich einfach auf der Startseite neu an oder schreib uns an info@verano-exotico.ch.",
     },
     abmelden: {
       title: "Newsletter abmelden",
@@ -39,7 +39,7 @@ const TEXT = {
     },
     ungueltig: {
       title: "Invalid link",
-      body: "This link is no longer valid. Just sign up again on the homepage or write to us at veranoexotico@gmail.com.",
+      body: "This link is no longer valid. Just sign up again on the homepage or write to us at info@verano-exotico.ch.",
     },
     abmelden: {
       title: "Unsubscribe",

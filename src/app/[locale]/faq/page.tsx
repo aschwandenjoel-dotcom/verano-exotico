@@ -54,18 +54,18 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Wie erreiche ich euch?",
-    a: "Per E-Mail an veranoexotico@gmail.com oder telefonisch unter +41 79 389 66 59. Wir antworten in der Regel innert 24 Stunden.",
+    a: "Per E-Mail an info@verano-exotico.ch oder telefonisch unter +41 79 389 66 59. Wir antworten in der Regel innert 24 Stunden.",
   },
 ];
 
 /** E-Mail-Adresse und Telefonnummer in Antworten anklickbar machen. */
 function Answer({ text }: { text: string }) {
-  const parts = text.split(/(veranoexotico@gmail\.com|\+41 79 389 66 59)/);
+  const parts = text.split(/(info@verano-exotico\.ch|\+41 79 389 66 59)/);
   return (
     <p>
       {parts.map((part, i) =>
-        part === "veranoexotico@gmail.com" ? (
-          <a key={i} href="mailto:veranoexotico@gmail.com" style={{ color: "#1A3040" }}>{part}</a>
+        part === "info@verano-exotico.ch" ? (
+          <a key={i} href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>{part}</a>
         ) : part === "+41 79 389 66 59" ? (
           <a key={i} href="tel:+41793896659" style={{ color: "#1A3040" }}>{part}</a>
         ) : (
