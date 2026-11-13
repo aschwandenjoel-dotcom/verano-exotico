@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import type { Locale, Product } from "@/types";
 import { useCart } from "@/context/CartContext";
+import { WELCOME_DISCOUNT_PERCENT } from "@/lib/newsletterOffer";
 import { useProductReviews, RatingSummary, ReviewDrawer } from "./ReviewSection";
 
 const SizeGuide = dynamic(() => import("./SizeGuide"), { ssr: false });
@@ -53,6 +54,21 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
   const [drawerState, setDrawerState] = useState<boolean | null>(null);
   const drawerOpen = drawerState ?? !!token;
   const closeDrawer = useCallback(() => setDrawerState(false), []);
+  const tp = useTranslations("product");
+  const cartButtonRef = useRef<HTMLButtonElement>(null);
+  const [stickyVisible, setStickyVisible] = useState(false);
+
+  // Sticky-Leiste nur zeigen, wenn der grosse Knopf oberhalb des Bildschirms liegt
+  // (nicht schon beim Öffnen, wenn er noch unten wartet)
+  useEffect(() => {
+    const el = cartButtonRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) =>
+      setStickyVisible(!e.isIntersecting && e.boundingClientRect.top < 0)
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // Produkte mit Grössenauswahl dürfen nicht ohne Grösse in den Warenkorb:
   // die CJ-Variante wird über "Farbe|Grösse" aufgelöst (src/lib/cjMapping.ts),
@@ -102,9 +118,24 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         {product.name[loc]}
       </h1>
 
-      <p className="text-3xl font-bold mb-8" style={{ color: "#D4AF37" }}>
+      <p className={`text-3xl font-bold ${WELCOME_DISCOUNT_PERCENT > 0 ? "mb-2" : "mb-8"}`} style={{ color: "#D4AF37" }}>
         CHF {product.price.toFixed(2)}
       </p>
+
+      {/* Wie bei Trendt Vision: Newsletter-Preis direkt unter dem Preis.
+          Gleicher Prozentsatz wie der Code in der Willkommensmail. */}
+      {WELCOME_DISCOUNT_PERCENT > 0 && (
+        <Link
+          href={`/${loc}/newsletter`}
+          className="inline-block text-sm underline underline-offset-4 mb-8"
+          style={{ color: "#5E7A8A" }}
+        >
+          {tp("newsletter_price", {
+            price: (product.price * (1 - WELCOME_DISCOUNT_PERCENT / 100)).toFixed(2),
+            percent: WELCOME_DISCOUNT_PERCENT,
+          })}
+        </Link>
+      )}
 
       {reviews.length > 0 && (
         <div className="-mt-5 mb-8">
@@ -182,6 +213,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
       )}
 
       <button
+        ref={cartButtonRef}
         onClick={handleAddToCart}
         className="w-full py-4 font-semibold text-base transition-all mb-4"
         style={{
@@ -204,6 +236,62 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
           {t.selectSize}
         </p>
       )}
+
+      {/* Trust-Box wie bei Trendt Vision: drei Versprechen direkt unter dem Knopf,
+          nicht erst in der Klappbox "Versand und Rückgabe" */}
+      <ul className="mb-6 space-y-2 text-sm" style={{ color: "#1A3040" }}>
+        {[t.shipping, t.trustReturns, t.trustPayment, tp("trust_swiss")].map((line) => (
+          <li key={line} className="flex items-center gap-2.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E7D5E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flexShrink: 0 }}>
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            {line}
+          </li>
+        ))}
+      </ul>
+
+      {/* Mitlaufender Warenkorb-Knopf auf dem Handy, sobald der grosse Knopf
+          aus dem Bild gescrollt ist */}
+      <div
+        className="md:hidden fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 px-4 pt-3"
+        style={{
+          background: "#F8F3E8",
+          borderTop: "1px solid rgba(26,48,64,0.15)",
+          paddingBottom: "calc(12px + env(safe-area-inset-bottom))",
+          transform: stickyVisible ? "translateY(0)" : "translateY(110%)",
+          transition: "transform 0.25s ease",
+        }}
+        aria-hidden={!stickyVisible}
+      >
+        <div className="min-w-0 flex-1">
+          <p className="text-sm truncate" style={{ color: "#1A3040" }}>{product.name[loc]}</p>
+          <p className="text-sm font-bold" style={{ color: "#1A3040" }}>
+            CHF {product.price.toFixed(2)}
+            {activeSize && <span className="font-normal" style={{ color: "#5E7A8A" }}> · {activeSize}</span>}
+          </p>
+        </div>
+        <button
+          type="button"
+          tabIndex={stickyVisible ? 0 : -1}
+          onClick={() => {
+            if (sizeMissing) {
+              setSizeHint(true);
+              cartButtonRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+              return;
+            }
+            handleAddToCart();
+          }}
+          className="px-6 py-3 font-semibold text-sm"
+          style={{
+            background: added ? "#2E7D5E" : "#D4AF37",
+            color: added ? "#F8F3E8" : "#1A3040",
+            borderRadius: "9999px",
+            flexShrink: 0,
+          }}
+        >
+          {added ? t.added : sizeMissing ? t.size : t.addToCart}
+        </button>
+      </div>
 
       {product.sizeChart && (
         <button

@@ -58,7 +58,9 @@
     "acc_material": "Material",
     "acc_care": "Care instructions",
     "acc_delivery": "Delivery and returns",
-    "delivery_more": "All about delivery and returns"
+    "delivery_more": "All about delivery and returns",
+    "newsletter_price": "or CHF {price} with {percent} % newsletter discount",
+    "trust_swiss": "Small shop from Switzerland"
   },
   "cart": {
     "title": "Cart",
@@ -305,5 +307,16 @@
   "shophero": {
     "title_1": "The new",
     "title_2": "Collection."
+  },
+  "survey": {
+    "question": "Quick question: how did you find us?",
+    "thanks": "Thank you! 💛",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "google": "Google",
+    "pinterest": "Pinterest",
+    "facebook": "Facebook",
+    "friend": "A friend",
+    "other": "Other"
   }
 }

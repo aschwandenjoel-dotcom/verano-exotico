@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import ShopShell from "@/components/ui/ShopShell";
 import ClearCartOnSuccess from "@/components/ui/ClearCartOnSuccess";
 import PurchaseTracker from "@/components/ui/PurchaseTracker";
+import PurchaseSurvey from "@/components/ui/PurchaseSurvey";
 import { fetchProductBySlug } from "@/lib/api";
 import { query, queryOne } from "@/lib/db";
 import { colorIndexOf, feedItemId } from "@/lib/feedIds";
@@ -244,6 +245,8 @@ export default async function OrderConfirmationPage({
             {prepay ? t("pending_note") : t("paid_delivery_note")}<br />
             {t("email_sent")}
           </p>
+
+          {order && order.status !== "payment_failed" && <PurchaseSurvey orderId={order.id} />}
 
           <Link
             href={`/${locale}/collection`}

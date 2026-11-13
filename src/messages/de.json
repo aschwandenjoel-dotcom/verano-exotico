@@ -58,7 +58,9 @@
     "acc_material": "Material",
     "acc_care": "Pflegehinweise",
     "acc_delivery": "Versand und Rückgabe",
-    "delivery_more": "Alle Infos zu Versand und Rückgabe"
+    "delivery_more": "Alle Infos zu Versand und Rückgabe",
+    "newsletter_price": "oder CHF {price} mit {percent} % Newsletter-Rabatt",
+    "trust_swiss": "Kleiner Shop aus der Schweiz"
   },
   "cart": {
     "title": "Warenkorb",
@@ -317,5 +319,16 @@
   "shophero": {
     "title_1": "Die neue",
     "title_2": "Kollektion."
+  },
+  "survey": {
+    "question": "Kurze Frage: Wie hast du uns gefunden?",
+    "thanks": "Danke dir! 💛",
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "google": "Google",
+    "pinterest": "Pinterest",
+    "facebook": "Facebook",
+    "friend": "Freundin / Freund",
+    "other": "Anders"
   }
 }
