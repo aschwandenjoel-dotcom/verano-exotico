@@ -39,7 +39,7 @@ export default async function VersandPage({
             <thead>
               <tr>
                 {["Zielland", "Grundpreis", "je weiterer Artikel", "Maximal"].map((h) => (
-                  <th key={h} style={{ textAlign: "left", padding: "10px 12px", borderBottom: "2px solid #1A3040", fontFamily: "var(--font-geist-mono)", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#1A3040" }}>
+                  <th key={h} style={{ textAlign: "left", padding: "10px 12px", borderBottom: "2px solid #0F1E3D", fontFamily: "var(--font-geist-mono)", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#0F1E3D" }}>
                     {h}
                   </th>
                 ))}
@@ -48,10 +48,10 @@ export default async function VersandPage({
             <tbody>
               {shippingTable().map((row) => (
                 <tr key={row.countries}>
-                  <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(26,48,64,0.1)" }}>{row.countries}</td>
-                  <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(26,48,64,0.1)" }}>CHF {row.base.toFixed(2)}</td>
-                  <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(26,48,64,0.1)" }}>+ CHF {row.perItem.toFixed(2)}</td>
-                  <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(26,48,64,0.1)" }}>CHF {row.cap.toFixed(2)}</td>
+                  <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(15,30,61,0.1)" }}>{row.countries}</td>
+                  <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(15,30,61,0.1)" }}>CHF {row.base.toFixed(2)}</td>
+                  <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(15,30,61,0.1)" }}>+ CHF {row.perItem.toFixed(2)}</td>
+                  <td style={{ padding: "10px 12px", borderBottom: "1px solid rgba(15,30,61,0.1)" }}>CHF {row.cap.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
@@ -106,7 +106,7 @@ export default async function VersandPage({
           <li>
             Melde den Mangel innerhalb von <strong>14 Tagen nach Erhalt</strong> per
             E-Mail an{" "}
-            <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a>{" "}
+            <a href="mailto:info@verano-exotico.ch" style={{ color: "#0F1E3D" }}>info@verano-exotico.ch</a>{" "}
             mit Bestellnummer und Fotos.
           </li>
           <li>Du erhältst die Rücksendeadresse und alle weiteren Schritte von uns.</li>
@@ -124,8 +124,8 @@ export default async function VersandPage({
       <Section title="Fragen?">
         <p>
           Wir helfen gerne:{" "}
-          <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a>{" "}
-          · Telefon <a href="tel:+41793896659" style={{ color: "#1A3040" }}>+41 79 389 66 59</a>
+          <a href="mailto:info@verano-exotico.ch" style={{ color: "#0F1E3D" }}>info@verano-exotico.ch</a>{" "}
+          · Telefon <a href="tel:+41793896659" style={{ color: "#0F1E3D" }}>+41 79 389 66 59</a>
         </p>
       </Section>
     </LegalPage>

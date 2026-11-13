@@ -5,10 +5,10 @@ import { useState } from "react";
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending:            { label: "Wartet auf Zahlung", color: "#E8A830" },
   payment_failed:     { label: "Zahlung fehlgeschlagen", color: "#C0392B" },
-  paid:               { label: "Bezahlt",        color: "#2E7D5E" },
+  paid:               { label: "Bezahlt",        color: "#3F4F3A" },
   ordered:            { label: "Bei CJ bestellt", color: "#7B61FF" },
   fulfillment_failed: { label: "CJ-Fehler",      color: "#C0392B" },
-  shipped:            { label: "Versendet",       color: "#00B4C5" },
+  shipped:            { label: "Versendet",       color: "#A8894F" },
   delivered:          { label: "Geliefert",       color: "#6B7A8D" },
   cancelled:          { label: "Storniert",       color: "#C0392B" },
 };
@@ -97,13 +97,13 @@ export default function AdminOrders({ orders, products }: { orders: Order[]; pro
   return (
     <div style={{ minHeight: "100vh", background: "#F8F3E8" }}>
       {/* Header */}
-      <div style={{ background: "#1A3040", padding: "20px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ background: "#0F1E3D", padding: "20px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <p style={{ color: "#D4AF37", fontFamily: "sans-serif", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 4px" }}>Verano Exotico</p>
-          <h1 style={{ color: "#F8F3E8", fontFamily: "sans-serif", fontWeight: 900, fontSize: "18px", textTransform: "uppercase", margin: 0 }}>Admin</h1>
+          <p style={{ color: "#A8894F", fontFamily: "sans-serif", fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 4px" }}>Verano Exotico</p>
+          <h1 style={{ color: "#F8F3E8", fontFamily: "sans-serif", fontWeight: 500, fontSize: "18px", textTransform: "uppercase", margin: 0 }}>Admin</h1>
         </div>
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-          <button onClick={syncTracking} disabled={syncing} style={{ background: "#D4AF37", color: "#1A3040", border: "none", borderRadius: "9999px", padding: "8px 16px", fontFamily: "sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: syncing ? "wait" : "pointer", opacity: syncing ? 0.6 : 1 }}>
+          <button onClick={syncTracking} disabled={syncing} style={{ background: "#A8894F", color: "#0F1E3D", border: "none", borderRadius: "2px", padding: "8px 16px", fontFamily: "sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: syncing ? "wait" : "pointer", opacity: syncing ? 0.6 : 1 }}>
             {syncing ? "Synchronisiere…" : "⟳ Tracking sync"}
           </button>
           <a href="/admin" style={{ color: "rgba(248,243,232,0.4)", fontFamily: "sans-serif", fontSize: "11px", textDecoration: "none" }}>↺ Aktualisieren</a>
@@ -113,14 +113,14 @@ export default function AdminOrders({ orders, products }: { orders: Order[]; pro
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "16px", padding: "24px 32px 0" }}>
         {[
-          { label: "Bestellungen", value: localOrders.length, color: "#1A3040" },
-          { label: "Umsatz", value: `CHF ${totalRevenue.toFixed(2)}`, color: "#1A3040" },
+          { label: "Bestellungen", value: localOrders.length, color: "#0F1E3D" },
+          { label: "Umsatz", value: `CHF ${totalRevenue.toFixed(2)}`, color: "#0F1E3D" },
           { label: "Bei CJ / versandt", value: localOrders.filter((o) => ["ordered","shipped","delivered"].includes(o.status)).length, color: "#7B61FF" },
           { label: "CJ-Fehler", value: localOrders.filter((o) => o.status === "fulfillment_failed").length, color: "#C0392B" },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ background: "#FFFFFF", borderRadius: "12px", padding: "20px 24px" }}>
-            <p style={{ fontFamily: "sans-serif", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", margin: "0 0 6px" }}>{label}</p>
-            <p style={{ fontFamily: "sans-serif", fontWeight: 900, fontSize: "22px", color, margin: 0 }}>{value}</p>
+            <p style={{ fontFamily: "sans-serif", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(15,30,61,0.4)", margin: "0 0 6px" }}>{label}</p>
+            <p style={{ fontFamily: "sans-serif", fontWeight: 500, fontSize: "22px", color, margin: 0 }}>{value}</p>
           </div>
         ))}
       </div>
@@ -128,7 +128,7 @@ export default function AdminOrders({ orders, products }: { orders: Order[]; pro
       {/* Tabs */}
       <div style={{ display: "flex", gap: "4px", padding: "24px 32px 0" }}>
         {(["orders", "products"] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)} style={{ padding: "8px 20px", borderRadius: "9999px", border: "none", background: tab === t ? "#1A3040" : "transparent", color: tab === t ? "#F8F3E8" : "rgba(26,48,64,0.5)", fontFamily: "sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
+          <button key={t} onClick={() => setTab(t)} style={{ padding: "8px 20px", borderRadius: "2px", border: "none", background: tab === t ? "#0F1E3D" : "transparent", color: tab === t ? "#F8F3E8" : "rgba(15,30,61,0.5)", fontFamily: "sans-serif", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
             {t === "orders" ? "Bestellungen" : "Produkte"}
           </button>
         ))}
@@ -138,7 +138,7 @@ export default function AdminOrders({ orders, products }: { orders: Order[]; pro
         {tab === "orders" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {localOrders.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "60px", color: "rgba(26,48,64,0.35)", fontFamily: "sans-serif", fontSize: "13px" }}>Noch keine Bestellungen</div>
+              <div style={{ textAlign: "center", padding: "60px", color: "rgba(15,30,61,0.35)", fontFamily: "sans-serif", fontSize: "13px" }}>Noch keine Bestellungen</div>
             ) : localOrders.map((order) => {
               const s = STATUS_LABELS[order.status] ?? { label: order.status, color: "#9E9E9E" };
               return (
@@ -147,23 +147,23 @@ export default function AdminOrders({ orders, products }: { orders: Order[]; pro
                     onClick={() => setExpandedId(expandedId === order.id ? null : order.id)}
                     style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px", cursor: "pointer" }}
                   >
-                    <span style={{ fontFamily: "sans-serif", fontSize: "12px", fontWeight: 700, color: "#1A3040", minWidth: "60px" }}>#{order.order_number}</span>
-                    <span style={{ fontFamily: "sans-serif", fontSize: "12px", color: "rgba(26,48,64,0.6)", flex: 1 }}>{order.customer_email}</span>
-                    <span style={{ fontFamily: "sans-serif", fontSize: "13px", fontWeight: 700, color: "#1A3040" }}>
+                    <span style={{ fontFamily: "sans-serif", fontSize: "12px", fontWeight: 700, color: "#0F1E3D", minWidth: "60px" }}>#{order.order_number}</span>
+                    <span style={{ fontFamily: "sans-serif", fontSize: "12px", color: "rgba(15,30,61,0.6)", flex: 1 }}>{order.customer_email}</span>
+                    <span style={{ fontFamily: "sans-serif", fontSize: "13px", fontWeight: 700, color: "#0F1E3D" }}>
                       CHF {Number(order.subtotal).toFixed(2)}
                       {order.payment_currency && order.payment_currency !== "CHF" && order.payment_amount && (
-                        <span style={{ fontWeight: 400, color: "rgba(26,48,64,0.5)" }}> · Kunde zahlt {order.payment_currency} {Number(order.payment_amount).toFixed(2)}</span>
+                        <span style={{ fontWeight: 400, color: "rgba(15,30,61,0.5)" }}> · Kunde zahlt {order.payment_currency} {Number(order.payment_amount).toFixed(2)}</span>
                       )}
                     </span>
-                    <span style={{ background: s.color + "22", color: s.color, fontFamily: "sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 10px", borderRadius: "9999px" }}>{s.label}</span>
-                    <span style={{ color: "rgba(26,48,64,0.3)", fontSize: "12px" }}>{expandedId === order.id ? "▲" : "▼"}</span>
+                    <span style={{ background: s.color + "22", color: s.color, fontFamily: "sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 10px", borderRadius: "2px" }}>{s.label}</span>
+                    <span style={{ color: "rgba(15,30,61,0.3)", fontSize: "12px" }}>{expandedId === order.id ? "▲" : "▼"}</span>
                   </div>
 
                   {expandedId === order.id && (
-                    <div style={{ padding: "0 20px 20px", borderTop: "1px solid rgba(26,48,64,0.06)" }}>
+                    <div style={{ padding: "0 20px 20px", borderTop: "1px solid rgba(15,30,61,0.06)" }}>
                       <div style={{ paddingTop: "16px", display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
                         {order.order_items?.map((item, i) => (
-                          <div key={i} style={{ display: "flex", justifyContent: "space-between", fontFamily: "sans-serif", fontSize: "13px", color: "#1A3040" }}>
+                          <div key={i} style={{ display: "flex", justifyContent: "space-between", fontFamily: "sans-serif", fontSize: "13px", color: "#0F1E3D" }}>
                             <span>{item.quantity}× {item.product_name} {item.size ? `(${item.size})` : ""}{item.color_name ? ` · ${item.color_name}` : ""}</span>
                             <span>CHF {(item.price * item.quantity).toFixed(2)}</span>
                           </div>
@@ -172,16 +172,16 @@ export default function AdminOrders({ orders, products }: { orders: Order[]; pro
 
                       {/* CJ-Dropshipping-Infos */}
                       {(order.cj_order_id || order.tracking_number || order.fulfillment_error) && (
-                        <div style={{ background: "#F8F3E8", borderRadius: "10px", padding: "14px 16px", marginBottom: "16px", fontFamily: "sans-serif", fontSize: "12px", color: "#1A3040", display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div style={{ background: "#F8F3E8", borderRadius: "10px", padding: "14px 16px", marginBottom: "16px", fontFamily: "sans-serif", fontSize: "12px", color: "#0F1E3D", display: "flex", flexDirection: "column", gap: "6px" }}>
                           {order.cj_order_id && (
                             <div style={{ display: "flex", justifyContent: "space-between" }}>
-                              <span style={{ color: "rgba(26,48,64,0.5)" }}>CJ-Bestellung</span>
+                              <span style={{ color: "rgba(15,30,61,0.5)" }}>CJ-Bestellung</span>
                               <span style={{ fontFamily: "monospace" }}>{order.cj_order_id}{order.cj_order_status ? ` · ${order.cj_order_status}` : ""}</span>
                             </div>
                           )}
                           {order.tracking_number && (
                             <div style={{ display: "flex", justifyContent: "space-between" }}>
-                              <span style={{ color: "rgba(26,48,64,0.5)" }}>Tracking{order.tracking_provider ? ` · ${order.tracking_provider}` : ""}</span>
+                              <span style={{ color: "rgba(15,30,61,0.5)" }}>Tracking{order.tracking_provider ? ` · ${order.tracking_provider}` : ""}</span>
                               <span style={{ fontFamily: "monospace", fontWeight: 700 }}>{order.tracking_number}</span>
                             </div>
                           )}
@@ -196,7 +196,7 @@ export default function AdminOrders({ orders, products }: { orders: Order[]; pro
                           const val = STATUS_LABELS[key];
                           return (
                             <button key={key} onClick={() => updateStatus(order.id, key)}
-                              style={{ padding: "6px 14px", borderRadius: "9999px", border: `1px solid ${order.status === key ? val.color : "rgba(26,48,64,0.15)"}`, background: order.status === key ? val.color : "transparent", color: order.status === key ? "#FFF" : "rgba(26,48,64,0.5)", fontFamily: "sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
+                              style={{ padding: "6px 14px", borderRadius: "2px", border: `1px solid ${order.status === key ? val.color : "rgba(15,30,61,0.15)"}`, background: order.status === key ? val.color : "transparent", color: order.status === key ? "#FFF" : "rgba(15,30,61,0.5)", fontFamily: "sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
                               {val.label}
                             </button>
                           );
@@ -214,10 +214,10 @@ export default function AdminOrders({ orders, products }: { orders: Order[]; pro
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {products.map((p) => (
               <div key={p.id} style={{ background: "#FFFFFF", borderRadius: "12px", padding: "16px 20px", display: "flex", alignItems: "center", gap: "16px" }}>
-                <span style={{ flex: 1, fontFamily: "sans-serif", fontSize: "13px", fontWeight: 700, color: "#1A3040" }}>{p.name_de}</span>
-                <span style={{ fontFamily: "sans-serif", fontSize: "13px", color: "rgba(26,48,64,0.5)" }}>CHF {Number(p.price).toFixed(2)}</span>
+                <span style={{ flex: 1, fontFamily: "sans-serif", fontSize: "13px", fontWeight: 700, color: "#0F1E3D" }}>{p.name_de}</span>
+                <span style={{ fontFamily: "sans-serif", fontSize: "13px", color: "rgba(15,30,61,0.5)" }}>CHF {Number(p.price).toFixed(2)}</span>
                 <button onClick={() => toggleProduct(p.id, !p.active)}
-                  style={{ padding: "6px 16px", borderRadius: "9999px", border: "none", background: p.active ? "#2E7D5E" : "rgba(26,48,64,0.1)", color: p.active ? "#FFF" : "rgba(26,48,64,0.4)", fontFamily: "sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
+                  style={{ padding: "6px 16px", borderRadius: "2px", border: "none", background: p.active ? "#3F4F3A" : "rgba(15,30,61,0.1)", color: p.active ? "#FFF" : "rgba(15,30,61,0.4)", fontFamily: "sans-serif", fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
                   {p.active ? "Aktiv" : "Inaktiv"}
                 </button>
               </div>

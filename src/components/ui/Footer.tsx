@@ -11,8 +11,8 @@ import NewsletterInput from "./NewsletterInput";
 const INSTAGRAM_URL = "https://www.instagram.com/veranoexotico/";
 
 const SAND = "#FAF7F2";
-const INK = "#1A3040";
-const INK_SOFT = "rgba(26,48,64,0.7)";
+const INK = "#0F1E3D";
+const INK_SOFT = "rgba(15,30,61,0.7)";
 
 const headingStyle: React.CSSProperties = {
   fontSize: "11px",
@@ -89,7 +89,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               aria-label="Instagram"
               className="inline-flex items-center justify-center mt-6"
-              style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(26,48,64,0.3)", color: INK }}
+              style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(15,30,61,0.3)", color: INK }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="2" y="2" width="20" height="20" rx="5" />
@@ -124,11 +124,11 @@ export default function Footer() {
         </div>
 
         {/* Handy: Gruppen als Klappzeilen */}
-        <div className="md:hidden mt-10" style={{ borderTop: "1px solid rgba(26,48,64,0.15)" }}>
+        <div className="md:hidden mt-10" style={{ borderTop: "1px solid rgba(15,30,61,0.15)" }}>
           {columns.map((col) => {
             const open = openCol === col.title;
             return (
-              <div key={col.title} style={{ borderBottom: "1px solid rgba(26,48,64,0.15)" }}>
+              <div key={col.title} style={{ borderBottom: "1px solid rgba(15,30,61,0.15)" }}>
                 <button
                   type="button"
                   onClick={() => setOpenCol(open ? null : col.title)}
@@ -155,7 +155,7 @@ export default function Footer() {
         {/* Bleib in Verbindung */}
         <div
           className="mt-14 pt-10 grid gap-6 md:grid-cols-2 md:items-end"
-          style={{ borderTop: "1px solid rgba(26,48,64,0.15)" }}
+          style={{ borderTop: "1px solid rgba(15,30,61,0.15)" }}
         >
           <div>
             <p style={{ ...headingStyle, marginBottom: "10px" }}>{t("newsletter_title")}</p>
@@ -172,7 +172,7 @@ export default function Footer() {
         {/* Copyright */}
         <div
           className="mt-12 pt-6 flex flex-wrap items-center justify-between gap-3"
-          style={{ borderTop: "1px solid rgba(26,48,64,0.15)", fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.55)" }}
+          style={{ borderTop: "1px solid rgba(15,30,61,0.15)", fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.55)" }}
         >
           <p>© {new Date().getFullYear()} – Verano Exotico</p>
           <p>{t("payment_note")}</p>

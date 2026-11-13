@@ -57,10 +57,10 @@ export default function CookieConsent() {
             maxWidth: "560px",
             marginLeft: "auto",
             background: "#F8F3E8",
-            color: "#1A3040",
-            border: "1px solid rgba(26,48,64,0.12)",
+            color: "#0F1E3D",
+            border: "1px solid rgba(15,30,61,0.12)",
             borderRadius: "14px",
-            boxShadow: "0 18px 40px -18px rgba(26,48,64,0.45)",
+            boxShadow: "0 18px 40px -18px rgba(15,30,61,0.45)",
             padding: "20px 22px",
           }}
         >
@@ -69,7 +69,7 @@ export default function CookieConsent() {
               fontSize: "10px",
               letterSpacing: "0.3em",
               textTransform: "uppercase",
-              color: "#D4AF37",
+              color: "#A8894F",
               fontFamily: "var(--font-geist-mono)",
               margin: "0 0 10px",
             }}
@@ -81,14 +81,14 @@ export default function CookieConsent() {
               fontSize: "13px",
               lineHeight: 1.65,
               fontFamily: "var(--font-syne)",
-              color: "rgba(26,48,64,0.8)",
+              color: "rgba(15,30,61,0.8)",
               margin: 0,
             }}
           >
             {t("text")}{" "}
             <a
               href={`/${locale}/datenschutz`}
-              style={{ color: "#1A3040", textDecoration: "underline", textUnderlineOffset: "3px" }}
+              style={{ color: "#0F1E3D", textDecoration: "underline", textUnderlineOffset: "3px" }}
             >
               {t("link")}
             </a>
@@ -103,12 +103,12 @@ export default function CookieConsent() {
                 flex: "1 1 160px",
                 minHeight: "44px",
                 padding: "0 20px",
-                background: "#D4AF37",
-                color: "#1A3040",
+                background: "#A8894F",
+                color: "#0F1E3D",
                 border: "none",
                 cursor: "pointer",
                 fontFamily: "var(--font-archivo-black), sans-serif",
-                fontWeight: 900,
+                fontWeight: 500,
                 fontSize: "10px",
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
@@ -125,8 +125,8 @@ export default function CookieConsent() {
                 minHeight: "44px",
                 padding: "0 20px",
                 background: "transparent",
-                color: "rgba(26,48,64,0.75)",
-                border: "1px solid rgba(26,48,64,0.22)",
+                color: "rgba(15,30,61,0.75)",
+                border: "1px solid rgba(15,30,61,0.22)",
                 cursor: "pointer",
                 fontFamily: "var(--font-geist-mono)",
                 fontSize: "10px",

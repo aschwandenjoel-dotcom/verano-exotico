@@ -24,18 +24,18 @@ export default function Philosophy({ locale }: { locale: Locale }) {
   const tp = useTranslations("philosophy");
   const year = new Date().getFullYear();
   return (
-    <div style={{ background: "#F8F3E8", color: "#1A3040" }}>
+    <div style={{ background: "#F8F3E8", color: "#0F1E3D" }}>
       {/* ── HERO ────────────────────────────────────────────────── */}
         <section
           className="px-6 md:px-10 pt-16 md:pt-20 pb-12"
-          style={{ borderBottom: "1px solid rgba(26,48,64,0.1)", position: "relative", overflow: "hidden", display: "grid", gridTemplateRows: "auto auto auto" }}
+          style={{ borderBottom: "1px solid rgba(15,30,61,0.1)", position: "relative", overflow: "hidden", display: "grid", gridTemplateRows: "auto auto auto" }}
         >
           {/* Meta row */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "clamp(3rem,8vw,5rem)" }}>
-            <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)" }}>
+            <span style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(15,30,61,0.4)", fontFamily: "var(--font-geist-mono)" }}>
               {t("season", { year })}
             </span>
-            <h1 style={{ fontSize: "10px", fontWeight: 400, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", margin: 0 }}>
+            <h1 style={{ fontSize: "10px", fontWeight: 400, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(15,30,61,0.4)", fontFamily: "var(--font-geist-mono)", margin: 0 }}>
               {tp("h1")}
             </h1>
           </div>
@@ -43,16 +43,16 @@ export default function Philosophy({ locale }: { locale: Locale }) {
           {/* Headline */}
           <div style={{ padding: "40px 0" }}>
             <div style={{ marginBottom: "28px" }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(26,48,64,0.06)", borderRadius: "9999px", padding: "6px 16px", fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(26,48,64,0.5)" }}>
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#D4AF37", display: "inline-block" }} />
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(15,30,61,0.06)", borderRadius: "2px", padding: "6px 16px", fontSize: "10px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(15,30,61,0.5)" }}>
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#A8894F", display: "inline-block" }} />
                 {t("badge", { year })}
               </span>
             </div>
             <p style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
-              <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.02em", color: "#1A3040" }}>
+              <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "-0.02em", color: "#0F1E3D" }}>
                 Golden Days,
               </span>
-              <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", textTransform: "none", letterSpacing: "-0.02em" }}>
+              <span className="hero-word" style={{ display: "block", fontSize: "clamp(2.8rem, 9vw, 9rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#A8894F", textTransform: "none", letterSpacing: "-0.02em" }}>
                 Timeless Wear.
               </span>
             </p>
@@ -60,17 +60,17 @@ export default function Philosophy({ locale }: { locale: Locale }) {
   
           {/* Bottom row */}
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
-            <p className="text-sm max-w-sm leading-relaxed md:max-w-xs" style={{ color: "rgba(26,48,64,0.65)", fontFamily: "var(--font-syne)" }}>
+            <p className="text-sm max-w-sm leading-relaxed md:max-w-xs" style={{ color: "rgba(15,30,61,0.65)", fontFamily: "var(--font-syne)" }}>
               {t("hero_sub_1")}
-              <em style={{ color: "#D4AF37", fontFamily: "var(--font-dm-serif)" }}>Golden Days</em>
+              <em style={{ color: "#A8894F", fontFamily: "var(--font-dm-serif)" }}>Golden Days</em>
               {t("hero_sub_2")}
-              <em style={{ color: "#D4AF37", fontFamily: "var(--font-dm-serif)" }}>Timeless Wear</em>
+              <em style={{ color: "#A8894F", fontFamily: "var(--font-dm-serif)" }}>Timeless Wear</em>
               {t("hero_sub_3")}
             </p>
             <Link
               href={`/${locale}/collection`}
               className="btn-shimmer inline-flex items-center gap-3 text-[11px] font-black tracking-[0.25em] uppercase px-7 py-4 hover:opacity-80 transition-opacity"
-              style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px" }}
+              style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#A8894F", color: "#0F1E3D", minHeight: "44px" }}
             >
               {t("cta_shop")}
               <span aria-hidden="true">→</span>
@@ -79,7 +79,7 @@ export default function Philosophy({ locale }: { locale: Locale }) {
         </section>
   
         {/* ── TICKER STRIP ────────────────────────────────────────── */}
-        <div className="overflow-hidden py-3" style={{ background: "#1A3040" }}>
+        <div className="overflow-hidden py-3" style={{ background: "#0F1E3D" }}>
           <div
             className="flex gap-12 whitespace-nowrap"
             style={{ animation: "marquee 22s linear infinite" }}
@@ -100,7 +100,7 @@ export default function Philosophy({ locale }: { locale: Locale }) {
         {/* ── PHILOSOPHY ──────────────────────────────────────────── */}
         <section
           className="px-6 md:px-10 py-24 md:py-36 relative overflow-hidden"
-          style={{ background: "#0A3D52", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+          style={{ background: "#0F1E3D", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
         >
           {/* Grain overlay */}
           <div
@@ -116,7 +116,7 @@ export default function Philosophy({ locale }: { locale: Locale }) {
           <div className="max-w-3xl mx-auto text-center relative">
             <p
               className="tracking-[0.4em] uppercase mb-8"
-              style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)", fontSize: "13px" }}
+              style={{ color: "#A8894F", fontFamily: "var(--font-geist-mono)", fontSize: "13px" }}
             >
               {t("philosophy_eyebrow")}
             </p>
@@ -134,16 +134,16 @@ export default function Philosophy({ locale }: { locale: Locale }) {
   
             <div
               className="mx-auto mb-10"
-              style={{ width: "40px", height: "2px", background: "#D4AF37" }}
+              style={{ width: "40px", height: "2px", background: "#A8894F" }}
             />
   
             <p
               className="text-base md:text-lg leading-loose"
               style={{ color: "rgba(228,244,247,0.75)", fontFamily: "var(--font-syne)" }}
             >
-              <strong style={{ color: "#E4F4F7" }}>Golden Days</strong>
+              <strong style={{ color: "#EFE8DA" }}>Golden Days</strong>
               {t("phil_1")}
-              <strong style={{ color: "#E4F4F7" }}>Timeless Wear</strong>
+              <strong style={{ color: "#EFE8DA" }}>Timeless Wear</strong>
               {t("phil_2")}
             </p>
           </div>
@@ -152,12 +152,12 @@ export default function Philosophy({ locale }: { locale: Locale }) {
         {/* ── EDITORIAL STATEMENT ─────────────────────────────────── */}
         <section
           className="px-6 md:px-10 py-20 md:py-28"
-          style={{ borderBottom: "1px solid rgba(26,48,64,0.1)" }}
+          style={{ borderBottom: "1px solid rgba(15,30,61,0.1)" }}
         >
           <div className="max-w-4xl">
             <span
               className="text-[10px] tracking-[0.35em] uppercase block mb-6"
-              style={{ color: "#00B4C5", fontFamily: "var(--font-geist-mono)" }}
+              style={{ color: "#A8894F", fontFamily: "var(--font-geist-mono)" }}
             >
               {t("manifest_eyebrow")}
             </span>
@@ -168,7 +168,7 @@ export default function Philosophy({ locale }: { locale: Locale }) {
               <span className="block">Trends are</span>
               <span
                 className="block"
-                style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#00B4C5", textTransform: "none" }}
+                style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#A8894F", textTransform: "none" }}
               >
                 temporary.
               </span>
@@ -181,11 +181,11 @@ export default function Philosophy({ locale }: { locale: Locale }) {
         <section className="px-6 md:px-10 py-20 md:py-28">
           <p
             className="mx-auto max-w-3xl text-center text-base md:text-xl leading-relaxed"
-            style={{ color: "rgba(26,48,64,0.8)", fontFamily: "var(--font-syne)" }}
+            style={{ color: "rgba(15,30,61,0.8)", fontFamily: "var(--font-syne)" }}
           >
-            <strong style={{ color: "#1A3040" }}>Golden Days</strong>
+            <strong style={{ color: "#0F1E3D" }}>Golden Days</strong>
             {t("phil_1")}
-            <strong style={{ color: "#1A3040" }}>Timeless Wear</strong>
+            <strong style={{ color: "#0F1E3D" }}>Timeless Wear</strong>
             {t("phil_2")}
           </p>
         </section>

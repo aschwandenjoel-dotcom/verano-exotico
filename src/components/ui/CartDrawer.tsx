@@ -39,20 +39,20 @@ export default function CartDrawer() {
           position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 101,
           width: "min(420px, 100vw)",
           background: "#F8F3E8",
-          boxShadow: "-8px 0 40px rgba(26,48,64,0.12)",
+          boxShadow: "-8px 0 40px rgba(15,30,61,0.12)",
           display: "flex", flexDirection: "column",
           transform: isOpen ? "translateX(0)" : "translateX(100%)",
           transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
         }}
       >
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid rgba(26,48,64,0.08)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid rgba(15,30,61,0.08)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <h2 style={{ fontSize: "13px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.1em", color: "#1A3040", margin: 0 }}>
+            <h2 style={{ fontSize: "13px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.1em", color: "#0F1E3D", margin: 0 }}>
               {t("title")}
             </h2>
             {items.length > 0 && (
-              <span style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)" }}>
+              <span style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.45)" }}>
                 ({items.reduce((s, i) => s + i.quantity, 0)})
               </span>
             )}
@@ -60,7 +60,7 @@ export default function CartDrawer() {
           <button
             onClick={closeCart}
             aria-label={t("close")}
-            style={{ width: 34, height: 34, borderRadius: "50%", border: "1px solid rgba(26,48,64,0.15)", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", color: "#1A3040" }}
+            style={{ width: 34, height: 34, borderRadius: "50%", border: "1px solid rgba(15,30,61,0.15)", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", color: "#0F1E3D" }}
           >
             ×
           </button>
@@ -71,7 +71,7 @@ export default function CartDrawer() {
           {items.length === 0 ? (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "12px" }}>
               <span style={{ fontSize: "32px", opacity: 0.2 }}>○</span>
-              <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.1em" }}>
+              <p style={{ fontSize: "13px", color: "rgba(15,30,61,0.4)", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.1em" }}>
                 {t("empty")}
               </p>
             </div>
@@ -91,42 +91,42 @@ export default function CartDrawer() {
 
                   {/* Info */}
                   <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <p style={{ fontSize: "12px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", margin: 0, lineHeight: 1.3 }}>
+                    <p style={{ fontSize: "12px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, textTransform: "uppercase", color: "#0F1E3D", margin: 0, lineHeight: 1.3 }}>
                       {item.name}
                     </p>
                     {item.size && (
-                      <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)", margin: 0 }}>
+                      <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.45)", margin: 0 }}>
                         {item.size}
                       </p>
                     )}
                     {item.colorName && (
                       <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                        {item.color && <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: item.color, border: "1px solid rgba(26,48,64,0.15)" }} />}
-                        <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)", margin: 0 }}>{item.colorName}</p>
+                        {item.color && <div style={{ width: "10px", height: "10px", borderRadius: "50%", background: item.color, border: "1px solid rgba(15,30,61,0.15)" }} />}
+                        <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.45)", margin: 0 }}>{item.colorName}</p>
                       </div>
                     )}
 
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "8px" }}>
                       {/* Qty stepper */}
-                      <div style={{ display: "flex", alignItems: "center", gap: "0", border: "1px solid rgba(26,48,64,0.12)", borderRadius: "9999px", overflow: "hidden" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0", border: "1px solid rgba(15,30,61,0.12)", borderRadius: "2px", overflow: "hidden" }}>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          style={{ width: "28px", height: "28px", border: "none", background: "transparent", cursor: "pointer", fontSize: "16px", color: "#1A3040", display: "flex", alignItems: "center", justifyContent: "center" }}
+                          style={{ width: "28px", height: "28px", border: "none", background: "transparent", cursor: "pointer", fontSize: "16px", color: "#0F1E3D", display: "flex", alignItems: "center", justifyContent: "center" }}
                         >
                           −
                         </button>
-                        <span style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "#1A3040", minWidth: "20px", textAlign: "center" }}>
+                        <span style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "#0F1E3D", minWidth: "20px", textAlign: "center" }}>
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          style={{ width: "28px", height: "28px", border: "none", background: "transparent", cursor: "pointer", fontSize: "16px", color: "#1A3040", display: "flex", alignItems: "center", justifyContent: "center" }}
+                          style={{ width: "28px", height: "28px", border: "none", background: "transparent", cursor: "pointer", fontSize: "16px", color: "#0F1E3D", display: "flex", alignItems: "center", justifyContent: "center" }}
                         >
                           +
                         </button>
                       </div>
 
-                      <p style={{ fontSize: "13px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: "#1A3040", margin: 0 }}>
+                      <p style={{ fontSize: "13px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: "#0F1E3D", margin: 0 }}>
                         CHF {(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
@@ -136,9 +136,9 @@ export default function CartDrawer() {
                   <button
                     onClick={() => removeItem(item.id)}
                     aria-label={t("remove")}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(26,48,64,0.3)", fontSize: "14px", padding: "0", alignSelf: "flex-start", lineHeight: 1, transition: "color 0.15s" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "#1A3040")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(26,48,64,0.3)")}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(15,30,61,0.3)", fontSize: "14px", padding: "0", alignSelf: "flex-start", lineHeight: 1, transition: "color 0.15s" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#0F1E3D")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(15,30,61,0.3)")}
                   >
                     ×
                   </button>
@@ -150,7 +150,7 @@ export default function CartDrawer() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div style={{ padding: "20px 24px", borderTop: "1px solid rgba(26,48,64,0.08)" }}>
+          <div style={{ padding: "20px 24px", borderTop: "1px solid rgba(15,30,61,0.08)" }}>
             <ExpressCheckout locale={locale as Locale} onLeave={closeCart} />
           </div>
         )}

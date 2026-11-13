@@ -65,9 +65,9 @@ function Answer({ text }: { text: string }) {
     <p>
       {parts.map((part, i) =>
         part === "info@verano-exotico.ch" ? (
-          <a key={i} href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>{part}</a>
+          <a key={i} href="mailto:info@verano-exotico.ch" style={{ color: "#0F1E3D" }}>{part}</a>
         ) : part === "+41 79 389 66 59" ? (
-          <a key={i} href="tel:+41793896659" style={{ color: "#1A3040" }}>{part}</a>
+          <a key={i} href="tel:+41793896659" style={{ color: "#0F1E3D" }}>{part}</a>
         ) : (
           part
         )

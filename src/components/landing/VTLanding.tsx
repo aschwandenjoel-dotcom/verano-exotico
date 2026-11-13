@@ -74,7 +74,7 @@ function ProductRow({
         <Link
           href={href}
           className="text-[10px] tracking-[0.25em] uppercase whitespace-nowrap underline underline-offset-4"
-          style={{ color: "#1A3040", fontFamily: "var(--font-geist-mono)" }}
+          style={{ color: "#0F1E3D", fontFamily: "var(--font-geist-mono)" }}
         >
           {linkLabel}
         </Link>
@@ -94,7 +94,7 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
   const t = useTranslations("landing");
   const year = new Date().getFullYear();
   return (
-    <div className="min-h-screen" style={{ background: "#F8F3E8", color: "#1A3040" }}>
+    <div className="min-h-screen" style={{ background: "#F8F3E8", color: "#0F1E3D" }}>
       {/* ── TITELBILD (bildschirmhoch, Header darüber durchsichtig) ── */}
       <section className="relative overflow-hidden" style={{ height: "100svh", minHeight: "520px" }}>
         <Image
@@ -112,14 +112,14 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
         />
         {/* dezent unten links, damit das Model in der Mitte frei bleibt */}
         <div className="absolute left-6 md:left-10 bottom-10 md:bottom-14" style={{ color: "#F8F3E8", maxWidth: "520px" }}>
-          <p className="text-[10px] tracking-[0.35em] uppercase mb-3" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
+          <p className="text-[10px] tracking-[0.35em] uppercase mb-3" style={{ color: "#A8894F", fontFamily: "var(--font-geist-mono)" }}>
             {t("season", { year })}
           </p>
           <p style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
-            <span style={{ display: "block", fontSize: "clamp(1.8rem, 4vw, 3.4rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.01em" }}>
+            <span style={{ display: "block", fontSize: "clamp(1.8rem, 4vw, 3.4rem)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "-0.01em" }}>
               Golden Days,
             </span>
-            <span style={{ display: "block", fontSize: "clamp(1.8rem, 4vw, 3.4rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37" }}>
+            <span style={{ display: "block", fontSize: "clamp(1.8rem, 4vw, 3.4rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#A8894F" }}>
               Timeless Wear.
             </span>
           </p>
@@ -201,7 +201,7 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
           // h1 für Google – das Panorama hat keine Überschrift
           <h1
             className="text-[10px] tracking-[0.3em] uppercase mb-2"
-            style={{ color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", fontWeight: 400 }}
+            style={{ color: "rgba(15,30,61,0.5)", fontFamily: "var(--font-geist-mono)", fontWeight: 400 }}
           >
             {t("seo_h1")}
           </h1>
@@ -258,14 +258,14 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
         <AiBadge inset={16} />
         <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(5,25,35,0.6), rgba(5,25,35,0.1) 60%)" }} />
         <div className="relative px-6 md:px-16 flex flex-col justify-center min-h-[600px] md:min-h-0 md:h-full reveal" style={{ maxWidth: "720px" }}>
-          <p className="text-[10px] tracking-[0.35em] uppercase mb-5" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
+          <p className="text-[10px] tracking-[0.35em] uppercase mb-5" style={{ color: "#A8894F", fontFamily: "var(--font-geist-mono)" }}>
             {t("season", { year })}
           </p>
           <p style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
-            <span style={{ display: "block", fontSize: "clamp(2.4rem, 6vw, 5.5rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.02em", color: "#F8F3E8" }}>
+            <span style={{ display: "block", fontSize: "clamp(2.4rem, 6vw, 5.5rem)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "-0.02em", color: "#F8F3E8" }}>
               Golden Days,
             </span>
-            <span style={{ display: "block", fontSize: "clamp(2.4rem, 6vw, 5.5rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", letterSpacing: "-0.02em" }}>
+            <span style={{ display: "block", fontSize: "clamp(2.4rem, 6vw, 5.5rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#A8894F", letterSpacing: "-0.02em" }}>
               Timeless Wear.
             </span>
           </p>

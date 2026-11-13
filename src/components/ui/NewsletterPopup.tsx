@@ -86,14 +86,14 @@ export default function NewsletterPopup() {
         </div>
 
         <div className="flex flex-col justify-center text-center" style={{ padding: "56px clamp(24px, 5vw, 48px)" }}>
-          <h2 id="nl-popup-title" style={{ fontFamily: "var(--font-dm-serif)", fontSize: "clamp(1.9rem, 3.5vw, 2.6rem)", color: "#1A3040", lineHeight: 1.1, marginBottom: "18px" }}>
+          <h2 id="nl-popup-title" style={{ fontFamily: "var(--font-dm-serif)", fontSize: "clamp(1.9rem, 3.5vw, 2.6rem)", color: "#0F1E3D", lineHeight: 1.1, marginBottom: "18px" }}>
             {t("popup_title", { percent: WELCOME_DISCOUNT_PERCENT })}
           </h2>
-          <p style={{ fontSize: "15px", lineHeight: 1.6, color: "#1A3040", marginBottom: "28px" }}>
+          <p style={{ fontSize: "15px", lineHeight: 1.6, color: "#0F1E3D", marginBottom: "28px" }}>
             {t("popup_text", { percent: WELCOME_DISCOUNT_PERCENT })}
           </p>
           <NewsletterInput variant="light" onSuccess={() => write(() => localStorage, SUBSCRIBED_KEY, String(Date.now()))} />
-          <p style={{ fontSize: "11px", lineHeight: 1.6, color: "rgba(26,48,64,0.6)", marginTop: "22px" }}>
+          <p style={{ fontSize: "11px", lineHeight: 1.6, color: "rgba(15,30,61,0.6)", marginTop: "22px" }}>
             {t.rich("popup_fine", {
               privacy: (chunks) => (
                 <a href={`/${locale}/datenschutz`} style={{ textDecoration: "underline", textUnderlineOffset: "2px", color: "inherit" }}>
@@ -110,7 +110,7 @@ export default function NewsletterPopup() {
           aria-label={t("close")}
           style={{
             position: "absolute", top: 14, right: 14, width: 40, height: 40, borderRadius: "50%",
-            border: "1.5px solid #1A3040", background: "#FFFFFF", color: "#1A3040",
+            border: "1.5px solid #0F1E3D", background: "#FFFFFF", color: "#0F1E3D",
             fontSize: 20, lineHeight: 1, cursor: "pointer",
           }}
         >

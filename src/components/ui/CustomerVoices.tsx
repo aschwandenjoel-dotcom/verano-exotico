@@ -66,9 +66,9 @@ function flag(country: string | null): string {
 
 function Stars({ value }: { value: number }) {
   return (
-    <span aria-hidden="true" style={{ color: "#B8922A", fontSize: "11px", letterSpacing: "3px" }}>
+    <span aria-hidden="true" style={{ color: "#8C7142", fontSize: "11px", letterSpacing: "3px" }}>
       {"★".repeat(Math.max(1, Math.min(5, value)))}
-      <span style={{ color: "rgba(26,48,64,0.18)" }}>{"★".repeat(5 - Math.max(1, Math.min(5, value)))}</span>
+      <span style={{ color: "rgba(15,30,61,0.18)" }}>{"★".repeat(5 - Math.max(1, Math.min(5, value)))}</span>
     </span>
   );
 }
@@ -88,7 +88,7 @@ function VoiceCard({ voice, locale, copy = false }: { voice: Voice; locale: Loca
           fontFamily: "var(--font-dm-serif)",
           fontSize: "19px",
           lineHeight: 1.55,
-          color: "#1A3040",
+          color: "#0F1E3D",
         }}
       >
         «{voice.comment}»
@@ -101,7 +101,7 @@ function VoiceCard({ voice, locale, copy = false }: { voice: Voice; locale: Loca
           fontFamily: "var(--font-geist-mono)",
           letterSpacing: "0.18em",
           textTransform: "uppercase",
-          color: "rgba(26,48,64,0.5)",
+          color: "rgba(15,30,61,0.5)",
         }}
       >
         {flag(voice.country) && <span aria-hidden="true">{flag(voice.country)} </span>}
@@ -109,7 +109,7 @@ function VoiceCard({ voice, locale, copy = false }: { voice: Voice; locale: Loca
         {" · "}
         <Link
           href={`/${locale}/product/${voice.slug}`}
-          style={{ color: "rgba(26,48,64,0.75)", textDecoration: "underline", textUnderlineOffset: "3px" }}
+          style={{ color: "rgba(15,30,61,0.75)", textDecoration: "underline", textUnderlineOffset: "3px" }}
         >
           {locale === "de" ? voice.product.de : voice.product.en}
         </Link>
@@ -127,29 +127,29 @@ function VoicesHeading({ label, lead, accent }: { label: string; lead: string; a
   return (
     <div className="text-center reveal" style={{ marginBottom: "clamp(3rem, 6vw, 5rem)" }}>
       <p
-        style={{ color: "rgba(26,48,64,0.5)", fontSize: "10px", letterSpacing: "0.45em", textTransform: "uppercase", fontFamily: "var(--font-geist-mono)", marginBottom: "1.5rem" }}
+        style={{ color: "rgba(15,30,61,0.5)", fontSize: "10px", letterSpacing: "0.45em", textTransform: "uppercase", fontFamily: "var(--font-geist-mono)", marginBottom: "1.5rem" }}
       >
         {label}
       </p>
       <h2
         style={{
           fontFamily: "var(--font-archivo-black), sans-serif",
-          fontWeight: 900,
+          fontWeight: 500,
           // 1.9rem: "WAS KÄUFERINNEN" passt auch auf 360 px breiten Handys in eine Zeile
           fontSize: "clamp(1.9rem, 4.6vw, 4rem)",
           lineHeight: 1.0,
           letterSpacing: "-0.03em",
           textTransform: "uppercase",
-          color: "#1A3040",
+          color: "#0F1E3D",
         }}
       >
         {lead}
         <br />
-        <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#D4AF37", textTransform: "none", letterSpacing: "-0.02em" }}>
+        <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#A8894F", textTransform: "none", letterSpacing: "-0.02em" }}>
           {accent}
         </span>
       </h2>
-      <div style={{ width: "40px", height: "1px", background: "#D4AF37", margin: "2rem auto 0" }} />
+      <div style={{ width: "40px", height: "1px", background: "#A8894F", margin: "2rem auto 0" }} />
     </div>
   );
 }
@@ -229,7 +229,7 @@ export default function CustomerVoices({
 
         <p
           className="text-center text-[10px] leading-relaxed px-6"
-          style={{ fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.38)", maxWidth: "620px", margin: "36px auto 0" }}
+          style={{ fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.38)", maxWidth: "620px", margin: "36px auto 0" }}
         >
           {t("source_note")}
         </p>
@@ -265,8 +265,8 @@ export default function CustomerVoices({
               aria-label={t("aria_prev")}
               onClick={() => go(-1)}
               style={arrowStyle}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "#1A3040"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(26,48,64,0.35)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "#0F1E3D"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(15,30,61,0.35)"; }}
             >
               ‹
             </button>
@@ -294,7 +294,7 @@ export default function CustomerVoices({
                   fontFamily: "var(--font-dm-serif)",
                   fontSize: "clamp(1.15rem, 2.4vw, 1.6rem)",
                   lineHeight: 1.5,
-                  color: "#1A3040",
+                  color: "#0F1E3D",
                 }}
               >
                 «{v.comment}»
@@ -306,7 +306,7 @@ export default function CustomerVoices({
                   fontSize: "9.5px",
                   letterSpacing: "0.18em",
                   textTransform: "uppercase",
-                  color: "rgba(26,48,64,0.5)",
+                  color: "rgba(15,30,61,0.5)",
                 }}
               >
                 {flag(v.country) && <span aria-hidden="true">{flag(v.country)} </span>}
@@ -314,7 +314,7 @@ export default function CustomerVoices({
                 {" · "}
                 <Link
                   href={`/${locale}/product/${v.slug}`}
-                  style={{ color: "rgba(26,48,64,0.75)", textDecoration: "underline", textUnderlineOffset: "3px" }}
+                  style={{ color: "rgba(15,30,61,0.75)", textDecoration: "underline", textUnderlineOffset: "3px" }}
                 >
                   {productName}
                 </Link>
@@ -328,8 +328,8 @@ export default function CustomerVoices({
               aria-label={t("aria_next")}
               onClick={() => go(1)}
               style={arrowStyle}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "#1A3040"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(26,48,64,0.35)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "#0F1E3D"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(15,30,61,0.35)"; }}
             >
               ›
             </button>
@@ -349,11 +349,11 @@ export default function CustomerVoices({
                 style={{
                   width: i === index ? "20px" : "7px",
                   height: "7px",
-                  borderRadius: "9999px",
+                  borderRadius: "2px",
                   border: "none",
                   padding: 0,
                   cursor: "pointer",
-                  background: i === index ? "#D4AF37" : "rgba(26,48,64,0.2)",
+                  background: i === index ? "#A8894F" : "rgba(15,30,61,0.2)",
                   transition: "width .25s ease, background .25s ease",
                 }}
               />
@@ -363,7 +363,7 @@ export default function CustomerVoices({
         {voices.length > 12 && (
           <p
             className="text-center mt-6 text-[10px]"
-            style={{ fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.35)" }}
+            style={{ fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.35)" }}
           >
             {index + 1} / {voices.length}
           </p>
@@ -376,7 +376,7 @@ export default function CustomerVoices({
             über das der Shop seinen Produktfeed ausliefert. */}
         <p
           className="text-center text-[10px] leading-relaxed"
-          style={{ fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.38)", maxWidth: "620px", margin: "28px auto 0" }}
+          style={{ fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.38)", maxWidth: "620px", margin: "28px auto 0" }}
         >
           {t("source_note")}
         </p>
@@ -392,7 +392,7 @@ const arrowStyle: React.CSSProperties = {
   fontSize: "26px",
   lineHeight: 1,
   cursor: "pointer",
-  color: "rgba(26,48,64,0.35)",
+  color: "rgba(15,30,61,0.35)",
   transition: "color .2s",
   flexShrink: 0,
 };

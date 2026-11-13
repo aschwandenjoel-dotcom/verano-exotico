@@ -43,7 +43,7 @@ export function PalmShadow({
       {/* Central trunk shadow */}
       <path
         d="M280 620 Q278 520 275 400 Q272 300 270 200"
-        stroke="#1A3040"
+        stroke="#0F1E3D"
         strokeWidth="6"
         strokeLinecap="round"
         opacity="0.07"
@@ -51,41 +51,41 @@ export function PalmShadow({
       {/* Frond 1 – sweeps upper-left */}
       <path
         d="M270,200 Q200,140 100,60 Q140,120 190,175 Q228,195 270,200Z"
-        fill="#1A3040"
+        fill="#0F1E3D"
         opacity="0.07"
       />
       <path
         d="M270,200 Q195,135 90,50 Q95,70 115,95 Q165,155 240,192 Q255,197 270,200Z"
-        fill="#1A3040"
+        fill="#0F1E3D"
         opacity="0.04"
       />
       {/* Frond 2 – upper-right */}
       <path
         d="M270,200 Q360,140 460,70 Q420,130 370,178 Q314,197 270,200Z"
-        fill="#1A3040"
+        fill="#0F1E3D"
         opacity="0.07"
       />
       <path
         d="M270,200 Q380,150 490,80 Q480,100 460,120 Q400,165 300,194 Q282,199 270,200Z"
-        fill="#1A3040"
+        fill="#0F1E3D"
         opacity="0.04"
       />
       {/* Frond 3 – horizontal right */}
       <path
         d="M270,200 Q380,185 510,195 Q420,202 330,205 Q296,204 270,200Z"
-        fill="#1A3040"
+        fill="#0F1E3D"
         opacity="0.06"
       />
       {/* Frond 4 – horizontal left */}
       <path
         d="M270,200 Q160,188 20,195 Q110,203 210,205 Q244,204 270,200Z"
-        fill="#1A3040"
+        fill="#0F1E3D"
         opacity="0.06"
       />
       {/* Frond 5 – drooping right */}
       <path
         d="M270,200 Q360,240 480,300 Q400,260 330,230 Q296,214 270,200Z"
-        fill="#1A3040"
+        fill="#0F1E3D"
         opacity="0.05"
       />
     </svg>
@@ -117,53 +117,53 @@ export function LoungeChair({
         {/* Chair back (reclined ~30°) */}
         <path
           d="M40,170 L260,75"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="3"
           strokeLinecap="round"
         />
         {/* Seat */}
         <path
           d="M40,170 L295,170"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="3"
           strokeLinecap="round"
         />
         {/* Leg support – front pair */}
         <path
           d="M295,170 L295,196"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="2.5"
           strokeLinecap="round"
         />
         <path
           d="M255,170 L252,196"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="2"
           strokeLinecap="round"
         />
         {/* Leg support – back pair */}
         <path
           d="M60,170 L58,196"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="2.5"
           strokeLinecap="round"
         />
         <path
           d="M100,170 L98,196"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="2"
           strokeLinecap="round"
         />
         {/* Armrests */}
         <path
           d="M40,170 L38,148 Q42,144 60,140"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="2"
           strokeLinecap="round"
         />
         <path
           d="M295,170 L297,148 Q293,144 275,140"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="2"
           strokeLinecap="round"
         />
@@ -173,13 +173,13 @@ export function LoungeChair({
           cy="72"
           rx="22"
           ry="9"
-          fill="#D4AF37"
+          fill="#A8894F"
           opacity="0.25"
         />
         {/* Fabric / towel stripes on seat */}
         <path
           d="M90,165 L125,80"
-          stroke="#00B4C5"
+          stroke="#A8894F"
           strokeWidth="10"
           strokeOpacity="0.06"
           strokeLinecap="round"
@@ -193,7 +193,7 @@ export function LoungeChair({
         />
         <path
           d="M180,166 L210,86"
-          stroke="#00B4C5"
+          stroke="#A8894F"
           strokeWidth="10"
           strokeOpacity="0.06"
           strokeLinecap="round"
@@ -228,7 +228,7 @@ export function BeachUmbrella({
         {/* Canopy segments */}
         <path
           d="M110,30 Q60,70 28,130 Q68,90 110,105Z"
-          fill="#00B4C5"
+          fill="#A8894F"
         />
         <path
           d="M110,30 Q110,78 110,105 Q152,90 192,130Z"
@@ -236,7 +236,7 @@ export function BeachUmbrella({
         />
         <path
           d="M110,30 Q160,70 192,130 Q155,150 110,155Z"
-          fill="#00B4C5"
+          fill="#A8894F"
         />
         <path
           d="M110,30 Q110,100 110,155 Q65,150 28,130Z"
@@ -248,7 +248,7 @@ export function BeachUmbrella({
           cy="132"
           rx="84"
           ry="22"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="1.5"
           fill="none"
           opacity="0.6"
@@ -261,7 +261,7 @@ export function BeachUmbrella({
             y1="80"
             x2={110 + 84 * Math.cos((deg * Math.PI) / 180)}
             y2={132 + 22 * Math.sin((deg * Math.PI) / 180)}
-            stroke="#D4AF37"
+            stroke="#A8894F"
             strokeWidth="0.8"
             opacity="0.35"
           />
@@ -272,25 +272,25 @@ export function BeachUmbrella({
           y1="105"
           x2="110"
           y2="296"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="3"
           strokeLinecap="round"
         />
         {/* Base cross */}
         <path
           d="M85,292 L135,292 M110,285 L110,300"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="2"
           strokeLinecap="round"
         />
         {/* Top spike */}
         <path
           d="M110,30 L110,18"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="2"
           strokeLinecap="round"
         />
-        <circle cx="110" cy="15" r="4" fill="#D4AF37" opacity="0.5" />
+        <circle cx="110" cy="15" r="4" fill="#A8894F" opacity="0.5" />
       </g>
     </svg>
   );
@@ -317,25 +317,25 @@ export function CoconutAccent({
         ...style,
       }}
     >
-      <circle cx="60" cy="65" r="32" fill="#2E7D5E" />
-      <ellipse cx="60" cy="65" rx="20" ry="28" fill="#1A3040" opacity="0.4" />
+      <circle cx="60" cy="65" r="32" fill="#3F4F3A" />
+      <ellipse cx="60" cy="65" rx="20" ry="28" fill="#0F1E3D" opacity="0.4" />
       <path
         d="M60,33 Q42,18 22,10 Q38,22 52,36"
-        stroke="#2E7D5E"
+        stroke="#3F4F3A"
         strokeWidth="5"
         fill="none"
         strokeLinecap="round"
       />
       <path
         d="M60,33 Q78,18 98,10 Q82,22 68,36"
-        stroke="#2E7D5E"
+        stroke="#3F4F3A"
         strokeWidth="5"
         fill="none"
         strokeLinecap="round"
       />
       <path
         d="M60,33 Q50,14 50,0 Q54,18 58,32"
-        stroke="#2E7D5E"
+        stroke="#3F4F3A"
         strokeWidth="4"
         fill="none"
         strokeLinecap="round"
@@ -370,12 +370,12 @@ export function SunsetScene() {
             <stop offset="48%" stopColor="#C04535" />
             <stop offset="65%" stopColor="#E07030" />
             <stop offset="78%" stopColor="#E8A830" />
-            <stop offset="90%" stopColor="#D4AF37" />
+            <stop offset="90%" stopColor="#A8894F" />
             <stop offset="100%" stopColor="#E8C97A" />
           </linearGradient>
           <linearGradient id="sg-water" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#C06030" stopOpacity="0.85" />
-            <stop offset="40%" stopColor="#0A3D52" stopOpacity="0.95" />
+            <stop offset="40%" stopColor="#0F1E3D" stopOpacity="0.95" />
             <stop offset="100%" stopColor="#061E2A" />
           </linearGradient>
           <radialGradient id="sg-sun-glow" cx="50%" cy="100%" r="60%">
@@ -482,7 +482,7 @@ export function SunsetScene() {
           y1="290"
           x2="1440"
           y2="290"
-          stroke="#D4AF37"
+          stroke="#A8894F"
           strokeWidth="1"
           opacity="0.5"
         />

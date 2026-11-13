@@ -51,7 +51,7 @@ export default async function CategoryPage({
       {/* Shop-Seiten weiss (Joel, 12.10.) */}
       <div style={{ background: "#FFFFFF" }}>
         <header className="max-w-6xl mx-auto px-6 md:px-10 pt-32 pb-10 text-center">
-          <nav aria-label="Breadcrumb" className="text-[10px] font-mono uppercase tracking-[0.25em] mb-6" style={{ color: "rgba(26,48,64,0.45)" }}>
+          <nav aria-label="Breadcrumb" className="text-[10px] font-mono uppercase tracking-[0.25em] mb-6" style={{ color: "rgba(15,30,61,0.45)" }}>
             <Link href={`/${loc}/collection`} style={{ color: "inherit" }}>Shop</Link>
             <span className="mx-2">/</span>
             <span>{text.h1}</span>
@@ -63,7 +63,7 @@ export default async function CategoryPage({
               lineHeight: 0.95,
               textTransform: "uppercase",
               letterSpacing: "-0.02em",
-              color: "#1A3040",
+              color: "#0F1E3D",
             }}
           >
             {text.h1}
@@ -82,19 +82,19 @@ export default async function CategoryPage({
                   fontSize: "clamp(1rem, 2vw, 1.25rem)",
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
-                  color: "#1A3040",
+                  color: "#0F1E3D",
                 }}
               >
                 {s.heading}
               </h2>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(26,48,64,0.7)" }}>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(15,30,61,0.7)" }}>
                 {s.body}
               </p>
             </div>
           ))}
 
           <div>
-            <h2 className="text-xs font-mono uppercase tracking-[0.25em] mb-4" style={{ color: "#5E7A8A" }}>
+            <h2 className="text-xs font-mono uppercase tracking-[0.25em] mb-4" style={{ color: "#5F6475" }}>
               {loc === "de" ? "Weitere Kategorien" : "More categories"}
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -102,8 +102,8 @@ export default async function CategoryPage({
                 <Link
                   key={c.slug}
                   href={`/${loc}/${c.slug}`}
-                  className="px-4 py-2 text-xs font-mono rounded-full"
-                  style={{ border: "1px solid rgba(26,48,64,0.2)", color: "#1A3040" }}
+                  className="px-4 py-2 text-xs font-mono"
+                  style={{ border: "1px solid rgba(15,30,61,0.2)", color: "#0F1E3D" }}
                 >
                   {c[loc].label}
                 </Link>

@@ -59,14 +59,14 @@ export default function ShopHero({ src, alt }: { src: string; alt: string }) {
         style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(5,25,35,0.4) 0%, rgba(5,25,35,0) 35%)" }}
       />
       <div className="absolute left-6 md:left-10" style={{ bottom: "clamp(56px, 7vw, 88px)", color: "#F8F3E8" }}>
-        <p className="text-[10px] tracking-[0.35em] uppercase mb-3" style={{ color: "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
+        <p className="text-[10px] tracking-[0.35em] uppercase mb-3" style={{ color: "#A8894F", fontFamily: "var(--font-geist-mono)" }}>
           {tl("season", { year })}
         </p>
         <p style={{ margin: 0, lineHeight: 1.0 }}>
-          <span style={{ display: "block", fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(1.6rem, 3.4vw, 3rem)", fontWeight: 900, textTransform: "uppercase", letterSpacing: "-0.01em" }}>
+          <span style={{ display: "block", fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(1.6rem, 3.4vw, 3rem)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "-0.01em" }}>
             {t("title_1")}
           </span>
-          <span style={{ display: "block", fontFamily: "var(--font-dm-serif)", fontSize: "clamp(1.6rem, 3.4vw, 3rem)", fontStyle: "italic", color: "#D4AF37" }}>
+          <span style={{ display: "block", fontFamily: "var(--font-dm-serif)", fontSize: "clamp(1.6rem, 3.4vw, 3rem)", fontStyle: "italic", color: "#A8894F" }}>
             {t("title_2")}
           </span>
         </p>

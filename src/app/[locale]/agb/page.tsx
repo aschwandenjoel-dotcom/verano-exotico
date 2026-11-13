@@ -98,7 +98,7 @@ export default async function AgbPage({
         <p>
           Es gelten die gesetzlichen Gewährleistungsrechte. Ist die gelieferte Ware
           mangelhaft, melden Sie sich bitte unter{" "}
-          <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a>{" "}
+          <a href="mailto:info@verano-exotico.ch" style={{ color: "#0F1E3D" }}>info@verano-exotico.ch</a>{" "}
           — wir finden eine Lösung (Ersatzlieferung oder Rückerstattung). Für Kundinnen
           und Kunden in der EU bleiben die zwingenden Verbraucherrechte ihres
           Wohnsitzstaates unberührt.

@@ -97,7 +97,7 @@ export function ProductTile({
         ) : (
           <div
             className="w-full h-full flex items-end justify-center pb-8 gap-2"
-            style={{ background: "#E4F4F7" }}
+            style={{ background: "#EFE8DA" }}
           >
             {product.colors.slice(0, 3).map((c, i) => (
               <div key={c} style={{ background: c, width: 32, height: 48 + i * 20, opacity: 0.85 }} />
@@ -112,11 +112,11 @@ export function ProductTile({
               position: "absolute",
               top: "12px",
               left: "12px",
-              background: "#D4AF37",
-              color: "#1A3040",
+              background: "#A8894F",
+              color: "#0F1E3D",
               fontSize: "9px",
               fontFamily: "var(--font-archivo-black), sans-serif",
-              fontWeight: 900,
+              fontWeight: 500,
               letterSpacing: "0.25em",
               textTransform: "uppercase",
               padding: "4px 8px",
@@ -135,7 +135,7 @@ export function ProductTile({
             fontSize: "9px",
             letterSpacing: "0.2em",
             textTransform: "uppercase",
-            color: "#D4AF37",
+            color: "#A8894F",
             fontFamily: "var(--font-geist-mono)",
             marginBottom: "3px",
           }}
@@ -146,10 +146,10 @@ export function ProductTile({
           style={{
             fontSize: featured ? "14px" : "12px",
             fontFamily: "var(--font-archivo-black), sans-serif",
-            fontWeight: 900,
+            fontWeight: 500,
             textTransform: "uppercase",
             letterSpacing: "0.03em",
-            color: "#1A3040",
+            color: "#0F1E3D",
             marginBottom: "4px",
             lineHeight: 1.2,
           }}
@@ -160,7 +160,7 @@ export function ProductTile({
           style={{
             fontSize: "13px",
             fontFamily: "var(--font-geist-mono)",
-            color: "#1A3040",
+            color: "#0F1E3D",
             fontWeight: featured ? 700 : 400,
           }}
         >
@@ -176,12 +176,12 @@ export function ProductTile({
                   width: "10px",
                   height: "10px",
                   background: color,
-                  border: "1px solid rgba(26,48,64,0.2)",
+                  border: "1px solid rgba(15,30,61,0.2)",
                 }}
               />
             ))}
             {product.colors.length > 4 && (
-              <span style={{ fontSize: "11px", color: "#5E7A8A", marginLeft: "2px", lineHeight: "10px" }}>
+              <span style={{ fontSize: "11px", color: "#5F6475", marginLeft: "2px", lineHeight: "10px" }}>
                 +{product.colors.length - 4}
               </span>
             )}
@@ -230,7 +230,7 @@ export default function CollectionGrid({ products, locale, showFilters = true, s
             top: `${HEADER_H}px`,
             zIndex: 40,
             background: stuck ? DARK_BLUE : "#FFFFFF",
-            borderBottom: `1px solid ${stuck ? "rgba(248,243,232,0.08)" : "rgba(26,48,64,0.08)"}`,
+            borderBottom: `1px solid ${stuck ? "rgba(248,243,232,0.08)" : "rgba(15,30,61,0.08)"}`,
             transition: "background 0.25s ease",
             padding: "0 clamp(1.5rem, 5vw, 2.5rem)",
           }}
@@ -261,10 +261,10 @@ export default function CollectionGrid({ products, locale, showFilters = true, s
                     fontFamily: "var(--font-geist-mono)",
                     letterSpacing: "0.15em",
                     textTransform: "uppercase",
-                    background: filter === f ? (stuck ? "#F8F3E8" : "#1A3040") : "transparent",
+                    background: filter === f ? (stuck ? "#F8F3E8" : "#0F1E3D") : "transparent",
                     color: filter === f
-                      ? (stuck ? "#1A3040" : "#F8F3E8")
-                      : (stuck ? "rgba(248,243,232,0.65)" : "rgba(26,48,64,0.5)"),
+                      ? (stuck ? "#0F1E3D" : "#F8F3E8")
+                      : (stuck ? "rgba(248,243,232,0.65)" : "rgba(15,30,61,0.5)"),
                     border: "none",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
@@ -288,7 +288,7 @@ export default function CollectionGrid({ products, locale, showFilters = true, s
                   fontFamily: "var(--font-geist-mono)",
                   letterSpacing: "0.1em",
                   textTransform: "uppercase",
-                  color: stuck ? "rgba(248,243,232,0.85)" : "rgba(26,48,64,0.6)",
+                  color: stuck ? "rgba(248,243,232,0.85)" : "rgba(15,30,61,0.6)",
                   background: "transparent",
                   border: "none",
                   cursor: "pointer",
@@ -296,14 +296,14 @@ export default function CollectionGrid({ products, locale, showFilters = true, s
                 }}
               >
                 {SORTS.map((s) => (
-                  <option key={s} value={s} style={{ color: "#1A3040" }}>{t(`sort_${s}`)}</option>
+                  <option key={s} value={s} style={{ color: "#0F1E3D" }}>{t(`sort_${s}`)}</option>
                 ))}
               </select>
               <span
                 style={{
                   fontSize: "10px",
                   fontFamily: "var(--font-geist-mono)",
-                  color: stuck ? "rgba(248,243,232,0.5)" : "rgba(26,48,64,0.35)",
+                  color: stuck ? "rgba(248,243,232,0.5)" : "rgba(15,30,61,0.35)",
                   letterSpacing: "0.1em",
                   paddingRight: "4px",
                 }}
@@ -318,7 +318,7 @@ export default function CollectionGrid({ products, locale, showFilters = true, s
       {/* ── Product grid ─────────────────────────────────────── */}
       <div style={{ padding: "clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 5vw, 2.5rem) 4rem" }}>
         {sorted.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "5rem 0", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", fontSize: "12px", letterSpacing: "0.15em", textTransform: "uppercase" }}>
+          <div style={{ textAlign: "center", padding: "5rem 0", color: "rgba(15,30,61,0.4)", fontFamily: "var(--font-geist-mono)", fontSize: "12px", letterSpacing: "0.15em", textTransform: "uppercase" }}>
             {t("empty")}
           </div>
         ) : (

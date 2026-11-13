@@ -47,7 +47,7 @@ export default function NewsletterInput({
 
   if (submitted) {
     return (
-      <p className="text-sm tracking-widest uppercase" style={{ color: light ? "#1A3040" : "#D4AF37", fontFamily: "var(--font-geist-mono)" }}>
+      <p className="text-sm tracking-widest uppercase" style={{ color: light ? "#0F1E3D" : "#A8894F", fontFamily: "var(--font-geist-mono)" }}>
         ✓ {t("success")}
       </p>
     );
@@ -65,13 +65,13 @@ export default function NewsletterInput({
         required
         className="flex-1 bg-transparent px-4 py-3 text-sm outline-none transition-colors"
         style={{
-          border: `1px solid ${light ? "rgba(26,48,64,0.35)" : "rgba(248,243,232,0.3)"}`,
-          color: light ? "#1A3040" : "#F8F3E8",
+          border: `1px solid ${light ? "rgba(15,30,61,0.35)" : "rgba(248,243,232,0.3)"}`,
+          color: light ? "#0F1E3D" : "#F8F3E8",
           fontFamily: "var(--font-geist-mono)",
           minHeight: light ? "52px" : "44px",
         }}
-        onFocus={(e) => (e.target.style.borderColor = light ? "#1A3040" : "#D4AF37")}
-        onBlur={(e) => (e.target.style.borderColor = light ? "rgba(26,48,64,0.35)" : "rgba(248,243,232,0.3)")}
+        onFocus={(e) => (e.target.style.borderColor = light ? "#0F1E3D" : "#A8894F")}
+        onBlur={(e) => (e.target.style.borderColor = light ? "rgba(15,30,61,0.35)" : "rgba(248,243,232,0.3)")}
       />
       <button
         type="submit"
@@ -79,8 +79,8 @@ export default function NewsletterInput({
         className="px-6 py-3 text-[10px] font-black tracking-[0.25em] uppercase transition-colors hover:opacity-80"
         style={{
           fontFamily: "var(--font-archivo-black), sans-serif",
-          background: light ? "#1A3040" : "#D4AF37",
-          color: light ? "#F8F3E8" : "#1A3040",
+          background: light ? "#0F1E3D" : "#A8894F",
+          color: light ? "#F8F3E8" : "#0F1E3D",
           minHeight: light ? "52px" : "44px",
           opacity: sending ? 0.7 : 1,
         }}

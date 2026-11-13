@@ -23,7 +23,7 @@ export default function ConsentReset({ label }: { label: string }) {
         border: "none",
         padding: 0,
         font: "inherit",
-        color: "#1A3040",
+        color: "#0F1E3D",
         textDecoration: "underline",
         textUnderlineOffset: "3px",
         cursor: "pointer",

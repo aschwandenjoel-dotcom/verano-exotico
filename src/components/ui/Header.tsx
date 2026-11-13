@@ -60,14 +60,14 @@ function LanguageSwitch({ locale, onNavigate, onLight = false }: { locale: Local
     >
       {LOCALES.map((l, i) => (
         <span key={l} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          {i > 0 && <span aria-hidden="true" style={{ color: onLight ? "rgba(26,48,64,0.3)" : "rgba(248,243,232,0.3)" }}>/</span>}
+          {i > 0 && <span aria-hidden="true" style={{ color: onLight ? "rgba(15,30,61,0.3)" : "rgba(248,243,232,0.3)" }}>/</span>}
           <Link
             href={pathFor(l)}
             onClick={onNavigate}
             aria-current={l === locale ? "true" : undefined}
             style={{
               color: onLight
-                ? (l === locale ? "#1A3040" : "rgba(26,48,64,0.45)")
+                ? (l === locale ? "#0F1E3D" : "rgba(15,30,61,0.45)")
                 : (l === locale ? CREAM : "rgba(248,243,232,0.55)"),
               fontWeight: l === locale ? 700 : 400,
               textDecoration: "none",
@@ -177,7 +177,7 @@ export default function Header({ locale, transparentAtTop = false }: Props) {
         <Link
           href={`/${locale}/collection`}
           className="hidden md:inline-flex items-center text-[10px] font-black tracking-[0.2em] uppercase px-4 py-2 hover:opacity-80 transition-opacity"
-          style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#D4AF37", color: "#1A3040", minHeight: "44px" }}
+          style={{ fontFamily: "var(--font-archivo-black), sans-serif", background: "#A8894F", color: "#0F1E3D", minHeight: "44px" }}
         >
           {t("cta")}
         </Link>
@@ -195,7 +195,7 @@ export default function Header({ locale, transparentAtTop = false }: Props) {
               <path d="M16 10a4 4 0 01-8 0"/>
             </svg>
             {totalCount > 0 && (
-              <span style={{ position: "absolute", top: "-4px", right: "-4px", width: "18px", height: "18px", borderRadius: "50%", background: "#D4AF37", color: "#1A3040", fontSize: "9px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ position: "absolute", top: "-4px", right: "-4px", width: "18px", height: "18px", borderRadius: "50%", background: "#A8894F", color: "#0F1E3D", fontSize: "9px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {totalCount > 9 ? "9+" : totalCount}
               </span>
             )}
@@ -259,7 +259,7 @@ function MobileMenu({ locale, pathname, onClose }: { locale: Locale; pathname: s
   const rowStyle: React.CSSProperties = {
     display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%",
     padding: "20px 0", background: "transparent", border: "none", cursor: "pointer",
-    color: "#1A3040", fontFamily: "var(--font-geist-mono)", fontSize: "13px",
+    color: "#0F1E3D", fontFamily: "var(--font-geist-mono)", fontSize: "13px",
     letterSpacing: "0.2em", textTransform: "uppercase", textDecoration: "none", textAlign: "left",
   };
 
@@ -275,12 +275,12 @@ function MobileMenu({ locale, pathname, onClose }: { locale: Locale; pathname: s
           animation: "menuIn 0.35s cubic-bezier(0.22,1,0.36,1)",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px", borderBottom: "1px solid rgba(26,48,64,0.1)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "72px", borderBottom: "1px solid rgba(15,30,61,0.1)" }}>
           <button
             type="button"
             onClick={onClose}
             aria-label={t("menu_close")}
-            style={{ width: 40, height: 40, marginLeft: -10, background: "transparent", border: "none", color: "#1A3040", fontSize: 26, lineHeight: 1, cursor: "pointer" }}
+            style={{ width: 40, height: 40, marginLeft: -10, background: "transparent", border: "none", color: "#0F1E3D", fontSize: 26, lineHeight: 1, cursor: "pointer" }}
           >
             ×
           </button>
@@ -292,7 +292,7 @@ function MobileMenu({ locale, pathname, onClose }: { locale: Locale; pathname: s
           href={`/${locale}`}
           onClick={onClose}
           aria-current={pathname === `/${locale}` ? "page" : undefined}
-          style={{ ...rowStyle, borderBottom: "1px solid rgba(26,48,64,0.1)" }}
+          style={{ ...rowStyle, borderBottom: "1px solid rgba(15,30,61,0.1)" }}
         >
           {t("home")}
         </Link>
@@ -300,7 +300,7 @@ function MobileMenu({ locale, pathname, onClose }: { locale: Locale; pathname: s
         {groups.map((g) => {
           const open = openGroup === g.id;
           return (
-            <div key={g.id} style={{ borderBottom: "1px solid rgba(26,48,64,0.1)" }}>
+            <div key={g.id} style={{ borderBottom: "1px solid rgba(15,30,61,0.1)" }}>
               <button type="button" onClick={() => setOpenGroup(open ? null : g.id)} aria-expanded={open} style={rowStyle}>
                 {g.label}
                 <span aria-hidden="true" style={{ fontSize: "20px", fontWeight: 300, letterSpacing: 0 }}>{open ? "−" : "+"}</span>
@@ -313,7 +313,7 @@ function MobileMenu({ locale, pathname, onClose }: { locale: Locale; pathname: s
                         href={l.href}
                         onClick={onClose}
                         aria-current={pathname === l.href ? "page" : undefined}
-                        style={{ display: "block", padding: "10px 0", fontFamily: "var(--font-syne)", fontSize: "15px", color: pathname === l.href ? "#B8922A" : "#1A3040", textDecoration: "none" }}
+                        style={{ display: "block", padding: "10px 0", fontFamily: "var(--font-syne)", fontSize: "15px", color: pathname === l.href ? "#8C7142" : "#0F1E3D", textDecoration: "none" }}
                       >
                         {l.label}
                       </Link>
@@ -332,7 +332,7 @@ function MobileMenu({ locale, pathname, onClose }: { locale: Locale; pathname: s
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(26,48,64,0.2)", color: "#1A3040", display: "flex", alignItems: "center", justifyContent: "center" }}
+            style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(15,30,61,0.2)", color: "#0F1E3D", display: "flex", alignItems: "center", justifyContent: "center" }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <rect x="2" y="2" width="20" height="20" rx="5" />

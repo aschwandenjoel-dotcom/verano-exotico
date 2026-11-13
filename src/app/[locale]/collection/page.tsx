@@ -57,8 +57,8 @@ export default async function CollectionPage({
               <Link
                 key={c.slug}
                 href={`/${locale}/${c.slug}`}
-                className="px-4 py-2 text-[11px] font-mono rounded-full whitespace-nowrap"
-                style={{ border: "1px solid rgba(26,48,64,0.2)", color: "#1A3040" }}
+                className="px-4 py-2 text-[11px] font-mono whitespace-nowrap"
+                style={{ border: "1px solid rgba(15,30,61,0.2)", color: "#0F1E3D" }}
               >
                 {c[locale as Locale].label}
               </Link>

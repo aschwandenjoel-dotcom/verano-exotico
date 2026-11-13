@@ -35,11 +35,11 @@ function countryName(locale: Locale, code: string): string {
 const inputStyle: React.CSSProperties = {
   width: "100%",
   background: "#FFFFFF",
-  border: "1px solid rgba(26,48,64,0.15)",
+  border: "1px solid rgba(15,30,61,0.15)",
   borderRadius: "8px",
   padding: "12px 16px",
   fontSize: "14px",
-  color: "#1A3040",
+  color: "#0F1E3D",
   outline: "none",
   boxSizing: "border-box",
 };
@@ -59,17 +59,17 @@ const labelStyle: React.CSSProperties = {
   fontFamily: "var(--font-geist-mono)",
   letterSpacing: "0.14em",
   textTransform: "uppercase",
-  color: "rgba(26,48,64,0.5)",
+  color: "rgba(15,30,61,0.5)",
   marginBottom: "6px",
 };
 
 const sectionTitle: React.CSSProperties = {
   fontSize: "12px",
   fontFamily: "var(--font-archivo-black), sans-serif",
-  fontWeight: 900,
+  fontWeight: 500,
   textTransform: "uppercase",
   letterSpacing: "0.14em",
-  color: "#1A3040",
+  color: "#0F1E3D",
   margin: "0 0 16px",
 };
 
@@ -275,12 +275,12 @@ export default function CheckoutForm({
   if (items.length === 0) {
     return (
       <div style={{ maxWidth: "480px", margin: "80px auto", textAlign: "center" }}>
-        <p style={{ fontSize: "14px", color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", marginBottom: "24px" }}>
+        <p style={{ fontSize: "14px", color: "rgba(15,30,61,0.5)", fontFamily: "var(--font-geist-mono)", marginBottom: "24px" }}>
           {t("empty")}
         </p>
         <Link
           href={`/${locale}/collection`}
-          style={{ display: "inline-block", background: "#1A3040", color: "#F8F3E8", borderRadius: "9999px", padding: "14px 32px", fontSize: "11px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", textDecoration: "none" }}
+          style={{ display: "inline-block", background: "#0F1E3D", color: "#F8F3E8", borderRadius: "2px", padding: "14px 32px", fontSize: "11px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase", textDecoration: "none" }}
         >
           {t("to_shop")}
         </Link>
@@ -290,7 +290,7 @@ export default function CheckoutForm({
 
   return (
     <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-      <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.6rem)", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", marginBottom: "32px" }}>
+      <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.6rem)", fontWeight: 500, textTransform: "uppercase", color: "#0F1E3D", marginBottom: "32px" }}>
         {t("title")}
       </h1>
 
@@ -299,7 +299,7 @@ export default function CheckoutForm({
         <p style={{
           fontSize: "13px",
           lineHeight: 1.6,
-          color: "#1A3040",
+          color: "#0F1E3D",
           background: "rgba(212,175,55,0.12)",
           border: "1px solid rgba(212,175,55,0.4)",
           borderRadius: "12px",
@@ -317,7 +317,7 @@ export default function CheckoutForm({
 
           {/* ── Formular ── */}
           <div className="lg:col-span-3" style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-            <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "28px", border: "1px solid rgba(26,48,64,0.08)" }}>
+            <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "28px", border: "1px solid rgba(15,30,61,0.08)" }}>
               <h2 style={sectionTitle}>{t("contact")}</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div>
@@ -332,13 +332,13 @@ export default function CheckoutForm({
                   <div>
                     <label style={labelStyle} htmlFor="feld-phone">{t("phone")}</label>
                     <input id="feld-phone" required type="tel" aria-invalid={!!fehler.phone} value={phone} onChange={beiEingabe("phone", setPhone)} style={feldStil("phone")} autoComplete="tel" placeholder="+41 79 …" />
-                    <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.4)", marginTop: "4px" }}>{t("phone_hint")}</p>
+                    <p style={{ fontSize: "10px", color: "rgba(15,30,61,0.4)", marginTop: "4px" }}>{t("phone_hint")}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "28px", border: "1px solid rgba(26,48,64,0.08)" }}>
+            <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "28px", border: "1px solid rgba(15,30,61,0.08)" }}>
               <h2 style={sectionTitle}>{t("address")}</h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div>
@@ -393,8 +393,8 @@ export default function CheckoutForm({
                         style={{
                           position: "absolute", top: "100%", left: 0, right: 0, zIndex: 20,
                           margin: "4px 0 0", padding: 0, listStyle: "none",
-                          background: "#FFFFFF", border: "1px solid rgba(26,48,64,0.15)",
-                          borderRadius: "8px", boxShadow: "0 8px 24px rgba(26,48,64,0.12)",
+                          background: "#FFFFFF", border: "1px solid rgba(15,30,61,0.15)",
+                          borderRadius: "8px", boxShadow: "0 8px 24px rgba(15,30,61,0.12)",
                           overflow: "hidden",
                         }}
                       >
@@ -409,21 +409,21 @@ export default function CheckoutForm({
                             style={{
                               padding: "10px 14px", cursor: "pointer", fontSize: "13px",
                               display: "flex", justifyContent: "space-between", gap: "10px",
-                              background: i === aktiver ? "rgba(0,180,197,0.10)" : "transparent",
+                              background: i === aktiver ? "rgba(168,137,79,0.10)" : "transparent",
                             }}
                           >
-                            <span style={{ color: "#1A3040" }}>
+                            <span style={{ color: "#0F1E3D" }}>
                               <strong style={{ fontFamily: "var(--font-geist-mono)", fontWeight: 600 }}>{o.plz}</strong>{" "}
                               {o.ort}
                             </span>
-                            <span style={{ color: "rgba(26,48,64,0.45)", fontSize: "11px", whiteSpace: "nowrap" }}>
+                            <span style={{ color: "rgba(15,30,61,0.45)", fontSize: "11px", whiteSpace: "nowrap" }}>
                               {countryName(locale, o.land)}
                             </span>
                           </li>
                         ))}
                       </ul>
                     )}
-                    <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.4)", marginTop: "4px" }}>
+                    <p style={{ fontSize: "10px", color: "rgba(15,30,61,0.4)", marginTop: "4px" }}>
                       {t("city_hint")}
                     </p>
                   </div>
@@ -463,13 +463,13 @@ export default function CheckoutForm({
                       <option key={c.code} value={c.code}>{c.code}</option>
                     ))}
                   </select>
-                  <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.4)", marginTop: "4px" }}>{t("pay_currency_hint")}</p>
+                  <p style={{ fontSize: "10px", color: "rgba(15,30,61,0.4)", marginTop: "4px" }}>{t("pay_currency_hint")}</p>
                 </div>
               </div>
             </div>
 
-            <div style={{ background: "#1A3040", borderRadius: "16px", padding: "28px" }}>
-              <h2 style={{ ...sectionTitle, color: "#D4AF37" }}>{t(isCard ? "payment_title_card" : "payment_title")}</h2>
+            <div style={{ background: "#0F1E3D", borderRadius: "16px", padding: "28px" }}>
+              <h2 style={{ ...sectionTitle, color: "#A8894F" }}>{t(isCard ? "payment_title_card" : "payment_title")}</h2>
               <p style={{ fontSize: "13px", color: "rgba(248,243,232,0.75)", lineHeight: 1.7, margin: 0 }}>
                 {t(isCard ? "payment_info_card" : "payment_info")}
               </p>
@@ -478,7 +478,7 @@ export default function CheckoutForm({
                 <span style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(248,243,232,0.55)" }}>
                   {t(isCard ? "amount_to_pay" : "amount_to_transfer")}
                 </span>
-                <span style={{ fontSize: "22px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#D4AF37" }}>
+                <span style={{ fontSize: "22px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, color: "#A8894F" }}>
                   {total === null ? "—" : formatPrice(total, payCurrency)}
                 </span>
               </div>
@@ -491,7 +491,7 @@ export default function CheckoutForm({
           </div>
 
           {/* ── Bestellübersicht ── */}
-          <div className="lg:col-span-2" style={{ background: "#FFFFFF", borderRadius: "16px", padding: "28px", border: "1px solid rgba(26,48,64,0.08)", position: "sticky", top: "90px" }}>
+          <div className="lg:col-span-2" style={{ background: "#FFFFFF", borderRadius: "16px", padding: "28px", border: "1px solid rgba(15,30,61,0.08)", position: "sticky", top: "90px" }}>
             <h2 style={sectionTitle}>{t("summary")}</h2>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "20px" }}>
@@ -501,33 +501,33 @@ export default function CheckoutForm({
                     {item.image && <Image src={item.image} alt={item.name} fill sizes="52px" style={{ objectFit: "cover" }} />}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: "11px", fontWeight: 700, color: "#1A3040", margin: 0, textTransform: "uppercase", lineHeight: 1.3 }}>{item.name}</p>
-                    <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)", margin: "2px 0 0" }}>
+                    <p style={{ fontSize: "11px", fontWeight: 700, color: "#0F1E3D", margin: 0, textTransform: "uppercase", lineHeight: 1.3 }}>{item.name}</p>
+                    <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.45)", margin: "2px 0 0" }}>
                       {item.quantity}× {item.size ? `· ${item.size}` : ""} {item.colorName ? `· ${item.colorName}` : ""}
                     </p>
                   </div>
-                  <span style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "#1A3040", fontWeight: 700 }}>
+                  <span style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "#0F1E3D", fontWeight: 700 }}>
                     {formatPrice(item.price * item.quantity, payCurrency)}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div style={{ borderTop: "1px solid rgba(26,48,64,0.1)", paddingTop: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.6)" }}>
+            <div style={{ borderTop: "1px solid rgba(15,30,61,0.1)", paddingTop: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.6)" }}>
                 <span>{t("subtotal")}</span>
                 <span>{formatPrice(totalPrice, payCurrency)}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.6)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.6)" }}>
                 <span>{t("shipping")}{country ? ` · ${countryName(locale, country)}` : ""}</span>
                 <span>{shipping === null ? "—" : formatPrice(shipping, payCurrency)}</span>
               </div>
-              <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.4)", margin: 0 }}>
+              <p style={{ fontSize: "10px", color: "rgba(15,30,61,0.4)", margin: 0 }}>
                 {shipping === null ? t("shipping_pending") : t("shipping_hint")}
               </p>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderTop: "2px solid #1A3040", paddingTop: "12px", marginTop: "6px" }}>
-                <span style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#1A3040" }}>{t("total")}</span>
-                <span style={{ fontSize: "20px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#1A3040" }}>{total === null ? "—" : formatPrice(total, payCurrency)}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderTop: "2px solid #0F1E3D", paddingTop: "12px", marginTop: "6px" }}>
+                <span style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#0F1E3D" }}>{t("total")}</span>
+                <span style={{ fontSize: "20px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, color: "#0F1E3D" }}>{total === null ? "—" : formatPrice(total, payCurrency)}</span>
               </div>
             </div>
 
@@ -536,9 +536,9 @@ export default function CheckoutForm({
                 type="checkbox"
                 checked={newsletter}
                 onChange={(e) => setNewsletter(e.target.checked)}
-                style={{ marginTop: "2px", width: "16px", height: "16px", accentColor: "#1A3040", flexShrink: 0 }}
+                style={{ marginTop: "2px", width: "16px", height: "16px", accentColor: "#0F1E3D", flexShrink: 0 }}
               />
-              <span style={{ fontSize: "11px", color: "rgba(26,48,64,0.65)", lineHeight: 1.6 }}>
+              <span style={{ fontSize: "11px", color: "rgba(15,30,61,0.65)", lineHeight: 1.6 }}>
                 {t("newsletter_optin")}
               </span>
             </label>
@@ -550,18 +550,18 @@ export default function CheckoutForm({
             <button
               type="submit"
               disabled={submitting}
-              style={{ width: "100%", marginTop: "18px", padding: "16px", background: "#1A3040", color: "#F8F3E8", border: "none", borderRadius: "9999px", fontSize: "12px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", cursor: submitting ? "wait" : "pointer", opacity: submitting ? 0.7 : 1 }}
+              style={{ width: "100%", marginTop: "18px", padding: "16px", background: "#0F1E3D", color: "#F8F3E8", border: "none", borderRadius: "2px", fontSize: "12px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, letterSpacing: "0.14em", textTransform: "uppercase", cursor: submitting ? "wait" : "pointer", opacity: submitting ? 0.7 : 1 }}
             >
               {submitting ? t("submitting") : t("submit")}
             </button>
 
-            <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.45)", lineHeight: 1.6, marginTop: "12px", textAlign: "center" }}>
+            <p style={{ fontSize: "10px", color: "rgba(15,30,61,0.45)", lineHeight: 1.6, marginTop: "12px", textAlign: "center" }}>
               {t.rich("legal_note", {
                 agb: (chunks) => (
-                  <Link href={`/${locale}/agb`} style={{ color: "#1A3040", textDecoration: "underline" }}>{chunks}</Link>
+                  <Link href={`/${locale}/agb`} style={{ color: "#0F1E3D", textDecoration: "underline" }}>{chunks}</Link>
                 ),
                 widerruf: (chunks) => (
-                  <Link href={`/${locale}/widerruf`} style={{ color: "#1A3040", textDecoration: "underline" }}>{chunks}</Link>
+                  <Link href={`/${locale}/widerruf`} style={{ color: "#0F1E3D", textDecoration: "underline" }}>{chunks}</Link>
                 ),
               })}
             </p>

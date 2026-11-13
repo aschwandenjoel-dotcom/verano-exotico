@@ -19,7 +19,7 @@ export default function AiBadge({ inset = 10, variant = "overlay" }: { inset?: n
           fontSize: "8.5px",
           letterSpacing: "0.18em",
           textTransform: "uppercase",
-          color: "rgba(26,48,64,0.45)",
+          color: "rgba(15,30,61,0.45)",
         }}
       >
         {t("label")}

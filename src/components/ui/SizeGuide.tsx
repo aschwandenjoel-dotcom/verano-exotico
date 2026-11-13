@@ -16,12 +16,12 @@ const MEASURE_STEPS = [
 
 const thStyle: React.CSSProperties = {
   padding: "11px 14px", textAlign: "center", fontWeight: 700,
-  color: "#1A3040", borderBottom: "1px solid #E4E4E4", whiteSpace: "nowrap",
+  color: "#0F1E3D", borderBottom: "1px solid #E4E4E4", whiteSpace: "nowrap",
 };
 const tdStyle: React.CSSProperties = {
   padding: "11px 14px", textAlign: "center", color: "#444", borderBottom: "1px solid #F0F0F0",
 };
-const tdBoldStyle: React.CSSProperties = { ...tdStyle, fontWeight: 700, color: "#1A3040" };
+const tdBoldStyle: React.CSSProperties = { ...tdStyle, fontWeight: 700, color: "#0F1E3D" };
 
 export default function SizeGuide({ product, onClose }: Props) {
   const [unit, setUnit] = useState<"cm" | "in">("cm");
@@ -60,9 +60,9 @@ export default function SizeGuide({ product, onClose }: Props) {
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "20px 24px 16px",
           position: "sticky", top: 0, background: "#FFFFFF", zIndex: 10,
-          borderBottom: "1px solid rgba(26,48,64,0.1)",
+          borderBottom: "1px solid rgba(15,30,61,0.1)",
         }}>
-          <h2 style={{ fontSize: "18px", fontWeight: 900, color: "#1A3040" }}>
+          <h2 style={{ fontSize: "18px", fontWeight: 500, color: "#0F1E3D" }}>
             Konfektionsleitfaden
           </h2>
           <button
@@ -70,10 +70,10 @@ export default function SizeGuide({ product, onClose }: Props) {
             aria-label="Schließen"
             style={{
               width: 34, height: 34, borderRadius: "50%",
-              border: "1px solid rgba(26,48,64,0.15)",
+              border: "1px solid rgba(15,30,61,0.15)",
               background: "transparent", cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "20px", color: "#1A3040",
+              fontSize: "20px", color: "#0F1E3D",
             }}
           >
             ×
@@ -85,20 +85,20 @@ export default function SizeGuide({ product, onClose }: Props) {
 
           {chart && (
             <>
-              <p style={{ fontSize: "13px", fontWeight: 700, color: "#1A3040", marginBottom: 16 }}>
+              <p style={{ fontSize: "13px", fontWeight: 700, color: "#0F1E3D", marginBottom: 16 }}>
                 Vom Händler angegebene Artikelabmessungen
               </p>
 
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <span style={{ fontSize: "13px", color: "#1A3040", fontWeight: 600 }}>EU Größe ∨</span>
+                <span style={{ fontSize: "13px", color: "#0F1E3D", fontWeight: 600 }}>EU Größe ∨</span>
                 <div style={{ display: "flex", gap: 3, background: "#F0F0F0", borderRadius: 999, padding: 3 }}>
                   {(["cm", "in"] as const).map((u) => (
                     <button key={u} onClick={() => setUnit(u)} style={{
                       padding: "4px 13px", borderRadius: 999, border: "none",
                       fontSize: "11px", fontWeight: 700, letterSpacing: "0.06em",
                       textTransform: "uppercase", cursor: "pointer",
-                      background: unit === u ? "#1A3040" : "transparent",
-                      color: unit === u ? "#FFF" : "#5E7A8A",
+                      background: unit === u ? "#0F1E3D" : "transparent",
+                      color: unit === u ? "#FFF" : "#5F6475",
                       transition: "background 0.15s, color 0.15s",
                     }}>
                       {u.toUpperCase()}
@@ -136,8 +136,8 @@ export default function SizeGuide({ product, onClose }: Props) {
           )}
 
           {/* Diagram */}
-          <div style={{ borderTop: "1px solid rgba(26,48,64,0.08)", paddingTop: 24 }}>
-            <p style={{ fontSize: "14px", fontWeight: 700, color: "#1A3040", marginBottom: 20 }}>
+          <div style={{ borderTop: "1px solid rgba(15,30,61,0.08)", paddingTop: 24 }}>
+            <p style={{ fontSize: "14px", fontWeight: 700, color: "#0F1E3D", marginBottom: 20 }}>
               Wie messe ich richtig?
             </p>
 
@@ -155,13 +155,13 @@ export default function SizeGuide({ product, onClose }: Props) {
                   fill="#E7EDF0" stroke="#CBD8DF" strokeWidth="1.5"
                 />
                 {/* Bikini-Oberteil */}
-                <path d="M82 62 C94 72 126 72 138 62 L138 74 C126 82 94 82 82 74 Z" fill="#0A3D52" />
+                <path d="M82 62 C94 72 126 72 138 62 L138 74 C126 82 94 82 82 74 Z" fill="#0F1E3D" />
                 {/* Bikini-Unterteil */}
-                <path d="M84 152 C96 163 124 163 136 152 L128 172 C119 179 101 179 92 172 Z" fill="#0A3D52" />
+                <path d="M84 152 C96 163 124 163 136 152 L128 172 C119 179 101 179 92 172 Z" fill="#0F1E3D" />
                 {/* Messlinien */}
                 {[{ y: 64, n: 1 }, { y: 118, n: 2 }, { y: 156, n: 3 }].map(({ y, n }) => (
                   <g key={n}>
-                    <line x1="42" y1={y} x2="178" y2={y} stroke="#1A3040" strokeWidth="1" strokeDasharray="4 3" />
+                    <line x1="42" y1={y} x2="178" y2={y} stroke="#0F1E3D" strokeWidth="1" strokeDasharray="4 3" />
                     <circle cx="30" cy={y} r="10" fill="#1A1A1A" />
                     <text x="30" y={y + 3.5} textAnchor="middle" fontSize="11" fontWeight="700" fill="#FFF">{n}</text>
                   </g>
@@ -179,7 +179,7 @@ export default function SizeGuide({ product, onClose }: Props) {
                       fontSize: "10px", fontWeight: 700,
                       display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                     }}>{step.n}</span>
-                    <span style={{ fontSize: "13px", fontWeight: 700, color: "#1A3040" }}>{step.title}</span>
+                    <span style={{ fontSize: "13px", fontWeight: 700, color: "#0F1E3D" }}>{step.title}</span>
                   </div>
                   <p style={{ fontSize: "12px", color: "#666", lineHeight: 1.6, paddingLeft: 29 }}>{step.desc}</p>
                 </div>

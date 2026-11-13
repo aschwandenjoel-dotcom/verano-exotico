@@ -106,19 +106,19 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
     <div className="pt-4 md:pt-8">
       <p
         className="text-xs font-mono tracking-widest uppercase mb-3"
-        style={{ color: "#00B4C5" }}
+        style={{ color: "#A8894F" }}
       >
         {product.category}
       </p>
 
       <h1
-        className="text-4xl md:text-5xl font-black mb-4"
-        style={{ color: "#1A3040" }}
+        className="text-4xl md:text-5xl mb-4" 
+        style={{ color: "#0F1E3D" }}
       >
         {product.name[loc]}
       </h1>
 
-      <p className={`text-3xl font-bold ${WELCOME_DISCOUNT_PERCENT > 0 ? "mb-2" : "mb-8"}`} style={{ color: "#D4AF37" }}>
+      <p className={`text-2xl ${WELCOME_DISCOUNT_PERCENT > 0 ? "mb-2" : "mb-8"}`} style={{ color: "#0F1E3D", letterSpacing: "0.04em" }}>
         CHF {product.price.toFixed(2)}
       </p>
 
@@ -128,7 +128,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         <Link
           href={`/${loc}/newsletter`}
           className="inline-block text-sm underline underline-offset-4 mb-8"
-          style={{ color: "#5E7A8A" }}
+          style={{ color: "#5F6475" }}
         >
           {tp("newsletter_price", {
             price: (product.price * (1 - WELCOME_DISCOUNT_PERCENT / 100)).toFixed(2),
@@ -148,8 +148,8 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
           Farbbild bleibt eine Kachel in der Farbe selbst. */}
       {product.colors.length > 1 && (
         <div className="mb-8">
-          <p className="text-sm mb-3" style={{ color: "#1A3040" }}>
-            <span style={{ color: "#5E7A8A" }}>{t.color}:</span>{" "}
+          <p className="text-sm mb-3" style={{ color: "#0F1E3D" }}>
+            <span style={{ color: "#5F6475" }}>{t.color}:</span>{" "}
             {product.colorNames?.[loc]?.[activeColor]}
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -170,7 +170,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
                     width: "52px",
                     height: "65px",
                     backgroundColor: img ? "#fff" : color,
-                    border: `1px solid ${active ? "#1A3040" : "transparent"}`,
+                    border: `1px solid ${active ? "#0F1E3D" : "transparent"}`,
                     padding: 0,
                   }}
                 >
@@ -187,7 +187,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         <div className="mb-8">
           <p
             className="text-xs font-mono tracking-widest uppercase mb-3"
-            style={{ color: sizeHint && sizeMissing ? "#B4553C" : "#5E7A8A" }}
+            style={{ color: sizeHint && sizeMissing ? "#B4553C" : "#5F6475" }}
           >
             {t.size}
           </p>
@@ -199,8 +199,8 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
                 onClick={() => chooseSize(size)}
                 className="px-4 py-2 text-xs font-mono transition-all"
                 style={{
-                  border: `1px solid ${activeSize === size ? "#00B4C5" : "rgba(26,48,64,0.2)"}`,
-                  color: activeSize === size ? "#00B4C5" : "#1A3040",
+                  border: `1px solid ${activeSize === size ? "#A8894F" : "rgba(15,30,61,0.2)"}`,
+                  color: activeSize === size ? "#A8894F" : "#0F1E3D",
                   borderRadius: "6px",
                   background: "transparent",
                 }}
@@ -217,9 +217,9 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         onClick={handleAddToCart}
         className="w-full py-4 font-semibold text-base transition-all mb-4"
         style={{
-          background: added ? "#2E7D5E" : "#D4AF37",
-          color: added ? "#F8F3E8" : "#1A3040",
-          borderRadius: "9999px",
+          background: added ? "#3F4F3A" : "#0F1E3D",
+          color: "#F6F0E4",
+          borderRadius: "2px",
           cursor: "pointer",
           transition: "background 0.3s, color 0.3s",
         }}
@@ -239,10 +239,10 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
 
       {/* Trust-Box wie bei Trendt Vision: drei Versprechen direkt unter dem Knopf,
           nicht erst in der Klappbox "Versand und Rückgabe" */}
-      <ul className="mb-6 space-y-2 text-sm" style={{ color: "#1A3040" }}>
+      <ul className="mb-6 space-y-2 text-sm" style={{ color: "#0F1E3D" }}>
         {[t.shipping, t.trustReturns, t.trustPayment, tp("trust_swiss")].map((line) => (
           <li key={line} className="flex items-center gap-2.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E7D5E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flexShrink: 0 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3F4F3A" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flexShrink: 0 }}>
               <polyline points="20 6 9 17 4 12" />
             </svg>
             {line}
@@ -256,7 +256,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         className="md:hidden fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 px-4 pt-3"
         style={{
           background: "#F8F3E8",
-          borderTop: "1px solid rgba(26,48,64,0.15)",
+          borderTop: "1px solid rgba(15,30,61,0.15)",
           paddingBottom: "calc(12px + env(safe-area-inset-bottom))",
           transform: stickyVisible ? "translateY(0)" : "translateY(110%)",
           transition: "transform 0.25s ease",
@@ -264,10 +264,10 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         aria-hidden={!stickyVisible}
       >
         <div className="min-w-0 flex-1">
-          <p className="text-sm truncate" style={{ color: "#1A3040" }}>{product.name[loc]}</p>
-          <p className="text-sm font-bold" style={{ color: "#1A3040" }}>
+          <p className="text-sm truncate" style={{ color: "#0F1E3D" }}>{product.name[loc]}</p>
+          <p className="text-sm font-bold" style={{ color: "#0F1E3D" }}>
             CHF {product.price.toFixed(2)}
-            {activeSize && <span className="font-normal" style={{ color: "#5E7A8A" }}> · {activeSize}</span>}
+            {activeSize && <span className="font-normal" style={{ color: "#5F6475" }}> · {activeSize}</span>}
           </p>
         </div>
         <button
@@ -283,9 +283,9 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
           }}
           className="px-6 py-3 font-semibold text-sm"
           style={{
-            background: added ? "#2E7D5E" : "#D4AF37",
-            color: added ? "#F8F3E8" : "#1A3040",
-            borderRadius: "9999px",
+            background: added ? "#3F4F3A" : "#0F1E3D",
+            color: "#F6F0E4",
+            borderRadius: "2px",
             flexShrink: 0,
           }}
         >
@@ -298,9 +298,9 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
           onClick={() => setSizeGuideOpen(true)}
           className="w-full py-4 font-semibold text-base transition-colors mb-10"
           style={{
-            border: "1px solid rgba(26,48,64,0.2)",
-            color: "#1A3040",
-            borderRadius: "9999px",
+            border: "1px solid rgba(15,30,61,0.2)",
+            color: "#0F1E3D",
+            borderRadius: "2px",
             background: "transparent",
           }}
         >
@@ -328,7 +328,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
                         type="button"
                         onClick={() => setSizeGuideOpen(true)}
                         className="text-sm underline underline-offset-4"
-                        style={{ color: "#1A3040" }}
+                        style={{ color: "#0F1E3D" }}
                       >
                         {t.sizeGuide}
                       </button>
@@ -345,7 +345,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
             content: (
               <div className="space-y-3">
                 <DetailText text={[`– ${t.shipping}`, `– ${t.trustShipping}`, `– ${t.trustReturns}`, `– ${t.trustPayment}`].join("\n")} />
-                <Link href={`/${loc}/versand`} className="text-sm underline underline-offset-4" style={{ color: "#1A3040" }}>
+                <Link href={`/${loc}/versand`} className="text-sm underline underline-offset-4" style={{ color: "#0F1E3D" }}>
                   {t.deliveryMore}
                 </Link>
               </div>
@@ -360,11 +360,11 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
         id="reviews"
         onClick={() => setDrawerState(true)}
         className="w-full flex items-center justify-between py-5 text-left"
-        style={{ color: "#1A3040", background: "transparent", cursor: "pointer", scrollMarginTop: "120px" }}
+        style={{ color: "#0F1E3D", background: "transparent", cursor: "pointer", scrollMarginTop: "120px" }}
       >
         <span className="text-[15px] uppercase tracking-[0.04em]">
           {tr("count_many")}
-          {reviews.length > 0 && <span style={{ color: "rgba(26,48,64,0.55)" }}> ({reviews.length})</span>}
+          {reviews.length > 0 && <span style={{ color: "rgba(15,30,61,0.55)" }}> ({reviews.length})</span>}
         </span>
         <PlusIcon open={false} />
       </button>
@@ -388,7 +388,7 @@ export default function ProductDetail({ product, locale: loc, labels: t, activeC
  * Zeilen mit "– " oder "- " am Anfang = Aufzählung.
  */
 function DetailText({ text }: { text: string }) {
-  const color = "rgba(26,48,64,0.65)";
+  const color = "rgba(15,30,61,0.65)";
   return (
     <div className="space-y-3">
       {text.split(/\n\s*\n/).map((block, i) => {
@@ -432,11 +432,11 @@ function Accordion({ items }: { items: { id: string; label: string; content: Rea
     });
 
   return (
-    <div style={{ borderTop: "1px solid rgba(26,48,64,0.15)" }}>
+    <div style={{ borderTop: "1px solid rgba(15,30,61,0.15)" }}>
       {items.map(({ id, label, content }) => {
         const isOpen = open.has(id);
         return (
-          <div key={id} style={{ borderBottom: "1px solid rgba(26,48,64,0.15)" }}>
+          <div key={id} style={{ borderBottom: "1px solid rgba(15,30,61,0.15)" }}>
             <button
               type="button"
               id={`acc-${id}`}
@@ -444,7 +444,7 @@ function Accordion({ items }: { items: { id: string; label: string; content: Rea
               aria-controls={`acc-${id}-panel`}
               onClick={() => toggle(id)}
               className="w-full flex items-center justify-between py-5 text-left"
-              style={{ color: "#1A3040", background: "transparent", cursor: "pointer" }}
+              style={{ color: "#0F1E3D", background: "transparent", cursor: "pointer" }}
             >
               <span className="text-base">{label}</span>
               <svg

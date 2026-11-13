@@ -37,7 +37,7 @@ function Stars({ value, onChange }: { value: number; onChange?: (v: number) => v
               fontSize: "20px",
               lineHeight: 1,
               cursor: interactive ? "pointer" : "default",
-              color: filled ? "#D4AF37" : "rgba(26,48,64,0.2)",
+              color: filled ? "#A8894F" : "rgba(15,30,61,0.2)",
               transition: "color 0.15s",
             }}
           >
@@ -58,10 +58,10 @@ function ReviewCard({ review, locale, verifiedLabel }: { review: Review; locale:
   return (
     <div style={{
       padding: "20px 0",
-      borderBottom: "1px solid rgba(26,48,64,0.08)",
+      borderBottom: "1px solid rgba(15,30,61,0.08)",
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "8px", gap: "12px" }}>
-        <span style={{ fontSize: "13px", fontWeight: 700, color: "#1A3040" }}>
+        <span style={{ fontSize: "13px", fontWeight: 700, color: "#0F1E3D" }}>
           {review.name}
           {review.verified && (
             <span style={{
@@ -71,9 +71,9 @@ function ReviewCard({ review, locale, verifiedLabel }: { review: Review; locale:
               fontWeight: 400,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "#00B4C5",
-              border: "1px solid rgba(0,180,197,0.35)",
-              borderRadius: "9999px",
+              color: "#A8894F",
+              border: "1px solid rgba(168,137,79,0.35)",
+              borderRadius: "2px",
               padding: "2px 8px",
               whiteSpace: "nowrap",
             }}>
@@ -81,10 +81,10 @@ function ReviewCard({ review, locale, verifiedLabel }: { review: Review; locale:
             </span>
           )}
         </span>
-        <span style={{ fontSize: "11px", color: "rgba(26,48,64,0.4)", fontFamily: "var(--font-geist-mono)", whiteSpace: "nowrap" }}>{date}</span>
+        <span style={{ fontSize: "11px", color: "rgba(15,30,61,0.4)", fontFamily: "var(--font-geist-mono)", whiteSpace: "nowrap" }}>{date}</span>
       </div>
       <Stars value={review.rating} />
-      <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.7)", lineHeight: 1.7, marginTop: "10px" }}>
+      <p style={{ fontSize: "13px", color: "rgba(15,30,61,0.7)", lineHeight: 1.7, marginTop: "10px" }}>
         {review.comment}
       </p>
     </div>
@@ -94,11 +94,11 @@ function ReviewCard({ review, locale, verifiedLabel }: { review: Review; locale:
 const inputStyle = (hasError: boolean): React.CSSProperties => ({
   width: "100%",
   background: "#FFFFFF",
-  border: `1px solid ${hasError ? "#C0392B" : "rgba(26,48,64,0.15)"}`,
+  border: `1px solid ${hasError ? "#C0392B" : "rgba(15,30,61,0.15)"}`,
   borderRadius: "8px",
   padding: "12px 16px",
   fontSize: "13px",
-  color: "#1A3040",
+  color: "#0F1E3D",
   outline: "none",
   transition: "border-color 0.2s",
   boxSizing: "border-box",
@@ -110,7 +110,7 @@ const labelStyle: React.CSSProperties = {
   fontFamily: "var(--font-geist-mono)",
   letterSpacing: "0.14em",
   textTransform: "uppercase",
-  color: "rgba(26,48,64,0.5)",
+  color: "rgba(15,30,61,0.5)",
   marginBottom: "8px",
 };
 
@@ -151,7 +151,7 @@ export function RatingSummary({ avg, count, onClick }: { avg: number; count: num
       type="button"
       onClick={onClick}
       className="flex items-center gap-2"
-      style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "#1A3040" }}
+      style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "#0F1E3D" }}
     >
       <StaticStars value={avg} size={14} />
       <span className="text-sm underline underline-offset-4">{avg.toFixed(1)} ({count})</span>
@@ -163,8 +163,8 @@ export function RatingSummary({ avg, count, onClick }: { avg: number; count: num
 function StaticStars({ value, size }: { value: number; size: number }) {
   return (
     <span style={{ position: "relative", display: "inline-block", fontSize: size, lineHeight: 1, letterSpacing: "1px" }} aria-hidden>
-      <span style={{ color: "rgba(26,48,64,0.2)" }}>★★★★★</span>
-      <span style={{ position: "absolute", inset: 0, width: `${(value / 5) * 100}%`, overflow: "hidden", whiteSpace: "nowrap", color: "#1A3040" }}>
+      <span style={{ color: "rgba(15,30,61,0.2)" }}>★★★★★</span>
+      <span style={{ position: "absolute", inset: 0, width: `${(value / 5) * 100}%`, overflow: "hidden", whiteSpace: "nowrap", color: "#0F1E3D" }}>
         ★★★★★
       </span>
     </span>
@@ -239,23 +239,23 @@ export function ReviewDrawer({
   // Stapelkontext – darin läge die Leiste immer unter dem fixen Header.
   return createPortal(
     <div style={{ position: "fixed", inset: 0, zIndex: 60 }} role="dialog" aria-modal="true" aria-labelledby="reviews-title">
-      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(26,48,64,0.35)" }} />
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(15,30,61,0.35)" }} />
       <div
         style={{
           position: "absolute", top: 0, right: 0, bottom: 0, width: "min(480px, 100vw)",
           background: "#F8F3E8", overflowY: "auto", padding: "28px clamp(20px, 5vw, 32px) 40px",
-          boxShadow: "-12px 0 40px rgba(26,48,64,0.15)",
+          boxShadow: "-12px 0 40px rgba(15,30,61,0.15)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
-          <h2 id="reviews-title" style={{ fontSize: "18px", fontWeight: 600, color: "#1A3040", margin: 0 }}>
+          <h2 id="reviews-title" style={{ fontSize: "18px", fontWeight: 600, color: "#0F1E3D", margin: 0 }}>
             {t("count_many")}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label={t("close")}
-            style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(26,48,64,0.15)", background: "transparent", color: "#1A3040", fontSize: 22, lineHeight: 1, cursor: "pointer" }}
+            style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(15,30,61,0.15)", background: "transparent", color: "#0F1E3D", fontSize: 22, lineHeight: 1, cursor: "pointer" }}
           >
             ×
           </button>
@@ -263,11 +263,11 @@ export function ReviewDrawer({
 
         {/* Schnitt */}
         {reviews.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: "14px", paddingBottom: "24px", borderBottom: "1px solid rgba(26,48,64,0.12)" }}>
-            <span style={{ fontSize: "40px", fontWeight: 700, color: "#1A3040", lineHeight: 1 }}>{avg.toFixed(1)}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", paddingBottom: "24px", borderBottom: "1px solid rgba(15,30,61,0.12)" }}>
+            <span style={{ fontSize: "40px", fontWeight: 700, color: "#0F1E3D", lineHeight: 1 }}>{avg.toFixed(1)}</span>
             <div>
               <StaticStars value={avg} size={18} />
-              <p style={{ fontSize: "12px", color: "rgba(26,48,64,0.55)", marginTop: "6px" }}>
+              <p style={{ fontSize: "12px", color: "rgba(15,30,61,0.55)", marginTop: "6px" }}>
                 {reviews.length} {reviews.length === 1 ? t("count_one") : t("count_many")}
               </p>
             </div>
@@ -277,20 +277,20 @@ export function ReviewDrawer({
         {/* Dank / Formular / Knopf */}
         <div style={{ padding: "24px 0" }}>
           {submitted ? (
-            <div style={{ border: "1px solid rgba(26,48,64,0.1)", borderRadius: "12px", padding: "28px", textAlign: "center", background: "#FFFFFF" }}>
-              <div style={{ fontSize: "28px", color: "#D4AF37", marginBottom: "12px" }}>★</div>
-              <p style={{ fontSize: "14px", color: "#1A3040", fontWeight: 600, marginBottom: "6px" }}>{t("thanks")}</p>
-              <p style={{ fontSize: "12px", color: "rgba(26,48,64,0.5)" }}>{t("submitted")}</p>
+            <div style={{ border: "1px solid rgba(15,30,61,0.1)", borderRadius: "12px", padding: "28px", textAlign: "center", background: "#FFFFFF" }}>
+              <div style={{ fontSize: "28px", color: "#A8894F", marginBottom: "12px" }}>★</div>
+              <p style={{ fontSize: "14px", color: "#0F1E3D", fontWeight: 600, marginBottom: "6px" }}>{t("thanks")}</p>
+              <p style={{ fontSize: "12px", color: "rgba(15,30,61,0.5)" }}>{t("submitted")}</p>
             </div>
           ) : showForm ? (
-            <div style={{ background: "#FFFFFF", borderRadius: "12px", padding: "24px", border: "1px solid rgba(26,48,64,0.08)" }}>
-              <h3 style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: "rgba(26,48,64,0.5)", textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: token ? "16px" : "24px" }}>
+            <div style={{ background: "#FFFFFF", borderRadius: "12px", padding: "24px", border: "1px solid rgba(15,30,61,0.08)" }}>
+              <h3 style={{ fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, color: "rgba(15,30,61,0.5)", textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: token ? "16px" : "24px" }}>
                 {t("form_title")}
               </h3>
 
               {/* Über den Link aus der Bewertungs-Mail gekommen */}
               {token && (
-                <p style={{ fontSize: "12px", lineHeight: 1.6, color: "#1A3040", background: "rgba(0,180,197,0.08)", border: "1px solid rgba(0,180,197,0.25)", borderRadius: "8px", padding: "12px 14px", marginBottom: "24px" }}>
+                <p style={{ fontSize: "12px", lineHeight: 1.6, color: "#0F1E3D", background: "rgba(168,137,79,0.08)", border: "1px solid rgba(168,137,79,0.25)", borderRadius: "8px", padding: "12px 14px", marginBottom: "24px" }}>
                   ✓ {t("verified_hint")}
                 </p>
               )}
@@ -299,7 +299,7 @@ export function ReviewDrawer({
                 <div>
                   <label style={labelStyle}>
                     {t("name_label")}
-                    <span style={{ marginLeft: "6px", fontSize: "9px", color: "rgba(26,48,64,0.35)", letterSpacing: "0.1em" }}>— {t("name_optional")}</span>
+                    <span style={{ marginLeft: "6px", fontSize: "9px", color: "rgba(15,30,61,0.35)", letterSpacing: "0.1em" }}>— {t("name_optional")}</span>
                   </label>
                   <input
                     type="text"
@@ -307,8 +307,8 @@ export function ReviewDrawer({
                     onChange={(e) => setName(e.target.value)}
                     placeholder={t("name_placeholder")}
                     style={inputStyle(false)}
-                    onFocus={(e) => (e.target.style.borderColor = "#1A3040")}
-                    onBlur={(e) => (e.target.style.borderColor = "rgba(26,48,64,0.15)")}
+                    onFocus={(e) => (e.target.style.borderColor = "#0F1E3D")}
+                    onBlur={(e) => (e.target.style.borderColor = "rgba(15,30,61,0.15)")}
                   />
                 </div>
 
@@ -326,8 +326,8 @@ export function ReviewDrawer({
                     placeholder={t("comment_placeholder")}
                     rows={4}
                     style={{ ...inputStyle(error === "comment"), resize: "none" }}
-                    onFocus={(e) => (e.target.style.borderColor = "#1A3040")}
-                    onBlur={(e) => (e.target.style.borderColor = error === "comment" ? "#C0392B" : "rgba(26,48,64,0.15)")}
+                    onFocus={(e) => (e.target.style.borderColor = "#0F1E3D")}
+                    onBlur={(e) => (e.target.style.borderColor = error === "comment" ? "#C0392B" : "rgba(15,30,61,0.15)")}
                   />
                   {error === "comment" && <p style={{ fontSize: "11px", color: "#C0392B", marginTop: "6px" }}>{t("error_comment")}</p>}
                 </div>
@@ -339,8 +339,8 @@ export function ReviewDrawer({
                   type="submit"
                   disabled={submitting}
                   style={{
-                    width: "100%", padding: "14px", background: "#1A3040", color: "#F8F3E8", border: "none",
-                    borderRadius: "9999px", fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700,
+                    width: "100%", padding: "14px", background: "#0F1E3D", color: "#F8F3E8", border: "none",
+                    borderRadius: "2px", fontSize: "12px", fontFamily: "var(--font-geist-mono)", fontWeight: 700,
                     letterSpacing: "0.12em", textTransform: "uppercase",
                     cursor: submitting ? "wait" : "pointer", opacity: submitting ? 0.7 : 1,
                   }}
@@ -354,8 +354,8 @@ export function ReviewDrawer({
               type="button"
               onClick={() => setFormWanted(true)}
               style={{
-                width: "100%", padding: "14px", background: "transparent", color: "#1A3040",
-                border: "1.5px solid #1A3040", borderRadius: "9999px", fontSize: "12px",
+                width: "100%", padding: "14px", background: "transparent", color: "#0F1E3D",
+                border: "1.5px solid #0F1E3D", borderRadius: "2px", fontSize: "12px",
                 fontFamily: "var(--font-geist-mono)", fontWeight: 700, letterSpacing: "0.12em",
                 textTransform: "uppercase", cursor: "pointer",
               }}

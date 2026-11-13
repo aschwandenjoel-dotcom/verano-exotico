@@ -36,14 +36,14 @@ export default async function DatenschutzPage({
 
 function PrivacyContent() {
   return (
-    <div style={{ fontFamily: "var(--font-syne), sans-serif", color: "#1A3040", lineHeight: 1.8 }}>
-      <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#D4AF37", fontFamily: "var(--font-geist-mono)", marginBottom: "12px" }}>
+    <div style={{ fontFamily: "var(--font-syne), sans-serif", color: "#0F1E3D", lineHeight: 1.8 }}>
+      <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#A8894F", fontFamily: "var(--font-geist-mono)", marginBottom: "12px" }}>
         Rechtliches
       </p>
-      <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", lineHeight: 1, marginBottom: "16px" }}>
+      <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 500, textTransform: "uppercase", color: "#0F1E3D", lineHeight: 1, marginBottom: "16px" }}>
         Datenschutz&shy;erklärung
       </h1>
-      <p style={{ fontSize: "13px", color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", marginBottom: "48px" }}>
+      <p style={{ fontSize: "13px", color: "rgba(15,30,61,0.5)", fontFamily: "var(--font-geist-mono)", marginBottom: "48px" }}>
         Stand: Oktober 2026
       </p>
 
@@ -54,7 +54,7 @@ function PrivacyContent() {
           <strong>Verano Exotico</strong><br />
           Inhaber: Joel Aschwanden<br />
           Gotthardstrasse 59, 6460 Altdorf, Schweiz<br />
-          E-Mail: <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a><br />
+          E-Mail: <a href="mailto:info@verano-exotico.ch" style={{ color: "#0F1E3D" }}>info@verano-exotico.ch</a><br />
           Telefon: +41 79 389 66 59
         </p>
       </Section>
@@ -93,7 +93,7 @@ function PrivacyContent() {
 
       <Section title="4. Zahlungsabwicklung (Stripe)">
         <p>Die Bezahlung erfolgt über Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland («Stripe»). Beim Bezahlvorgang werden Sie auf die gesicherte Bezahlseite von Stripe weitergeleitet. Dort erfasst Stripe die für die Zahlung erforderlichen Daten (Karten- bzw. TWINT-Daten, Name, E-Mail-Adresse, Rechnungs- und Lieferadresse, Betrag) und verarbeitet sie in eigener Verantwortung zur Zahlungsabwicklung und Betrugsprävention. Stripe übermittelt uns Name, E-Mail-Adresse, Telefonnummer und Lieferadresse, damit wir die Bestellung ausführen können. Kartendaten erhalten wir nicht vollständig, sondern lediglich eine Zahlungsbestätigung, die Zahlungsreferenz und die letzten Ziffern des Zahlungsmittels.</p>
-        <p style={{ marginTop: "12px" }}>Rechtsgrundlage ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO bzw. Art. 31 Abs. 2 lit. a DSG). Stripe kann Daten in die USA übermitteln; dies erfolgt auf Basis der Standardvertragsklauseln der EU-Kommission. Weitere Informationen: <a href="https://stripe.com/ch/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#1A3040" }}>stripe.com/ch/privacy</a>.</p>
+        <p style={{ marginTop: "12px" }}>Rechtsgrundlage ist die Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO bzw. Art. 31 Abs. 2 lit. a DSG). Stripe kann Daten in die USA übermitteln; dies erfolgt auf Basis der Standardvertragsklauseln der EU-Kommission. Weitere Informationen: <a href="https://stripe.com/ch/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#0F1E3D" }}>stripe.com/ch/privacy</a>.</p>
       </Section>
 
       <Section title="5. E-Mail-Versand (Bestellbestätigung)">
@@ -103,7 +103,7 @@ function PrivacyContent() {
 
       <Section title="6. Hosting (Vercel)">
         <p>Diese Website wird bei Vercel Inc., 340 Pine Street, Suite 701, San Francisco, CA 94104, USA, gehostet. Vercel verarbeitet technische Zugriffsdaten als Auftragsverarbeiter gemäss Art. 28 DSGVO. Mit Vercel besteht ein Datenverarbeitungsvertrag. Die Datenübertragung in die USA erfolgt auf Basis der Standardvertragsklauseln (SCCs) der EU-Kommission.</p>
-        <p style={{ marginTop: "12px" }}>Weitere Informationen: <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: "#1A3040" }}>vercel.com/legal/privacy-policy</a></p>
+        <p style={{ marginTop: "12px" }}>Weitere Informationen: <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: "#0F1E3D" }}>vercel.com/legal/privacy-policy</a></p>
       </Section>
 
       <Section title="7. Datenbank (Hostpoint)">
@@ -130,7 +130,7 @@ function PrivacyContent() {
 
       <Section title="10. Analyse & Tracking">
         <p>Zur Reichweitenmessung setzen wir <strong>Vercel Web Analytics</strong> ein (Vercel Inc., siehe Abschnitt 6). Der Dienst arbeitet <strong>ohne Cookies</strong> und ohne geräteübergreifende Kennungen: Erfasst werden Seitenaufrufe, Referrer, Land, Gerätetyp und Browser; die IP-Adresse wird nur zur Bildung eines täglich wechselnden, anonymen Besucher-Hashes verwendet und nicht gespeichert. Eine Identifizierung einzelner Personen ist damit nicht möglich. Rechtsgrundlage ist unser berechtigtes Interesse an der Auswertung und Verbesserung unseres Angebots (Art. 6 Abs. 1 lit. f DSGVO).</p>
-        <p style={{ marginTop: "12px" }}><strong>Google-Tag (Kaufmessung):</strong> Mit Ihrer Zustimmung binden wir den Google-Tag der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, ein. Damit messen wir, ob ein Besuch über unsere kostenlosen Produkteinträge bei Google (Google Shopping) zu einer Bestellung geführt hat. Übermittelt werden Seitenaufrufe, bei einer Bestellung die Bestellnummer, die bestellten Artikel und der Betrag, sowie technische Daten wie IP-Adresse, Browser und Gerät; Google setzt dafür Cookies (z. B. „_gcl_au“, „_ga“). Name, E-Mail- und Lieferadresse übermitteln wir nicht. Personalisierte Werbung und Remarketing nutzen wir nicht. Google kann Daten in die USA übertragen; Google LLC ist unter dem EU-US Data Privacy Framework und dem Swiss-US Data Privacy Framework zertifiziert. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, Art. 31 Abs. 1 DSG). Weitere Informationen: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#1A3040" }}>policies.google.com/privacy</a>.</p>
+        <p style={{ marginTop: "12px" }}><strong>Google-Tag (Kaufmessung):</strong> Mit Ihrer Zustimmung binden wir den Google-Tag der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, ein. Damit messen wir, ob ein Besuch über unsere kostenlosen Produkteinträge bei Google (Google Shopping) zu einer Bestellung geführt hat. Übermittelt werden Seitenaufrufe, bei einer Bestellung die Bestellnummer, die bestellten Artikel und der Betrag, sowie technische Daten wie IP-Adresse, Browser und Gerät; Google setzt dafür Cookies (z. B. „_gcl_au“, „_ga“). Name, E-Mail- und Lieferadresse übermitteln wir nicht. Personalisierte Werbung und Remarketing nutzen wir nicht. Google kann Daten in die USA übertragen; Google LLC ist unter dem EU-US Data Privacy Framework und dem Swiss-US Data Privacy Framework zertifiziert. Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, Art. 31 Abs. 1 DSG). Weitere Informationen: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#0F1E3D" }}>policies.google.com/privacy</a>.</p>
         <p style={{ marginTop: "12px" }}>Beim ersten Besuch fragen wir Sie, ob wir diese Messungen (Vercel Web Analytics und Google-Tag) durchführen dürfen. Ohne Ihre Zustimmung wird keiner der beiden Dienste geladen. Ihre Entscheidung speichern wir lokal in Ihrem Browser (kein Cookie); Sie können sie jederzeit ändern: <ConsentReset label="Auswahl zurücksetzen" />.</p>
         <p style={{ marginTop: "12px" }}>Weitere Werbe-Tracking-Pixel (wie Meta Pixel, TikTok Pixel o. ä.) setzen wir <strong>nicht</strong> ein. Nutzerprofile für personalisierte Werbung werden nicht erstellt.</p>
       </Section>
@@ -145,7 +145,7 @@ function PrivacyContent() {
           <li><strong>Datenübertragbarkeit</strong> (Art. 20 DSGVO): Sie haben das Recht, Ihre Daten in einem maschinenlesbaren Format zu erhalten.</li>
           <li><strong>Widerspruchsrecht</strong> (Art. 21 DSGVO): Sie können der Verarbeitung Ihrer Daten auf Basis berechtigter Interessen widersprechen.</li>
         </ul>
-        <p style={{ marginTop: "12px" }}>Zur Ausübung Ihrer Rechte wenden Sie sich bitte an: <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a></p>
+        <p style={{ marginTop: "12px" }}>Zur Ausübung Ihrer Rechte wenden Sie sich bitte an: <a href="mailto:info@verano-exotico.ch" style={{ color: "#0F1E3D" }}>info@verano-exotico.ch</a></p>
         <p style={{ marginTop: "12px" }}>Sie haben zudem das Recht, sich bei der zuständigen Datenschutzbehörde zu beschweren. In der Schweiz ist dies der <strong>Eidgenössische Datenschutz- und Öffentlichkeitsbeauftragte (EDÖB)</strong>, in der EU die zuständige nationale Aufsichtsbehörde.</p>
       </Section>
 
@@ -158,11 +158,11 @@ function PrivacyContent() {
 
 const h3: React.CSSProperties = {
   fontFamily: "var(--font-archivo-black), sans-serif",
-  fontWeight: 900,
+  fontWeight: 500,
   fontSize: "14px",
   textTransform: "uppercase",
   letterSpacing: "0.08em",
-  color: "#1A3040",
+  color: "#0F1E3D",
   marginTop: "24px",
   marginBottom: "8px",
 };
@@ -175,19 +175,19 @@ const ul: React.CSSProperties = {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: "40px", paddingBottom: "40px", borderBottom: "1px solid rgba(26,48,64,0.1)" }}>
+    <div style={{ marginBottom: "40px", paddingBottom: "40px", borderBottom: "1px solid rgba(15,30,61,0.1)" }}>
       <h2 style={{
         fontFamily: "var(--font-archivo-black), sans-serif",
-        fontWeight: 900,
+        fontWeight: 500,
         fontSize: "clamp(1rem, 2vw, 1.25rem)",
         textTransform: "uppercase",
         letterSpacing: "0.1em",
-        color: "#1A3040",
+        color: "#0F1E3D",
         marginBottom: "16px",
       }}>
         {title}
       </h2>
-      <div style={{ fontSize: "15px", color: "rgba(26,48,64,0.75)", lineHeight: 1.85 }}>
+      <div style={{ fontSize: "15px", color: "rgba(15,30,61,0.75)", lineHeight: 1.85 }}>
         {children}
       </div>
     </div>

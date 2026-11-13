@@ -83,18 +83,18 @@ const labelStyle: React.CSSProperties = {
   fontFamily: "var(--font-geist-mono)",
   letterSpacing: "0.14em",
   textTransform: "uppercase",
-  color: "rgba(26,48,64,0.5)",
+  color: "rgba(15,30,61,0.5)",
   marginBottom: "4px",
 };
 
 const selectStyle: React.CSSProperties = {
   width: "100%",
   background: "#FFFFFF",
-  border: "1px solid rgba(26,48,64,0.15)",
+  border: "1px solid rgba(15,30,61,0.15)",
   borderRadius: "8px",
   padding: "9px 10px",
   fontSize: "13px",
-  color: "#1A3040",
+  color: "#0F1E3D",
   cursor: "pointer",
 };
 
@@ -103,7 +103,7 @@ const rowStyle: React.CSSProperties = {
   justifyContent: "space-between",
   fontSize: "12px",
   fontFamily: "var(--font-geist-mono)",
-  color: "rgba(26,48,64,0.6)",
+  color: "rgba(15,30,61,0.6)",
 };
 
 /**
@@ -222,11 +222,11 @@ export default function ExpressCheckout({ locale, onLeave }: { locale: Locale; o
           <span>{tc("shipping")}</span>
           <span>{formatPrice(shipping, currency)}</span>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderTop: "1px solid rgba(26,48,64,0.12)", paddingTop: "8px", marginTop: "2px" }}>
-          <span style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1A3040" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderTop: "1px solid rgba(15,30,61,0.12)", paddingTop: "8px", marginTop: "2px" }}>
+          <span style={{ fontSize: "11px", fontFamily: "var(--font-geist-mono)", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0F1E3D" }}>
             {tc("total")}
           </span>
-          <span style={{ fontSize: "18px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, color: "#1A3040" }}>
+          <span style={{ fontSize: "18px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, color: "#0F1E3D" }}>
             {formatPrice(total, currency)}
           </span>
         </div>
@@ -237,9 +237,9 @@ export default function ExpressCheckout({ locale, onLeave }: { locale: Locale; o
           type="checkbox"
           checked={newsletter}
           onChange={(e) => setNewsletter(e.target.checked)}
-          style={{ marginTop: "2px", width: "15px", height: "15px", accentColor: "#1A3040", flexShrink: 0 }}
+          style={{ marginTop: "2px", width: "15px", height: "15px", accentColor: "#0F1E3D", flexShrink: 0 }}
         />
-        <span style={{ fontSize: "10px", color: "rgba(26,48,64,0.6)", lineHeight: 1.5 }}>{tc("newsletter_optin")}</span>
+        <span style={{ fontSize: "10px", color: "rgba(15,30,61,0.6)", lineHeight: 1.5 }}>{tc("newsletter_optin")}</span>
       </label>
 
       {error && <p style={{ fontSize: "12px", color: "#C0392B", margin: "0 0 10px" }}>{error}</p>}
@@ -248,12 +248,12 @@ export default function ExpressCheckout({ locale, onLeave }: { locale: Locale; o
         type="button"
         onClick={pay}
         disabled={submitting || items.length === 0}
-        style={{ width: "100%", padding: "15px", background: "#1A3040", color: "#F8F3E8", border: "none", borderRadius: "9999px", fontSize: "12px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", cursor: submitting ? "wait" : "pointer", opacity: submitting ? 0.7 : 1 }}
+        style={{ width: "100%", padding: "15px", background: "#0F1E3D", color: "#F8F3E8", border: "none", borderRadius: "2px", fontSize: "12px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase", cursor: submitting ? "wait" : "pointer", opacity: submitting ? 0.7 : 1 }}
       >
         {submitting ? t("loading") : t("pay_now")}
       </button>
 
-      <p style={{ fontSize: "10px", color: "rgba(26,48,64,0.45)", lineHeight: 1.5, margin: "10px 0 0", textAlign: "center" }}>
+      <p style={{ fontSize: "10px", color: "rgba(15,30,61,0.45)", lineHeight: 1.5, margin: "10px 0 0", textAlign: "center" }}>
         {t("pay_note")}
       </p>
     </div>
@@ -271,12 +271,12 @@ export function ExpressCheckoutPage({ locale, canceled }: { locale: Locale; canc
   if (items.length === 0) {
     return (
       <div style={{ maxWidth: "480px", margin: "80px auto", textAlign: "center" }}>
-        <p style={{ fontSize: "14px", color: "rgba(26,48,64,0.5)", fontFamily: "var(--font-geist-mono)", marginBottom: "24px" }}>
+        <p style={{ fontSize: "14px", color: "rgba(15,30,61,0.5)", fontFamily: "var(--font-geist-mono)", marginBottom: "24px" }}>
           {t("empty")}
         </p>
         <Link
           href={`/${locale}/collection`}
-          style={{ display: "inline-block", background: "#1A3040", color: "#F8F3E8", borderRadius: "9999px", padding: "14px 32px", fontSize: "11px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", textDecoration: "none" }}
+          style={{ display: "inline-block", background: "#0F1E3D", color: "#F8F3E8", borderRadius: "2px", padding: "14px 32px", fontSize: "11px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase", textDecoration: "none" }}
         >
           {t("to_shop")}
         </Link>
@@ -286,17 +286,17 @@ export function ExpressCheckoutPage({ locale, canceled }: { locale: Locale; canc
 
   return (
     <div style={{ maxWidth: "480px", margin: "0 auto" }}>
-      <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.6rem)", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", marginBottom: "24px" }}>
+      <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.6rem)", fontWeight: 500, textTransform: "uppercase", color: "#0F1E3D", marginBottom: "24px" }}>
         {t("title")}
       </h1>
 
       {canceled && (
-        <p style={{ fontSize: "13px", lineHeight: 1.6, color: "#1A3040", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.4)", borderRadius: "12px", padding: "14px 18px", marginBottom: "20px" }}>
+        <p style={{ fontSize: "13px", lineHeight: 1.6, color: "#0F1E3D", background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.4)", borderRadius: "12px", padding: "14px 18px", marginBottom: "20px" }}>
           {t("canceled")}
         </p>
       )}
 
-      <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "24px", border: "1px solid rgba(26,48,64,0.08)" }}>
+      <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "24px", border: "1px solid rgba(15,30,61,0.08)" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
           {items.map((item) => (
             <div key={item.id} style={{ display: "flex", gap: "12px", alignItems: "center" }}>
@@ -304,8 +304,8 @@ export function ExpressCheckoutPage({ locale, canceled }: { locale: Locale; canc
                 {item.image && <Image src={item.image} alt={item.name} fill sizes="52px" style={{ objectFit: "cover" }} />}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: "11px", fontWeight: 700, color: "#1A3040", margin: 0, textTransform: "uppercase", lineHeight: 1.3 }}>{item.name}</p>
-                <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.45)", margin: "2px 0 0" }}>
+                <p style={{ fontSize: "11px", fontWeight: 700, color: "#0F1E3D", margin: 0, textTransform: "uppercase", lineHeight: 1.3 }}>{item.name}</p>
+                <p style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "rgba(15,30,61,0.45)", margin: "2px 0 0" }}>
                   {item.quantity}× {item.size ? `· ${item.size}` : ""} {item.colorName ? `· ${item.colorName}` : ""}
                 </p>
               </div>

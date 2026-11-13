@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Syne, Archivo_Black, DM_Serif_Display } from "next/font/google";
-import { Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, EB_Garamond, Jost } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -11,28 +10,32 @@ import CookieConsent from "@/components/ui/CookieConsent";
 import NewsletterPopup from "@/components/ui/NewsletterPopup";
 import "../globals.css";
 
-const syne = Syne({
+// Old-Money-Typografie (seit 13.11.2026). Die Variablennamen bleiben, damit
+// bestehende Stellen weiter greifen: "archivo-black" = Titel, "dm-serif" =
+// kursive Akzente, "syne" = Fliesstext, "geist-mono" = gesperrte Versal-Labels.
+const syne = EB_Garamond({
   variable: "--font-syne",
   subsets: ["latin"],
   display: "swap",
 });
 
-const archivoBlack = Archivo_Black({
-  weight: "400",
+const archivoBlack = Cormorant_Garamond({
+  weight: ["400", "500", "600"],
   variable: "--font-archivo-black",
   subsets: ["latin"],
   display: "swap",
 });
 
-const dmSerif = DM_Serif_Display({
-  weight: "400",
+const dmSerif = Cormorant_Garamond({
+  weight: ["400", "500"],
   style: ["normal", "italic"],
   variable: "--font-dm-serif",
   subsets: ["latin"],
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = Jost({
+  weight: ["300", "400", "500"],
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",

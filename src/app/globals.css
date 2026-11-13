@@ -1,20 +1,21 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Verano Exotico — Tropical Beach Palette */
-  --color-primary:      #FF6635;   /* coral sunset */
-  --color-teal:         #00B4C5;   /* ocean turquoise */
-  --color-sand:         #E8C97A;   /* golden sand */
-  --color-palm:         #2E7D5E;   /* palm green */
-  --color-bg-light:     #F8F3E8;   /* warm sandy white */
-  --color-bg-dark:      #0A3D52;   /* deep ocean */
-  --color-bg-mid:       #E4F4F7;   /* sea foam */
-  --color-text-dark:    #1A3040;   /* deep navy text */
-  --color-text-muted:   #5E7A8A;   /* sea gray */
-  --color-text-light:   #F8F3E8;   /* sand on dark */
+ /* Verano Exotico — Old Money (seit 13.11.2026): Navy und Creme, Antikgold nur als Akzent */
+ --color-primary: #0F1E3D; /* navy */
+ --color-teal: #A8894F; /* antikgold (früher Türkis) */
+ --color-sand: #D9CBB0; /* camel hell */
+ --color-palm: #3F4F3A; /* oliv */
+ --color-bg-light: #F6F0E4; /* creme */
+ --color-bg-dark: #0F1E3D; /* navy */
+ --color-bg-mid: #EFE8DA; /* leinen */
+ --color-text-dark: #0F1E3D;
+ --color-text-muted: #5F6475;
+ --color-text-light: #F6F0E4;
 
-  --font-sans: var(--font-syne);
-  --font-mono: var(--font-geist-mono);
+ --font-sans: var(--font-syne);
+ --font-serif: var(--font-archivo-black);
+ --font-mono: var(--font-geist-mono);
 }
 
 *,
@@ -35,15 +36,15 @@ html {
 
 body {
   background-color: #F8F3E8;
-  color: #1A3040;
+  color: #0F1E3D;
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: #00B4C5;
-  color: #F8F3E8;
+  background: #0F1E3D;
+  color: #F6F0E4;
 }
 
 .italic-accent {
@@ -133,7 +134,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(circle at center, rgba(0,180,197,0.28) 0%, transparent 70%);
+  background: radial-gradient(circle at center, rgba(168,137,79,0.28) 0%, transparent 70%);
   transform: scale(0);
   opacity: 0;
   pointer-events: none;
@@ -198,7 +199,7 @@ body {
   margin-right: 56px;
   /* Luxuriös und ruhig wie bei Hunza G: keine Box, keine Sprechblase –
      nur eine feine Linie über jeder Stimme */
-  border-top: 1px solid rgba(26, 48, 64, 0.18);
+  border-top: 1px solid rgba(15,30,61, 0.18);
   padding: 26px 0 4px;
 }
 
@@ -225,3 +226,13 @@ body {
 }
 
 .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+
+/* ── Old Money ───────────────────────────────────────────────────
+   Hierarchie über Grösse und Abstand, nicht über Fettdruck: Titel in
+   Cormorant Garamond mittlerer Stärke, gesperrte Versalien für Labels. */
+.font-black, .font-extrabold { font-weight: 500; }
+.font-bold { font-weight: 600; }
+h1, h2, h3 { font-family: var(--font-archivo-black), Georgia, serif; font-weight: 500; letter-spacing: 0.01em; }
+.font-mono { font-family: var(--font-geist-mono), system-ui, sans-serif; letter-spacing: 0.14em; }
+body { font-size: 17px; }

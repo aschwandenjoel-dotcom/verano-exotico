@@ -35,11 +35,11 @@ export default async function ImpressumPage({
 
 function LegalContent() {
   return (
-    <div style={{ fontFamily: "var(--font-syne), sans-serif", color: "#1A3040", lineHeight: 1.8 }}>
-      <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#D4AF37", fontFamily: "var(--font-geist-mono)", marginBottom: "12px" }}>
+    <div style={{ fontFamily: "var(--font-syne), sans-serif", color: "#0F1E3D", lineHeight: 1.8 }}>
+      <p style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#A8894F", fontFamily: "var(--font-geist-mono)", marginBottom: "12px" }}>
         Rechtliches
       </p>
-      <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", lineHeight: 1, marginBottom: "48px" }}>
+      <h1 style={{ fontFamily: "var(--font-archivo-black), sans-serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 500, textTransform: "uppercase", color: "#0F1E3D", lineHeight: 1, marginBottom: "48px" }}>
         Impressum
       </h1>
 
@@ -53,8 +53,8 @@ function LegalContent() {
 
       <Section title="Kontakt">
         <p>
-          E-Mail: <a href="mailto:info@verano-exotico.ch" style={{ color: "#1A3040" }}>info@verano-exotico.ch</a><br />
-          Telefon: <a href="tel:+41793896659" style={{ color: "#1A3040" }}>+41 79 389 66 59</a>
+          E-Mail: <a href="mailto:info@verano-exotico.ch" style={{ color: "#0F1E3D" }}>info@verano-exotico.ch</a><br />
+          Telefon: <a href="tel:+41793896659" style={{ color: "#0F1E3D" }}>+41 79 389 66 59</a>
         </p>
       </Section>
 
@@ -71,9 +71,9 @@ function LegalContent() {
         <p>
           Die Ortsvorschläge an der Kasse (Postleitzahlen und Ortsnamen für die Schweiz,
           Liechtenstein, Österreich und Deutschland) basieren auf Daten von{" "}
-          <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer" style={{ color: "#00B4C5" }}>GeoNames</a>,
+          <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer" style={{ color: "#A8894F" }}>GeoNames</a>,
           lizenziert unter{" "}
-          <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: "#00B4C5" }}>CC BY 4.0</a>.
+          <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: "#A8894F" }}>CC BY 4.0</a>.
           Die Daten sind lokal hinterlegt; bei der Ortssuche werden keine Eingaben an Dritte übermittelt.
         </p>
       </Section>
@@ -99,30 +99,30 @@ function LegalContent() {
 
 const h3: React.CSSProperties = {
   fontFamily: "var(--font-archivo-black), sans-serif",
-  fontWeight: 900,
+  fontWeight: 500,
   fontSize: "14px",
   textTransform: "uppercase",
   letterSpacing: "0.08em",
-  color: "#1A3040",
+  color: "#0F1E3D",
   marginTop: "24px",
   marginBottom: "8px",
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: "40px", paddingBottom: "40px", borderBottom: "1px solid rgba(26,48,64,0.1)" }}>
+    <div style={{ marginBottom: "40px", paddingBottom: "40px", borderBottom: "1px solid rgba(15,30,61,0.1)" }}>
       <h2 style={{
         fontFamily: "var(--font-archivo-black), sans-serif",
-        fontWeight: 900,
+        fontWeight: 500,
         fontSize: "clamp(1rem, 2vw, 1.25rem)",
         textTransform: "uppercase",
         letterSpacing: "0.1em",
-        color: "#1A3040",
+        color: "#0F1E3D",
         marginBottom: "16px",
       }}>
         {title}
       </h2>
-      <div style={{ fontSize: "15px", color: "rgba(26,48,64,0.75)", lineHeight: 1.85 }}>
+      <div style={{ fontSize: "15px", color: "rgba(15,30,61,0.75)", lineHeight: 1.85 }}>
         {children}
       </div>
     </div>

@@ -39,13 +39,13 @@ export default function BrandStory() {
   const t = useTranslations("about");
 
   return (
-    <div style={{ background: "#F8F3E8", color: "#1A3040" }}>
+    <div style={{ background: "#F8F3E8", color: "#0F1E3D" }}>
 
       {/* ── TITEL: über die ganze Breite, zentriert ──────────────────── */}
       <header className="text-center" style={{ padding: "clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem) clamp(3rem, 6vw, 5rem)" }}>
         <p
           className="about-reveal"
-          style={{ color: "#B8922A", fontSize: "10px", letterSpacing: "0.5em", textTransform: "uppercase", fontFamily: "var(--font-geist-mono)", marginBottom: "2rem" }}
+          style={{ color: "#8C7142", fontSize: "10px", letterSpacing: "0.5em", textTransform: "uppercase", fontFamily: "var(--font-geist-mono)", marginBottom: "2rem" }}
         >
           {t("eyebrow")}
         </p>
@@ -53,12 +53,12 @@ export default function BrandStory() {
           className="about-reveal"
           style={{
             fontFamily: "var(--font-archivo-black), sans-serif",
-            fontWeight: 900,
+            fontWeight: 500,
             fontSize: "clamp(2.8rem, 7.5vw, 7.5rem)",
             lineHeight: 0.95,
             letterSpacing: "-0.035em",
             textTransform: "uppercase",
-            color: "#1A3040",
+            color: "#0F1E3D",
           }}
         >
           {t("hero_l1")} {t("hero_l2")}
@@ -68,7 +68,7 @@ export default function BrandStory() {
               fontFamily: "var(--font-dm-serif)",
               fontStyle: "italic",
               fontWeight: 400,
-              color: "#D4AF37",
+              color: "#A8894F",
               textTransform: "none",
               letterSpacing: "-0.02em",
               marginTop: "0.08em",
@@ -77,7 +77,7 @@ export default function BrandStory() {
             {t("hero_accent")}
           </span>
         </h1>
-        <div className="about-reveal" style={{ width: "56px", height: "1px", background: "#D4AF37", margin: "clamp(2rem, 4vw, 3rem) auto 0" }} />
+        <div className="about-reveal" style={{ width: "56px", height: "1px", background: "#A8894F", margin: "clamp(2rem, 4vw, 3rem) auto 0" }} />
       </header>
 
       {/* ── EINSTIEG + VISION: Text links, Bild rechts (bleibt beim Scrollen stehen) ── */}
@@ -85,7 +85,7 @@ export default function BrandStory() {
         <div style={{ padding: "clamp(3rem, 6vw, 6rem) clamp(1.5rem, 5vw, 5rem)" }}>
           <p
             className="about-reveal"
-            style={{ color: "rgba(26,48,64,0.7)", fontSize: "0.95rem", fontFamily: "var(--font-syne)", maxWidth: "460px", lineHeight: 1.85 }}
+            style={{ color: "rgba(15,30,61,0.7)", fontSize: "0.95rem", fontFamily: "var(--font-syne)", maxWidth: "460px", lineHeight: 1.85 }}
           >
             {t("hero_body")}
           </p>
@@ -94,7 +94,7 @@ export default function BrandStory() {
           <p
             className="about-reveal"
             style={{
-              color: "#00B4C5",
+              color: "#A8894F",
               fontSize: "10px",
               letterSpacing: "0.4em",
               textTransform: "uppercase",
@@ -108,28 +108,28 @@ export default function BrandStory() {
             className="about-reveal"
             style={{
               fontFamily: "var(--font-archivo-black), sans-serif",
-              fontWeight: 900,
+              fontWeight: 500,
               fontSize: "clamp(1.8rem, 3.6vw, 3.2rem)",
               lineHeight: 1.05,
               textTransform: "uppercase",
-              color: "#1A3040",
+              color: "#0F1E3D",
               marginBottom: "1.75rem",
             }}
           >
             {t("vision_title")}<br />
-            <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#00B4C5", textTransform: "none" }}>
+            <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#A8894F", textTransform: "none" }}>
               {t("vision_accent")}
             </span>
           </h2>
           <div
             className="about-reveal"
-            style={{ fontFamily: "var(--font-syne)", fontSize: "0.95rem", lineHeight: 1.9, color: "rgba(26,48,64,0.7)", maxWidth: "480px" }}
+            style={{ fontFamily: "var(--font-syne)", fontSize: "0.95rem", lineHeight: 1.9, color: "rgba(15,30,61,0.7)", maxWidth: "480px" }}
           >
             <p style={{ marginBottom: "1.25rem" }}>{t("vision_p1")}</p>
             <p style={{ marginBottom: "1.25rem" }}>{t("vision_p2")}</p>
             <p>
               {t("vision_p3_pre")}
-              <em style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "#1A3040" }}>{t("vision_p3_em")}</em>
+              <em style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "#0F1E3D" }}>{t("vision_p3_em")}</em>
               {t("vision_p3_post")}
             </p>
           </div>
@@ -149,15 +149,15 @@ export default function BrandStory() {
           padding: "clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem)",
           position: "relative",
           overflow: "hidden",
-          borderTop: "1px solid rgba(26,48,64,0.08)",
-          borderBottom: "1px solid rgba(26,48,64,0.08)",
+          borderTop: "1px solid rgba(15,30,61,0.08)",
+          borderBottom: "1px solid rgba(15,30,61,0.08)",
         }}
       >
         <div style={{ maxWidth: "760px", margin: "0 auto", textAlign: "center", position: "relative" }}>
           <p
             className="about-reveal"
             style={{
-              color: "#00B4C5",
+              color: "#A8894F",
               fontSize: "10px",
               letterSpacing: "0.45em",
               textTransform: "uppercase",
@@ -172,11 +172,11 @@ export default function BrandStory() {
             className="about-reveal"
             style={{
               fontFamily: "var(--font-archivo-black), sans-serif",
-              fontWeight: 900,
+              fontWeight: 500,
               fontSize: "clamp(1.8rem, 4.5vw, 4rem)",
               lineHeight: 1.05,
               textTransform: "uppercase",
-              color: "#1A3040",
+              color: "#0F1E3D",
               marginBottom: "clamp(1.5rem, 3vw, 2.5rem)",
               transitionDelay: "0.1s",
             }}
@@ -187,7 +187,7 @@ export default function BrandStory() {
                 fontFamily: "var(--font-dm-serif)",
                 fontStyle: "italic",
                 fontWeight: 400,
-                color: "#00B4C5",
+                color: "#A8894F",
                 textTransform: "none",
               }}
             >
@@ -200,7 +200,7 @@ export default function BrandStory() {
             style={{
               width: "40px",
               height: "2px",
-              background: "#D4AF37",
+              background: "#A8894F",
               margin: "0 auto clamp(1.5rem, 3vw, 2.5rem)",
               transitionDelay: "0.15s",
             }}
@@ -212,7 +212,7 @@ export default function BrandStory() {
               fontFamily: "var(--font-syne)",
               fontSize: "clamp(0.875rem, 1.2vw, 1rem)",
               lineHeight: 1.9,
-              color: "rgba(26,48,64,0.65)",
+              color: "rgba(15,30,61,0.65)",
               transitionDelay: "0.2s",
             }}
           >
@@ -225,7 +225,7 @@ export default function BrandStory() {
                 style={{
                   fontFamily: "var(--font-dm-serif)",
                   fontStyle: "italic",
-                  color: "#D4AF37",
+                  color: "#A8894F",
                 }}
               >
                 {t("promise_p2_em")}
@@ -251,18 +251,18 @@ export default function BrandStory() {
           <div className="text-center" style={{ marginBottom: "clamp(3.5rem, 6vw, 6rem)" }}>
             <p
               className="about-reveal"
-              style={{ color: "rgba(26,48,64,0.5)", fontSize: "10px", letterSpacing: "0.45em", textTransform: "uppercase", fontFamily: "var(--font-geist-mono)", marginBottom: "1.5rem" }}
+              style={{ color: "rgba(15,30,61,0.5)", fontSize: "10px", letterSpacing: "0.45em", textTransform: "uppercase", fontFamily: "var(--font-geist-mono)", marginBottom: "1.5rem" }}
             >
               {t("quality_eyebrow")}
             </p>
             <h2
               className="about-reveal"
-              style={{ fontFamily: "var(--font-dm-serif)", fontWeight: 400, fontSize: "clamp(2.2rem, 4.6vw, 4rem)", lineHeight: 1.1, color: "#1A3040" }}
+              style={{ fontFamily: "var(--font-dm-serif)", fontWeight: 400, fontSize: "clamp(2.2rem, 4.6vw, 4rem)", lineHeight: 1.1, color: "#0F1E3D" }}
             >
               {t("quality_title")}{" "}
-              <em style={{ fontStyle: "italic", color: "#B8922A" }}>{t("quality_accent")}</em>
+              <em style={{ fontStyle: "italic", color: "#8C7142" }}>{t("quality_accent")}</em>
             </h2>
-            <div className="about-reveal" style={{ width: "40px", height: "1px", background: "#D4AF37", margin: "2rem auto 0" }} />
+            <div className="about-reveal" style={{ width: "40px", height: "1px", background: "#A8894F", margin: "2rem auto 0" }} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3">
@@ -276,19 +276,19 @@ export default function BrandStory() {
                 className="about-reveal text-center"
                 style={{
                   padding: "clamp(1.5rem, 3vw, 2.5rem) clamp(1.25rem, 3vw, 2.75rem)",
-                  borderLeft: i > 0 ? "1px solid rgba(26,48,64,0.12)" : "none",
+                  borderLeft: i > 0 ? "1px solid rgba(15,30,61,0.12)" : "none",
                   transitionDelay: `${i * 0.12}s`,
                 }}
               >
-                <p style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontSize: "1.6rem", color: "#B8922A", marginBottom: "1.25rem" }}>
+                <p style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontSize: "1.6rem", color: "#8C7142", marginBottom: "1.25rem" }}>
                   {item.n}.
                 </p>
                 <h3
-                  style={{ fontFamily: "var(--font-geist-mono)", fontSize: "11px", letterSpacing: "0.28em", textTransform: "uppercase", color: "#1A3040", marginBottom: "1.25rem" }}
+                  style={{ fontFamily: "var(--font-geist-mono)", fontSize: "11px", letterSpacing: "0.28em", textTransform: "uppercase", color: "#0F1E3D", marginBottom: "1.25rem" }}
                 >
                   {item.title}
                 </h3>
-                <p style={{ fontFamily: "var(--font-syne)", fontSize: "0.9rem", lineHeight: 1.9, color: "rgba(26,48,64,0.65)", maxWidth: "300px", margin: "0 auto" }}>
+                <p style={{ fontFamily: "var(--font-syne)", fontSize: "0.9rem", lineHeight: 1.9, color: "rgba(15,30,61,0.65)", maxWidth: "300px", margin: "0 auto" }}>
                   {item.body}
                 </p>
               </div>
@@ -325,11 +325,11 @@ export default function BrandStory() {
             className="about-reveal"
             style={{
               fontFamily: "var(--font-archivo-black), sans-serif",
-              fontWeight: 900,
+              fontWeight: 500,
               fontSize: "clamp(1.8rem, 5vw, 4.5rem)",
               lineHeight: 1.1,
               textTransform: "uppercase",
-              color: "#1A3040",
+              color: "#0F1E3D",
               marginBottom: "clamp(1.5rem, 3vw, 2.5rem)",
             }}
           >
@@ -341,7 +341,7 @@ export default function BrandStory() {
                 fontFamily: "var(--font-dm-serif)",
                 fontStyle: "italic",
                 fontWeight: 400,
-                color: "#D4AF37",
+                color: "#A8894F",
                 textTransform: "none",
               }}
             >
@@ -371,11 +371,11 @@ export default function BrandStory() {
               gap: "12px",
               fontFamily: "var(--font-archivo-black), sans-serif",
               fontSize: "11px",
-              fontWeight: 900,
+              fontWeight: 500,
               letterSpacing: "0.25em",
               textTransform: "uppercase",
-              background: "#D4AF37",
-              color: "#1A3040",
+              background: "#A8894F",
+              color: "#0F1E3D",
               padding: "16px 32px",
               textDecoration: "none",
               transitionDelay: "0.2s",

@@ -18,10 +18,10 @@ export default function LanguageSwitcher({ locale }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-1 text-sm font-mono" style={{ color: "#D4AF37" }}>
+    <div className="flex items-center gap-1 text-sm font-mono" style={{ color: "#A8894F" }}>
       {(["de", "en"] as Locale[]).map((loc, i) => (
         <span key={loc} className="flex items-center gap-1">
-          {i > 0 && <span style={{ color: "#D4AF37", opacity: 0.4 }}>/</span>}
+          {i > 0 && <span style={{ color: "#A8894F", opacity: 0.4 }}>/</span>}
           <Link
             href={getLocaleHref(loc)}
             className={

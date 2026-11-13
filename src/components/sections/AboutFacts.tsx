@@ -33,22 +33,22 @@ export default function AboutFacts({ locale, productCount }: { locale: Locale; p
   return (
     <section style={{ background: "#FFFFFF", padding: "clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem)" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-        <p className="text-center" style={{ fontFamily: "var(--font-geist-mono)", fontSize: "10px", letterSpacing: "0.35em", textTransform: "uppercase", color: "#B8922A", marginBottom: "1rem" }}>
+        <p className="text-center" style={{ fontFamily: "var(--font-geist-mono)", fontSize: "10px", letterSpacing: "0.35em", textTransform: "uppercase", color: "#8C7142", marginBottom: "1rem" }}>
           {en ? "About us" : "Über uns"}
         </p>
         <h1
           className="text-center"
-          style={{ fontFamily: "var(--font-dm-serif)", fontWeight: 400, fontSize: "clamp(2.2rem, 4.4vw, 3.4rem)", lineHeight: 1.1, color: "#1A3040", marginBottom: "clamp(2.5rem, 5vw, 4rem)" }}
+          style={{ fontFamily: "var(--font-dm-serif)", fontWeight: 400, fontSize: "clamp(2.2rem, 4.4vw, 3.4rem)", lineHeight: 1.1, color: "#0F1E3D", marginBottom: "clamp(2.5rem, 5vw, 4rem)" }}
         >
           {en ? "At a glance" : "Auf einen Blick"}
         </h1>
-        <dl className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3" style={{ borderTop: "1px solid rgba(26,48,64,0.12)" }}>
+        <dl className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3" style={{ borderTop: "1px solid rgba(15,30,61,0.12)" }}>
           {facts.map(([label, value]) => (
-            <div key={label} style={{ padding: "1.75rem 0.5rem", borderBottom: "1px solid rgba(26,48,64,0.12)" }}>
-              <dt style={{ fontFamily: "var(--font-geist-mono)", fontSize: "10px", letterSpacing: "0.28em", textTransform: "uppercase", color: "#B8922A", marginBottom: "0.6rem" }}>
+            <div key={label} style={{ padding: "1.75rem 0.5rem", borderBottom: "1px solid rgba(15,30,61,0.12)" }}>
+              <dt style={{ fontFamily: "var(--font-geist-mono)", fontSize: "10px", letterSpacing: "0.28em", textTransform: "uppercase", color: "#8C7142", marginBottom: "0.6rem" }}>
                 {label}
               </dt>
-              <dd style={{ fontFamily: "var(--font-dm-serif)", fontSize: "1.15rem", lineHeight: 1.45, color: "#1A3040", margin: 0 }}>
+              <dd style={{ fontFamily: "var(--font-dm-serif)", fontSize: "1.15rem", lineHeight: 1.45, color: "#0F1E3D", margin: 0 }}>
                 {value}
               </dd>
             </div>
@@ -59,7 +59,7 @@ export default function AboutFacts({ locale, productCount }: { locale: Locale; p
             <Link
               key={href}
               href={`/${locale}${href}`}
-              style={{ fontFamily: "var(--font-geist-mono)", fontSize: "11px", letterSpacing: "0.22em", textTransform: "uppercase", color: "#1A3040", textDecoration: "underline", textUnderlineOffset: "6px", textDecorationColor: "rgba(26,48,64,0.3)" }}
+              style={{ fontFamily: "var(--font-geist-mono)", fontSize: "11px", letterSpacing: "0.22em", textTransform: "uppercase", color: "#0F1E3D", textDecoration: "underline", textUnderlineOffset: "6px", textDecorationColor: "rgba(15,30,61,0.3)" }}
             >
               {label}
             </Link>

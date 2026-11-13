@@ -130,12 +130,12 @@ function footer(locale: EmailLocale) {
   const t = T[locale];
   return `
     <div style="background:#F8F3E8;padding:20px 40px;text-align:center;">
-      <p style="font-family:sans-serif;font-size:10px;color:rgba(26,48,64,0.45);margin:0 0 4px;letter-spacing:0.1em;">
+      <p style="font-family:sans-serif;font-size:10px;color:rgba(15,30,61,0.45);margin:0 0 4px;letter-spacing:0.1em;">
         © ${new Date().getFullYear()} Verano Exotico · ${t.footerTagline}
       </p>
-      <p style="font-family:sans-serif;font-size:10px;color:rgba(26,48,64,0.35);margin:0;line-height:1.6;">
+      <p style="font-family:sans-serif;font-size:10px;color:rgba(15,30,61,0.35);margin:0;line-height:1.6;">
         Verano Exotico · Joel Aschwanden · Gotthardstrasse 59 · 6460 Altdorf · Schweiz<br>
-        <a href="mailto:info@verano-exotico.ch" style="color:rgba(26,48,64,0.45);">info@verano-exotico.ch</a> · +41 79 389 66 59
+        <a href="mailto:info@verano-exotico.ch" style="color:rgba(15,30,61,0.45);">info@verano-exotico.ch</a> · +41 79 389 66 59
       </p>
     </div>`;
 }
@@ -237,8 +237,8 @@ export async function sendOrderConfirmation({
 
   // Bereits bezahlt: keine Kontoangaben, kein QR-Code — nur die Bestätigung.
   const paidBox = `
-      <div style="background:#1A3040;border-radius:12px;padding:24px;margin-top:28px;">
-        <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#D4AF37;margin:0 0 10px;">${t.paidBoxTitle}</p>
+      <div style="background:#0F1E3D;border-radius:12px;padding:24px;margin-top:28px;">
+        <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#A8894F;margin:0 0 10px;">${t.paidBoxTitle}</p>
         <p style="font-family:sans-serif;font-size:13px;color:#F8F3E8;line-height:1.8;margin:0;">
           ${t.amountLabel}: <strong>${isForeignCurrency ? `${currency} ${paymentAmount!.toFixed(2)}` : `CHF ${total.toFixed(2)}`}</strong><br>
           ${t.refLabel}: <strong style="font-family:monospace;">${reference}</strong>
@@ -249,8 +249,8 @@ export async function sendOrderConfirmation({
       </div>`;
 
   const paymentBox = `
-      <div style="background:#1A3040;border-radius:12px;padding:24px;margin-top:28px;">
-        <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#D4AF37;margin:0 0 4px;">${t.payTitle}</p>
+      <div style="background:#0F1E3D;border-radius:12px;padding:24px;margin-top:28px;">
+        <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#A8894F;margin:0 0 4px;">${t.payTitle}</p>
         <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(248,243,232,0.5);margin:0 0 14px;">${t.optionA}</p>
         <p style="font-family:sans-serif;font-size:13px;color:#F8F3E8;line-height:2;margin:0;">
           ${t.amountLabel}: <strong>${isForeignCurrency ? `${currency} ${paymentAmount!.toFixed(2)}` : `CHF ${total.toFixed(2)}`}</strong><br>
@@ -284,15 +284,15 @@ export async function sendOrderConfirmation({
     .map(
       (item) => `
       <tr>
-        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;">
+        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#0F1E3D;">
           <strong>${item.product_name}</strong>
           ${item.size ? `<br><span style="color:#9E9E9E;font-size:11px;">${t.size}: ${item.size}</span>` : ""}
           ${item.color_name ? `<br><span style="color:#9E9E9E;font-size:11px;">${t.color}: ${item.color_name}</span>` : ""}
         </td>
-        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;text-align:center;">
+        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#0F1E3D;text-align:center;">
           ${item.quantity}×
         </td>
-        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">
+        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#0F1E3D;text-align:right;">
           CHF ${(item.price * item.quantity).toFixed(2)}
         </td>
       </tr>`
@@ -303,7 +303,7 @@ export async function sendOrderConfirmation({
     ? `
       <div style="background:#F8F3E8;border-radius:12px;padding:16px 20px;margin-top:24px;">
         <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px;">${t.addressLabel}</p>
-        <p style="font-family:sans-serif;font-size:13px;color:#1A3040;line-height:1.6;margin:0;">
+        <p style="font-family:sans-serif;font-size:13px;color:#0F1E3D;line-height:1.6;margin:0;">
           ${customerName || ""}<br>
           ${shippingAddress.line1}${shippingAddress.line2 ? `<br>${shippingAddress.line2}` : ""}<br>
           ${shippingAddress.postal_code ?? ""} ${shippingAddress.city ?? ""}<br>
@@ -317,11 +317,11 @@ export async function sendOrderConfirmation({
 <html>
 <head>${EMAIL_HEAD}</head>
 <body style="margin:0;padding:0;background:#F8F3E8;">
-  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
+  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,30,61,0.08);">
 
     <!-- Header -->
-    <div style="background:#1A3040;padding:32px 40px;text-align:center;">
-      <p style="color:#D4AF37;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
+    <div style="background:#0F1E3D;padding:32px 40px;text-align:center;">
+      <p style="color:#A8894F;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
       <h1 style="color:#F8F3E8;font-family:sans-serif;font-size:22px;font-weight:900;text-transform:uppercase;margin:0;letter-spacing:0.05em;">
         ${paid ? t.paidTitle : t.orderReceivedTitle}
       </h1>
@@ -329,10 +329,10 @@ export async function sendOrderConfirmation({
 
     <!-- Body -->
     <div style="padding:32px 40px;">
-      <p style="font-family:sans-serif;font-size:15px;color:#1A3040;margin:0 0 8px;">
+      <p style="font-family:sans-serif;font-size:15px;color:#0F1E3D;margin:0 0 8px;">
         ${t.greeting(customerName || "")}
       </p>
-      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.6);line-height:1.6;margin:0 0 28px;">
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(15,30,61,0.6);line-height:1.6;margin:0 0 28px;">
         ${paid ? t.paidIntro : t.intro}
       </p>
 
@@ -348,27 +348,27 @@ export async function sendOrderConfirmation({
       <!-- Summen -->
       <table style="width:100%;border-collapse:collapse;margin-top:16px;">
         <tr>
-          <td style="font-family:sans-serif;font-size:13px;color:rgba(26,48,64,0.6);padding:4px 0;">${t.subtotal}</td>
-          <td style="font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">CHF ${goodsTotal.toFixed(2)}</td>
+          <td style="font-family:sans-serif;font-size:13px;color:rgba(15,30,61,0.6);padding:4px 0;">${t.subtotal}</td>
+          <td style="font-family:sans-serif;font-size:13px;color:#0F1E3D;text-align:right;">CHF ${goodsTotal.toFixed(2)}</td>
         </tr>
         <tr>
-          <td style="font-family:sans-serif;font-size:13px;color:rgba(26,48,64,0.6);padding:4px 0;">${t.shipping}</td>
-          <td style="font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">CHF ${shippingCost.toFixed(2)}</td>
+          <td style="font-family:sans-serif;font-size:13px;color:rgba(15,30,61,0.6);padding:4px 0;">${t.shipping}</td>
+          <td style="font-family:sans-serif;font-size:13px;color:#0F1E3D;text-align:right;">CHF ${shippingCost.toFixed(2)}</td>
         </tr>${discount > 0 ? `
         <tr>
-          <td style="font-family:sans-serif;font-size:13px;color:rgba(26,48,64,0.6);padding:4px 0;">${t.discount}</td>
-          <td style="font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">− CHF ${discount.toFixed(2)}</td>
+          <td style="font-family:sans-serif;font-size:13px;color:rgba(15,30,61,0.6);padding:4px 0;">${t.discount}</td>
+          <td style="font-family:sans-serif;font-size:13px;color:#0F1E3D;text-align:right;">− CHF ${discount.toFixed(2)}</td>
         </tr>` : ""}
         <tr>
-          <td style="font-family:sans-serif;font-size:13px;font-weight:700;color:#1A3040;text-transform:uppercase;letter-spacing:0.1em;padding:12px 0 0;border-top:2px solid #1A3040;">${t.total}</td>
-          <td style="font-family:sans-serif;font-size:18px;font-weight:900;color:#1A3040;text-align:right;padding:12px 0 0;border-top:2px solid #1A3040;">CHF ${total.toFixed(2)}</td>
+          <td style="font-family:sans-serif;font-size:13px;font-weight:700;color:#0F1E3D;text-transform:uppercase;letter-spacing:0.1em;padding:12px 0 0;border-top:2px solid #0F1E3D;">${t.total}</td>
+          <td style="font-family:sans-serif;font-size:18px;font-weight:900;color:#0F1E3D;text-align:right;padding:12px 0 0;border-top:2px solid #0F1E3D;">CHF ${total.toFixed(2)}</td>
         </tr>
       </table>
 
       ${paid ? paidBox : paymentBox}
       ${addressBlock}
 
-      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);margin-top:28px;line-height:1.6;">
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(15,30,61,0.45);margin-top:28px;line-height:1.6;">
         ${paid ? t.paidDeliveryNote : t.deliveryNote}<br>
         ${t.shippingMailNote}
       </p>
@@ -432,11 +432,11 @@ export async function sendAdminNewOrderNotification({
     .map(
       (item) => `
       <tr>
-        <td style="padding:8px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;">
+        <td style="padding:8px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#0F1E3D;">
           ${item.product_name}${item.size ? ` · ${item.size}` : ""}${item.color_name ? ` · ${item.color_name}` : ""}
         </td>
-        <td style="padding:8px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;text-align:center;">${item.quantity}×</td>
-        <td style="padding:8px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">CHF ${(item.price * item.quantity).toFixed(2)}</td>
+        <td style="padding:8px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#0F1E3D;text-align:center;">${item.quantity}×</td>
+        <td style="padding:8px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#0F1E3D;text-align:right;">CHF ${(item.price * item.quantity).toFixed(2)}</td>
       </tr>`
     )
     .join("");
@@ -450,21 +450,21 @@ export async function sendAdminNewOrderNotification({
 <html>
 <head>${EMAIL_HEAD}</head>
 <body style="margin:0;padding:0;background:#F8F3E8;">
-  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
-    <div style="background:#1A3040;padding:24px 40px;text-align:center;">
-      <p style="color:#D4AF37;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 6px;">Verano Exotico · Admin</p>
+  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,30,61,0.08);">
+    <div style="background:#0F1E3D;padding:24px 40px;text-align:center;">
+      <p style="color:#A8894F;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 6px;">Verano Exotico · Admin</p>
       <h1 style="color:#F8F3E8;font-family:sans-serif;font-size:20px;font-weight:900;text-transform:uppercase;margin:0;letter-spacing:0.05em;">Neue Bestellung #${orderNumber}</h1>
     </div>
     <div style="padding:28px 40px;">
-      <p style="font-family:sans-serif;font-size:13px;color:#1A3040;line-height:1.8;margin:0 0 20px;">
+      <p style="font-family:sans-serif;font-size:13px;color:#0F1E3D;line-height:1.8;margin:0 0 20px;">
         <strong>${customerName || "—"}</strong> · ${customerEmail}<br>
         Betrag: <strong>${amountLabel}</strong> ${isForeignCurrency ? `(entspricht CHF ${total.toFixed(2)})` : ""}<br>
         Referenz: <strong>VE-${orderNumber}</strong>
       </p>
       <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">${itemRows}</table>
       <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:#9E9E9E;margin:0 0 6px;">Lieferadresse</p>
-      <p style="font-family:sans-serif;font-size:13px;color:#1A3040;line-height:1.6;margin:0 0 20px;">${addressBlock}</p>
-      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.5);margin:0;">
+      <p style="font-family:sans-serif;font-size:13px;color:#0F1E3D;line-height:1.6;margin:0 0 20px;">${addressBlock}</p>
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(15,30,61,0.5);margin:0;">
         ${paid
           ? 'Zahlung ist über Stripe bestätigt — der CJ-Auftrag wurde automatisch ausgelöst. Im <strong>/admin</strong> prüfen, ob das Fulfillment durchgelaufen ist.'
           : 'Zahlungseingang im Bankkonto prüfen und Bestellung im <strong>/admin</strong> auf „Bezahlt“ setzen, sobald das Geld da ist.'}
@@ -505,25 +505,25 @@ export async function sendShippingNotification({
 <html>
 <head>${EMAIL_HEAD}</head>
 <body style="margin:0;padding:0;background:#F8F3E8;">
-  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
-    <div style="background:#1A3040;padding:32px 40px;text-align:center;">
-      <p style="color:#D4AF37;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
+  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,30,61,0.08);">
+    <div style="background:#0F1E3D;padding:32px 40px;text-align:center;">
+      <p style="color:#A8894F;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
       <h1 style="color:#F8F3E8;font-family:sans-serif;font-size:22px;font-weight:900;text-transform:uppercase;margin:0;letter-spacing:0.05em;">
         ${t.shippedTitle}
       </h1>
     </div>
     <div style="padding:32px 40px;">
-      <p style="font-family:sans-serif;font-size:15px;color:#1A3040;margin:0 0 8px;">${t.greeting(customerName || "")}</p>
-      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.6);line-height:1.6;margin:0 0 28px;">
+      <p style="font-family:sans-serif;font-size:15px;color:#0F1E3D;margin:0 0 8px;">${t.greeting(customerName || "")}</p>
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(15,30,61,0.6);line-height:1.6;margin:0 0 28px;">
         ${t.shippedIntro(orderNumber)}
       </p>
       <div style="background:#F8F3E8;border-radius:12px;padding:20px;text-align:center;margin-bottom:24px;">
         <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#9E9E9E;margin:0 0 8px;">
           ${t.trackingLabel}${trackingProvider ? ` · ${trackingProvider}` : ""}
         </p>
-        <p style="font-family:monospace;font-size:18px;font-weight:700;color:#1A3040;margin:0;letter-spacing:0.05em;">${trackingNumber}</p>
+        <p style="font-family:monospace;font-size:18px;font-weight:700;color:#0F1E3D;margin:0;letter-spacing:0.05em;">${trackingNumber}</p>
       </div>
-      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);margin:0;line-height:1.6;">
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(15,30,61,0.45);margin:0;line-height:1.6;">
         ${t.trackingHint}
       </p>
     </div>
@@ -586,12 +586,12 @@ export async function sendReviewRequest({
       const variant = [item.size, item.color_name].filter(Boolean).join(" · ");
       return `
       <tr>
-        <td style="padding:14px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;">
+        <td style="padding:14px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#0F1E3D;">
           <strong>${item.product_name}</strong>
           ${variant ? `<br><span style="color:#9E9E9E;font-size:11px;">${variant}</span>` : ""}
         </td>
         <td style="padding:14px 0;border-bottom:1px solid #F0EDE8;text-align:right;white-space:nowrap;">
-          <a href="${url}" style="font-family:sans-serif;font-size:12px;font-weight:700;color:#1A3040;text-decoration:none;border-bottom:2px solid #D4AF37;padding-bottom:2px;">
+          <a href="${url}" style="font-family:sans-serif;font-size:12px;font-weight:700;color:#0F1E3D;text-decoration:none;border-bottom:2px solid #A8894F;padding-bottom:2px;">
             ${t.reviewCta}
           </a>
         </td>
@@ -604,16 +604,16 @@ export async function sendReviewRequest({
 <html>
 <head>${EMAIL_HEAD}</head>
 <body style="margin:0;padding:0;background:#F8F3E8;">
-  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
-    <div style="background:#1A3040;padding:32px 40px;text-align:center;">
-      <p style="color:#D4AF37;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
+  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,30,61,0.08);">
+    <div style="background:#0F1E3D;padding:32px 40px;text-align:center;">
+      <p style="color:#A8894F;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
       <h1 style="color:#F8F3E8;font-family:sans-serif;font-size:22px;font-weight:900;text-transform:uppercase;margin:0;letter-spacing:0.05em;">
         ${t.reviewTitle}
       </h1>
     </div>
     <div style="padding:32px 40px;">
-      <p style="font-family:sans-serif;font-size:15px;color:#1A3040;margin:0 0 8px;">${t.greeting(customerName || "")}</p>
-      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.6);line-height:1.6;margin:0 0 28px;">
+      <p style="font-family:sans-serif;font-size:15px;color:#0F1E3D;margin:0 0 8px;">${t.greeting(customerName || "")}</p>
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(15,30,61,0.6);line-height:1.6;margin:0 0 28px;">
         ${t.reviewIntro(orderNumber)}
       </p>
 
@@ -621,7 +621,7 @@ export async function sendReviewRequest({
         ${itemRows}
       </table>
 
-      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);margin:24px 0 0;line-height:1.7;">
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(15,30,61,0.45);margin:24px 0 0;line-height:1.7;">
         ${t.reviewVerifiedNote}<br>
         ${t.reviewProblemNote}
       </p>
@@ -720,9 +720,9 @@ function marketingFooter(locale: EmailLocale, token: string) {
   const m = M[locale];
   return `
     <div style="background:#F8F3E8;padding:0 40px 20px;text-align:center;">
-      <p style="font-family:sans-serif;font-size:10px;color:rgba(26,48,64,0.45);margin:0;line-height:1.6;">
+      <p style="font-family:sans-serif;font-size:10px;color:rgba(15,30,61,0.45);margin:0;line-height:1.6;">
         ${m.unsubscribeNote}
-        <a href="${unsubscribePageUrl(token, locale)}" style="color:rgba(26,48,64,0.6);">${m.unsubscribe}</a>
+        <a href="${unsubscribePageUrl(token, locale)}" style="color:rgba(15,30,61,0.6);">${m.unsubscribe}</a>
       </p>
     </div>`;
 }
@@ -733,9 +733,9 @@ function shell(locale: EmailLocale, title: string, body: string, extraFooter = "
 <html>
 <head>${EMAIL_HEAD}</head>
 <body style="margin:0;padding:0;background:#F8F3E8;">
-  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(26,48,64,0.08);">
-    <div style="background:#1A3040;padding:32px 40px;text-align:center;">
-      <p style="color:#D4AF37;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
+  <div style="max-width:560px;margin:40px auto;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,30,61,0.08);">
+    <div style="background:#0F1E3D;padding:32px 40px;text-align:center;">
+      <p style="color:#A8894F;font-family:sans-serif;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 8px;">Verano Exotico</p>
       <h1 style="color:#F8F3E8;font-family:sans-serif;font-size:22px;font-weight:900;text-transform:uppercase;margin:0;letter-spacing:0.05em;">
         ${title}
       </h1>
@@ -753,7 +753,7 @@ function shell(locale: EmailLocale, title: string, body: string, extraFooter = "
 function button(href: string, label: string) {
   return `
       <div style="text-align:center;margin:28px 0;">
-        <a href="${href}" style="display:inline-block;background:#1A3040;color:#F8F3E8;font-family:sans-serif;font-size:12px;font-weight:900;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;padding:16px 32px;border-radius:9999px;">
+        <a href="${href}" style="display:inline-block;background:#0F1E3D;color:#F8F3E8;font-family:sans-serif;font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;padding:16px 32px;border-radius:2px;">
           ${label}
         </a>
       </div>`;
@@ -775,9 +775,9 @@ export async function sendNewsletterConfirmation({
     locale,
     m.confirmTitle,
     `
-      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.7);line-height:1.6;margin:0;">${m.confirmIntro}</p>
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(15,30,61,0.7);line-height:1.6;margin:0;">${m.confirmIntro}</p>
       ${button(confirmUrl, m.confirmCta)}
-      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);line-height:1.6;margin:0;">${m.confirmIgnore}</p>`
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(15,30,61,0.45);line-height:1.6;margin:0;">${m.confirmIgnore}</p>`
   );
 
   const { error } = await resend.emails.send({ from: FROM, to, replyTo: REPLY_TO, subject: m.subjectConfirm, html });
@@ -803,8 +803,8 @@ export async function sendNewsletterWelcome({
   const m = M[locale];
   const codeBox = code
     ? `
-      <div style="background:#1A3040;border-radius:12px;padding:24px;margin-top:24px;text-align:center;">
-        <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#D4AF37;margin:0 0 12px;">${m.welcomeCodeLabel(percent)}</p>
+      <div style="background:#0F1E3D;border-radius:12px;padding:24px;margin-top:24px;text-align:center;">
+        <p style="font-family:sans-serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#A8894F;margin:0 0 12px;">${m.welcomeCodeLabel(percent)}</p>
         <p style="font-family:monospace;font-size:24px;font-weight:700;color:#F8F3E8;margin:0;letter-spacing:0.1em;">${code}</p>
         <p style="font-family:sans-serif;font-size:11px;color:rgba(248,243,232,0.6);line-height:1.6;margin:14px 0 0;">${m.welcomeCodeHint(validDays)}</p>
       </div>`
@@ -814,7 +814,7 @@ export async function sendNewsletterWelcome({
     locale,
     m.welcomeTitle,
     `
-      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.7);line-height:1.6;margin:0;">${m.welcomeIntro}</p>
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(15,30,61,0.7);line-height:1.6;margin:0;">${m.welcomeIntro}</p>
       ${codeBox}
       ${button(`${siteUrl()}/${locale}/collection`, m.welcomeCta)}`,
     marketingFooter(locale, token)
@@ -858,11 +858,11 @@ export async function sendCartRecovery({
       const variant = [item.size, item.color_name].filter(Boolean).join(" · ");
       return `
       <tr>
-        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;">
+        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#0F1E3D;">
           <strong>${item.product_name}</strong>
           ${variant ? `<br><span style="color:#9E9E9E;font-size:11px;">${variant}</span>` : ""}
         </td>
-        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#1A3040;text-align:right;">
+        <td style="padding:12px 0;border-bottom:1px solid #F0EDE8;font-family:sans-serif;font-size:13px;color:#0F1E3D;text-align:right;">
           ${item.quantity}×
         </td>
       </tr>`;
@@ -873,11 +873,11 @@ export async function sendCartRecovery({
     locale,
     m.recoveryTitle,
     `
-      <p style="font-family:sans-serif;font-size:15px;color:#1A3040;margin:0 0 8px;">${t.greeting(customerName || "")}</p>
-      <p style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.7);line-height:1.6;margin:0 0 20px;">${m.recoveryIntro}</p>
+      <p style="font-family:sans-serif;font-size:15px;color:#0F1E3D;margin:0 0 8px;">${t.greeting(customerName || "")}</p>
+      <p style="font-family:sans-serif;font-size:14px;color:rgba(15,30,61,0.7);line-height:1.6;margin:0 0 20px;">${m.recoveryIntro}</p>
       <table style="width:100%;border-collapse:collapse;">${itemRows}</table>
       ${button(recoveryUrl, m.recoveryCta)}
-      <p style="font-family:sans-serif;font-size:12px;color:rgba(26,48,64,0.45);line-height:1.6;margin:0;">${m.recoveryNote}</p>`,
+      <p style="font-family:sans-serif;font-size:12px;color:rgba(15,30,61,0.45);line-height:1.6;margin:0;">${m.recoveryNote}</p>`,
     marketingFooter(locale, token)
   );
 
@@ -920,7 +920,7 @@ export function renderNewsletter(content: NewsletterContent, locale: EmailLocale
     : "";
   const body = `
       ${preheader}
-      <div style="font-family:sans-serif;font-size:14px;color:rgba(26,48,64,0.8);line-height:1.7;">
+      <div style="font-family:sans-serif;font-size:14px;color:rgba(15,30,61,0.8);line-height:1.7;">
         ${content.html}
       </div>
       ${content.buttonLabel && content.buttonUrl ? button(content.buttonUrl, content.buttonLabel) : ""}`;

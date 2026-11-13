@@ -45,7 +45,7 @@ export default function PanoramaIntro() {
         position: "relative",
         width: "100%",
         overflow: "hidden",
-        background: "#0A3D52",
+        background: "#0F1E3D",
       }}
       aria-label="Strand-Panorama"
     >
@@ -140,11 +140,11 @@ export default function PanoramaIntro() {
         <div style={{
           fontSize: "clamp(2.8rem, 7vw, 6.5rem)",
           fontFamily: "var(--font-archivo-black), sans-serif",
-          fontWeight: 900,
+          fontWeight: 500,
           lineHeight: 1,
           textTransform: "uppercase",
           letterSpacing: "0.08em",
-          color: "#D4AF37",
+          color: "#A8894F",
           textShadow: "0 2px 32px rgba(0,0,0,0.7)",
         }}>
           VERANO
@@ -154,7 +154,7 @@ export default function PanoramaIntro() {
         <div style={{
           width: "clamp(32px, 4vw, 64px)",
           height: 1,
-          background: "linear-gradient(to right, transparent, #D4AF37, transparent)",
+          background: "linear-gradient(to right, transparent, #A8894F, transparent)",
           margin: "12px auto",
           opacity: 0.6,
         }} />
@@ -167,7 +167,7 @@ export default function PanoramaIntro() {
           fontWeight: 400,
           lineHeight: 1,
           letterSpacing: "0.04em",
-          color: "#D4AF37",
+          color: "#A8894F",
           textShadow: "0 2px 32px rgba(0,0,0,0.7)",
         }}>
           Exotico

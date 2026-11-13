@@ -104,7 +104,7 @@ export default async function OrderConfirmationPage({
             borderRadius: "24px",
             padding: "48px 40px",
             textAlign: "center",
-            boxShadow: "0 8px 40px rgba(26,48,64,0.08)",
+            boxShadow: "0 8px 40px rgba(15,30,61,0.08)",
           }}
         >
           <ClearCartOnSuccess />
@@ -123,23 +123,23 @@ export default async function OrderConfirmationPage({
               margin: "0 auto 24px",
             }}
           >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2E7D5E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3F4F3A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6L9 17l-5-5" />
             </svg>
           </div>
 
-          <p style={{ ...mono, fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#2E7D5E", marginBottom: "12px" }}>
+          <p style={{ ...mono, fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#3F4F3A", marginBottom: "12px" }}>
             {t("received_label")}
           </p>
-          <h1 style={{ fontSize: "24px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 900, textTransform: "uppercase", color: "#1A3040", marginBottom: "12px", lineHeight: 1.2 }}>
+          <h1 style={{ fontSize: "24px", fontFamily: "var(--font-archivo-black),sans-serif", fontWeight: 500, textTransform: "uppercase", color: "#0F1E3D", marginBottom: "12px", lineHeight: 1.2 }}>
             {t("title")}
           </h1>
           {order && (
-            <p style={{ ...mono, fontSize: "12px", color: "rgba(26,48,64,0.45)", marginBottom: "24px" }}>
+            <p style={{ ...mono, fontSize: "12px", color: "rgba(15,30,61,0.45)", marginBottom: "24px" }}>
               {t("order_no")} #{order.order_number}
             </p>
           )}
-          <p style={{ fontSize: "14px", color: "rgba(26,48,64,0.55)", lineHeight: 1.7, marginBottom: "28px", fontFamily: "var(--font-syne)" }}>
+          <p style={{ fontSize: "14px", color: "rgba(15,30,61,0.55)", lineHeight: 1.7, marginBottom: "28px", fontFamily: "var(--font-syne)" }}>
             {prepay ? t("body") : paymentConfirmed ? t("body_paid") : t("body_processing")}
           </p>
 
@@ -153,23 +153,23 @@ export default async function OrderConfirmationPage({
               textAlign: "left",
               marginBottom: "28px",
             }}>
-              <p style={{ ...mono, fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: paymentConfirmed ? "#2E7D5E" : "#8A6D1F", marginBottom: "10px" }}>
+              <p style={{ ...mono, fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: paymentConfirmed ? "#3F4F3A" : "#8A6D1F", marginBottom: "10px" }}>
                 {paymentConfirmed ? t("paid_label") : t("processing_label")}
               </p>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px", color: "#1A3040" }}>
-                <span style={{ color: "rgba(26,48,64,0.55)" }}>{t("amount")}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px", color: "#0F1E3D" }}>
+                <span style={{ color: "rgba(15,30,61,0.55)" }}>{t("amount")}</span>
                 <strong>
                   {order.payment_currency && order.payment_currency !== "CHF" && order.payment_amount
                     ? `${order.payment_currency} ${Number(order.payment_amount).toFixed(2)}`
                     : `CHF ${Number(order.subtotal).toFixed(2)}`}
                 </strong>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px", color: "#1A3040", marginTop: "8px" }}>
-                <span style={{ color: "rgba(26,48,64,0.55)" }}>{t("reference")}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", fontSize: "13px", color: "#0F1E3D", marginTop: "8px" }}>
+                <span style={{ color: "rgba(15,30,61,0.55)" }}>{t("reference")}</span>
                 <strong style={mono}>VE-{order.order_number}</strong>
               </div>
               {!paymentConfirmed && (
-                <p style={{ fontSize: "11px", color: "rgba(26,48,64,0.55)", lineHeight: 1.6, margin: "12px 0 0" }}>
+                <p style={{ fontSize: "11px", color: "rgba(15,30,61,0.55)", lineHeight: 1.6, margin: "12px 0 0" }}>
                   {t("processing_note")}
                 </p>
               )}
@@ -178,8 +178,8 @@ export default async function OrderConfirmationPage({
 
           {/* Vorkasse: Zahlungsanweisungen */}
           {prepay && order && (
-            <div style={{ background: "#1A3040", borderRadius: "16px", padding: "24px", textAlign: "left", marginBottom: "28px" }}>
-              <p style={{ ...mono, fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#D4AF37", marginBottom: "4px" }}>
+            <div style={{ background: "#0F1E3D", borderRadius: "16px", padding: "24px", textAlign: "left", marginBottom: "28px" }}>
+              <p style={{ ...mono, fontSize: "10px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#A8894F", marginBottom: "4px" }}>
                 {t("payment_title")}
               </p>
               <p style={{ ...mono, fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(248,243,232,0.5)", marginBottom: "14px" }}>
@@ -241,7 +241,7 @@ export default async function OrderConfirmationPage({
             </div>
           )}
 
-          <p style={{ fontSize: "12px", color: "rgba(26,48,64,0.5)", lineHeight: 1.7, marginBottom: "32px" }}>
+          <p style={{ fontSize: "12px", color: "rgba(15,30,61,0.5)", lineHeight: 1.7, marginBottom: "32px" }}>
             {prepay ? t("pending_note") : t("paid_delivery_note")}<br />
             {t("email_sent")}
           </p>
@@ -254,13 +254,13 @@ export default async function OrderConfirmationPage({
               display: "inline-flex",
               alignItems: "center",
               gap: "8px",
-              background: "#1A3040",
+              background: "#0F1E3D",
               color: "#F8F3E8",
-              borderRadius: "9999px",
+              borderRadius: "2px",
               padding: "14px 32px",
               fontSize: "11px",
               fontFamily: "var(--font-archivo-black),sans-serif",
-              fontWeight: 900,
+              fontWeight: 500,
               letterSpacing: "0.15em",
               textTransform: "uppercase",
               textDecoration: "none",
