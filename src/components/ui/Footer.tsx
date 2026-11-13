@@ -5,25 +5,26 @@ import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { CATEGORIES } from "@/lib/categories";
 import { WELCOME_DISCOUNT_PERCENT } from "@/lib/newsletterOffer";
-const BLACK = "#000000";
 import NewsletterInput from "./NewsletterInput";
 
 const INSTAGRAM_URL = "https://www.instagram.com/veranoexotico/";
 
-const CREAM = "#F8F3E8";
+const SAND = "#EDE6DA";
+const INK = "#1A3040";
+const INK_SOFT = "rgba(26,48,64,0.7)";
 
 const headingStyle: React.CSSProperties = {
   fontSize: "11px",
   fontFamily: "var(--font-geist-mono)",
   letterSpacing: "0.18em",
   textTransform: "uppercase",
-  color: CREAM,
+  color: INK,
   marginBottom: "18px",
 };
 
 const linkStyle: React.CSSProperties = {
   fontSize: "13px",
-  color: "rgba(248,243,232,0.65)",
+  color: INK_SOFT,
   textDecoration: "none",
   transition: "color 0.15s",
   lineHeight: 1.4,
@@ -32,7 +33,7 @@ const linkStyle: React.CSSProperties = {
 /**
  * Footer im Stil von Hunza G: Marke mit Social-Icon und Leitsatz, daneben
  * Linkspalten mit Überschrift, darunter "Bleib in Verbindung" mit Newsletter,
- * ganz unten eine schlichte Copyright-Zeile. Auf Dunkelblau wie der Header.
+ * ganz unten eine schlichte Copyright-Zeile. Auf Sand (#EDE6DA) mit dunkelblauer Schrift, ruhiger Resort-Look.
  */
 export default function Footer() {
   const t = useTranslations("footer");
@@ -73,7 +74,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer style={{ background: BLACK, color: CREAM }}>
+    <footer style={{ background: SAND, color: INK, borderTop: "1px solid rgba(26,48,64,0.12)" }}>
       <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "64px clamp(1.5rem, 5vw, 2.5rem) 32px" }}>
 
         {/* Marke + Linkspalten */}
@@ -83,7 +84,7 @@ export default function Footer() {
               <span className="font-black tracking-[0.2em] uppercase" style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}>
                 Verano
               </span>{" "}
-              <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "#D4AF37", fontSize: "1.15em" }}>
+              <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "#A8842A", fontSize: "1.15em" }}>
                 Exótico
               </span>
             </p>
@@ -93,7 +94,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               aria-label="Instagram"
               className="inline-flex items-center justify-center mt-6"
-              style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(248,243,232,0.3)", color: CREAM }}
+              style={{ width: 40, height: 40, borderRadius: "50%", border: "1px solid rgba(26,48,64,0.3)", color: INK }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <rect x="2" y="2" width="20" height="20" rx="5" />
@@ -101,7 +102,7 @@ export default function Footer() {
                 <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
               </svg>
             </a>
-            <p className="mt-6 max-w-[260px]" style={{ fontSize: "13px", lineHeight: 1.6, color: "rgba(248,243,232,0.65)" }}>
+            <p className="mt-6 max-w-[260px]" style={{ fontSize: "13px", lineHeight: 1.6, color: INK_SOFT }}>
               {t("tagline")}
             </p>
           </div>
@@ -115,8 +116,8 @@ export default function Footer() {
                     <a
                       href={link.href}
                       style={linkStyle}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = CREAM)}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(248,243,232,0.65)")}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = INK)}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = INK_SOFT)}
                     >
                       {link.label}
                     </a>
@@ -128,11 +129,11 @@ export default function Footer() {
         </div>
 
         {/* Handy: Gruppen als Klappzeilen */}
-        <div className="md:hidden mt-10" style={{ borderTop: "1px solid rgba(248,243,232,0.15)" }}>
+        <div className="md:hidden mt-10" style={{ borderTop: "1px solid rgba(26,48,64,0.15)" }}>
           {columns.map((col) => {
             const open = openCol === col.title;
             return (
-              <div key={col.title} style={{ borderBottom: "1px solid rgba(248,243,232,0.15)" }}>
+              <div key={col.title} style={{ borderBottom: "1px solid rgba(26,48,64,0.15)" }}>
                 <button
                   type="button"
                   onClick={() => setOpenCol(open ? null : col.title)}
@@ -159,24 +160,24 @@ export default function Footer() {
         {/* Bleib in Verbindung */}
         <div
           className="mt-14 pt-10 grid gap-6 md:grid-cols-2 md:items-end"
-          style={{ borderTop: "1px solid rgba(248,243,232,0.15)" }}
+          style={{ borderTop: "1px solid rgba(26,48,64,0.15)" }}
         >
           <div>
             <p style={{ ...headingStyle, marginBottom: "10px" }}>{t("newsletter_title")}</p>
-            <p className="max-w-md" style={{ fontSize: "13px", lineHeight: 1.6, color: "rgba(248,243,232,0.65)" }}>
+            <p className="max-w-md" style={{ fontSize: "13px", lineHeight: 1.6, color: INK_SOFT }}>
               {t("newsletter_text")}
               {WELCOME_DISCOUNT_PERCENT > 0 && <> {tn("offer", { percent: WELCOME_DISCOUNT_PERCENT })}</>}
             </p>
           </div>
           <div className="md:justify-self-end w-full md:max-w-md">
-            <NewsletterInput />
+            <NewsletterInput variant="light" />
           </div>
         </div>
 
         {/* Copyright */}
         <div
           className="mt-12 pt-6 flex flex-wrap items-center justify-between gap-3"
-          style={{ borderTop: "1px solid rgba(248,243,232,0.15)", fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(248,243,232,0.45)" }}
+          style={{ borderTop: "1px solid rgba(26,48,64,0.15)", fontSize: "11px", fontFamily: "var(--font-geist-mono)", color: "rgba(26,48,64,0.55)" }}
         >
           <p>© {new Date().getFullYear()} – Verano Exotico</p>
           <p>{t("payment_note")}</p>
