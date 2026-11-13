@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { CATEGORIES } from "@/lib/categories";
 import { WELCOME_DISCOUNT_PERCENT } from "@/lib/newsletterOffer";
-import { DARK_BLUE } from "@/lib/theme";
+const BLACK = "#000000";
 import NewsletterInput from "./NewsletterInput";
 
 const INSTAGRAM_URL = "https://www.instagram.com/veranoexotico/";
@@ -73,7 +73,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer style={{ background: DARK_BLUE, color: CREAM }}>
+    <footer style={{ background: BLACK, color: CREAM }}>
       <div style={{ maxWidth: "1360px", margin: "0 auto", padding: "64px clamp(1.5rem, 5vw, 2.5rem) 32px" }}>
 
         {/* Marke + Linkspalten */}
