@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { Locale, Product } from "@/types";
-import { isAiImage } from "@/lib/productImages";
-import AiBadge from "./AiBadge";
 
 interface Props {
   product: Product;
@@ -104,7 +102,7 @@ export default function ProductGallery({ product, locale, activeColor }: Props) 
                 style={{ objectFit: "cover" }}
                 priority={i === 0}
               />
-              {isAiImage(src) && <AiBadge />}
+              
             </button>
           );
         })}

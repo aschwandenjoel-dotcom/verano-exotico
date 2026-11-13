@@ -22,7 +22,7 @@ export default async function AgbPage({
   const { locale } = await params;
 
   return (
-    <LegalPage locale={locale as Locale} eyebrow="Rechtliches" title="AGB" stand="Stand: September 2026">
+    <LegalPage locale={locale as Locale} eyebrow="Rechtliches" title="AGB" stand="Stand: November 2026">
       <Section title="1. Geltungsbereich">
         <p>
           Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Bestellungen über den
@@ -39,6 +39,13 @@ export default async function AgbPage({
           Mit dem Abschluss des Bestellvorgangs geben Sie ein verbindliches Angebot zum
           Kauf der Waren im Warenkorb ab. Der Kaufvertrag kommt mit dem Versand der
           Bestellbestätigung per E-Mail zustande.
+        </p>
+        <p style={{ marginTop: "12px" }}>
+          <strong>Produktbilder:</strong> Die Model- und Produktbilder im Shop sind mit
+          Hilfe von künstlicher Intelligenz (KI) erstellt. Sie zeigen Schnitt, Farbe und
+          Muster des jeweiligen Artikels; die abgebildeten Personen existieren nicht.
+          Farben können je nach Bildschirm leicht abweichen. Massgebend sind die
+          Angaben in der Produktbeschreibung und in der Grössentabelle.
         </p>
       </Section>
 

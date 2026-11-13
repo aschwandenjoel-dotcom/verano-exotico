@@ -26,23 +26,21 @@ export default function AiBadge({ inset = 10, variant = "overlay" }: { inset?: n
       </p>
     );
   }
+  // Am Handy kleiner und näher am Rand, damit der Hinweis weniger Bild verdeckt
   return (
     <span
+      className="right-[6px] bottom-[6px] md:right-[var(--ai-inset)] md:bottom-[var(--ai-inset)] px-[4px] py-[1px] md:px-[7px] md:py-[3px] text-[6px] md:text-[8.5px] tracking-[0.12em] md:tracking-[0.18em]"
       style={{
+        ["--ai-inset" as string]: `${inset}px`,
         position: "absolute",
-        right: inset,
-        bottom: inset,
         zIndex: 3,
         pointerEvents: "none",
-        padding: "3px 7px",
         borderRadius: "2px",
         background: "rgba(10,25,35,0.32)",
         backdropFilter: "blur(6px)",
         WebkitBackdropFilter: "blur(6px)",
         color: "rgba(248,243,232,0.9)",
         fontFamily: "var(--font-geist-mono)",
-        fontSize: "8.5px",
-        letterSpacing: "0.18em",
         textTransform: "uppercase",
         lineHeight: 1.4,
         whiteSpace: "nowrap",

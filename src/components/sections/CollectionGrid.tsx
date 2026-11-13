@@ -5,8 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import type { Locale, Product } from "@/types";
-import { cardImages, isAiImage } from "@/lib/productImages";
-import AiBadge from "@/components/ui/AiBadge";
+import { cardImages } from "@/lib/productImages";
 import { DARK_BLUE } from "@/lib/theme";
 
 /** Höhe des fixen Headers – darunter klebt die Filterleiste. */
@@ -189,7 +188,7 @@ export function ProductTile({
           </div>
         )}
         {/* KI-Kennzeichnung unter dem Bild statt darin */}
-        {isAiImage(title) && <AiBadge variant="inline" />}
+        
       </div>
     </Link>
   );
