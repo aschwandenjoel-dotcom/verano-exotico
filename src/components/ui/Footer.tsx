@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useState } from "react";
+import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { CATEGORIES } from "@/lib/categories";
 import { WELCOME_DISCOUNT_PERCENT } from "@/lib/newsletterOffer";
@@ -80,14 +81,8 @@ export default function Footer() {
         {/* Marke + Linkspalten */}
         <div className="grid grid-cols-2 md:grid-cols-[1.4fr_repeat(4,1fr)] gap-x-8 gap-y-10">
           <div className="col-span-2 md:col-span-1">
-            <p className="text-[18px] whitespace-nowrap" style={{ lineHeight: 1 }}>
-              <span className="font-black tracking-[0.2em] uppercase" style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}>
-                Verano
-              </span>{" "}
-              <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "#A8842A", fontSize: "1.15em" }}>
-                Exótico
-              </span>
-            </p>
+            {/* Volles Logo: VE-Monogramm mit Schriftzug */}
+            <Image src="/images/logo/full-navy.png" alt="Verano Exótico" width={1200} height={723} style={{ width: 190, height: "auto" }} />
             <a
               href={INSTAGRAM_URL}
               target="_blank"

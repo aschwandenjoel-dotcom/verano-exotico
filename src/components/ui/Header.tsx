@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
@@ -146,27 +147,12 @@ export default function Header({ locale, transparentAtTop = false }: Props) {
 
       <Link
         href={`/${locale}`}
-        className="text-[15px] md:text-[18px] whitespace-nowrap row-start-1 col-start-2 justify-self-center md:col-start-1 md:justify-self-start"
-        style={{ color: CREAM, textDecoration: "none", lineHeight: 1 }}
+        className="row-start-1 col-start-2 justify-self-center md:col-start-1 md:justify-self-start"
+        style={{ display: "block", lineHeight: 0 }}
         aria-label="Verano Exótico — Startseite"
       >
-        <span
-          className="font-black tracking-[0.2em] uppercase"
-          style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}
-        >
-          Verano
-        </span>{" "}
-        <span
-          style={{
-            fontFamily: "var(--font-dm-serif)",
-            fontStyle: "italic",
-            color: "#D4AF37",
-            letterSpacing: "0.02em",
-            fontSize: "1.15em",
-          }}
-        >
-          Exótico
-        </span>
+        {/* Logo-Kurzform: nur das VE-Monogramm, creme auf dem dunklen/transparenten Header */}
+        <Image src="/images/logo/ve-cream.png" alt="Verano Exótico" width={480} height={412} priority className="h-[38px] md:h-[44px] w-auto" />
       </Link>
 
       <nav className="hidden md:flex items-center gap-8 row-start-1 col-start-2" aria-label="Hauptnavigation">
@@ -298,10 +284,7 @@ function MobileMenu({ locale, pathname, onClose }: { locale: Locale; pathname: s
           >
             ×
           </button>
-          <span className="text-[15px] whitespace-nowrap" style={{ color: "#1A3040", lineHeight: 1 }}>
-            <span className="font-black tracking-[0.2em] uppercase" style={{ fontFamily: "var(--font-archivo-black), sans-serif" }}>Verano</span>{" "}
-            <span style={{ fontFamily: "var(--font-dm-serif)", fontStyle: "italic", color: "#B8922A", fontSize: "1.15em" }}>Exótico</span>
-          </span>
+          <Image src="/images/logo/ve-navy.png" alt="Verano Exótico" width={480} height={412} style={{ height: 34, width: "auto" }} />
           <span style={{ width: 30 }} />
         </div>
 
