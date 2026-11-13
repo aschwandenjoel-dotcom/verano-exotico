@@ -240,7 +240,6 @@ export default function BrandStory() {
         {["/images/about/stoff-detail.jpg", "/images/about/flatlay.jpg"].map((src) => (
           <div key={src} style={{ position: "relative", aspectRatio: "4/5" }}>
             <Image src={src} alt="" fill sizes="50vw" style={{ objectFit: "cover" }} />
-            <AiBadge inset={14} />
           </div>
         ))}
       </div>

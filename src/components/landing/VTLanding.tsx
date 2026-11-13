@@ -110,16 +110,18 @@ export default function VTLanding({ locale, bestsellers, bikinis, swimsuits }: P
           aria-hidden="true"
           style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(5,25,35,0.35) 0%, rgba(5,25,35,0) 22%, rgba(5,25,35,0) 58%, rgba(5,25,35,0.5) 100%)" }}
         />
+        {/* Handy: dunkler Verlauf unten, damit die Schrift auf der blauen Wand lesbar bleibt */}
+        <div aria-hidden="true" className="md:hidden" style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(10,18,40,0.78) 0%, rgba(10,18,40,0.45) 28%, rgba(10,18,40,0) 50%)" }} />
         {/* dezent unten links, damit das Model in der Mitte frei bleibt */}
-        <div className="absolute left-6 md:left-10 bottom-10 md:bottom-14" style={{ color: "#F8F3E8", maxWidth: "520px" }}>
-          <p className="text-[10px] tracking-[0.35em] uppercase mb-3" style={{ color: "#A8894F", fontFamily: "var(--font-geist-mono)" }}>
+        <div className="absolute left-6 md:left-10 bottom-10 md:bottom-14" style={{ color: "#F8F3E8", maxWidth: "520px", textShadow: "0 1px 14px rgba(10,18,40,0.45)" }}>
+          <p className="text-[10px] tracking-[0.35em] uppercase mb-3" style={{ color: "#E3CC98", fontFamily: "var(--font-geist-mono)" }}>
             {t("season", { year })}
           </p>
           <p style={{ fontFamily: "var(--font-archivo-black), sans-serif", lineHeight: 1.0, margin: 0 }}>
             <span style={{ display: "block", fontSize: "clamp(1.8rem, 4vw, 3.4rem)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "-0.01em" }}>
               Golden Days,
             </span>
-            <span style={{ display: "block", fontSize: "clamp(1.8rem, 4vw, 3.4rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#A8894F" }}>
+            <span style={{ display: "block", fontSize: "clamp(1.8rem, 4vw, 3.4rem)", fontFamily: "var(--font-dm-serif)", fontStyle: "italic", fontWeight: 400, color: "#E3CC98" }}>
               Timeless Wear.
             </span>
           </p>
